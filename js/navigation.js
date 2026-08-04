@@ -11,11 +11,13 @@ import { renderCreator } from './pages/creator.js';
 import { renderSkills } from './pages/agent.js';
 import { renderAgent } from './pages/agent.js';
 import { renderSettings } from './pages/settings.js';
+import { renderContentProjects } from './pages/content-projects.js';
 
 export const PAGES = {
   dashboard: { tpl: 'tpl-dashboard', init: renderDashboard },
   hotlist:   { tpl: 'tpl-hotlist',   init: () => renderHotlist() },
   inspiration: { tpl: 'tpl-inspiration', init: renderInspiration },
+  projects:  { tpl: 'tpl-projects',    init: renderContentProjects },
   search:    { tpl: 'tpl-search',    init: renderSearch },
   detail:    { tpl: 'tpl-detail' },
   tracker:   { tpl: 'tpl-tracker',   init: renderTracker },
@@ -54,8 +56,22 @@ export function gotoPage(page, options = {}) {
   const p = page === 'library' ? 'knowledgebase' : page;
   closeMobileSidebar();
   if (p === 'login') {
+    // 首次初始化页与登录页共用同一个容器。初始化完成后退出登录时，
+    // 必须显式切回登录表单，不能沿用初始化期间留下的表单状态。
+    document.getElementById('login-form')?.classList.remove('hidden');
+    document.getElementById('setup-form')?.classList.add('hidden');
+    const title = document.getElementById('auth-mode-title');
+    const note = document.getElementById('auth-mode-note');
+    const error = document.getElementById('auth-error');
+    if (title) title.textContent = '登录';
+    if (note) note.textContent = '使用你创建的本机账户登录';
+    if (error) {
+      error.textContent = '';
+      error.classList.add('hidden');
+    }
     document.getElementById('page-login').classList.add('active');
     document.getElementById('page-app').classList.remove('active');
+    requestAnimationFrame(() => document.getElementById('loginUser')?.focus());
     if (updateHistory) {
       const method = replaceHistory ? 'replaceState' : 'pushState';
       history[method]({ page: p }, '', '#' + p);

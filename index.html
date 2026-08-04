@@ -38,7 +38,7 @@
       <i data-lucide="moon" class="w-4 h-4 icon-moon"></i>
       <i data-lucide="sun" class="w-4 h-4 icon-sun"></i>
     </button>
-    <div class="w-full max-w-md">
+    <div class="w-full max-w-lg">
       <div class="text-center mb-8">
         <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 mb-4 shadow-lg">
           <i data-lucide="flame" class="w-9 h-9 text-white"></i>
@@ -48,8 +48,8 @@
       </div>
       <div class="glass-strong rounded-2xl p-8">
         <h2 class="text-lg font-semibold mb-6 flex items-center gap-2">
-          <i data-lucide="lock" class="w-4 h-4 text-purple-400"></i>
-          登录
+          <i data-lucide="lock" class="w-4 h-4 text-amber-300" id="auth-mode-icon"></i>
+          <span id="auth-mode-title">登录</span>
         </h2>
         <form id="login-form" class="space-y-4" autocomplete="off" onsubmit="return false">
           <div>
@@ -60,13 +60,48 @@
             <label class="text-xs text-gray-400 mb-1.5 block">密码</label>
             <input class="input" type="password" id="loginPass" name="furnace_login_password" autocomplete="new-password" placeholder="请输入密码" value="" />
           </div>
-          <button type="submit" class="btn btn-primary w-full justify-center py-2.5" data-action="enterApp">
+          <button type="submit" class="btn btn-primary w-full justify-center py-2.5" id="login-submit" data-action="enterApp">
             <i data-lucide="log-in" class="w-4 h-4"></i>进入熔炉
           </button>
-          <div class="text-center text-[11px] text-gray-500 mt-2">首次登录后请在「账户与安全」修改密码</div>
         </form>
+        <form id="setup-form" class="hidden space-y-4" autocomplete="off" onsubmit="return false">
+          <div class="rounded-lg border border-amber-400/20 bg-amber-400/[0.05] p-3">
+            <div class="flex items-center gap-2 text-xs font-medium text-amber-200"><i data-lucide="shield-check" class="w-4 h-4"></i>首次使用</div>
+            <p class="text-[11px] text-gray-500 mt-1.5 leading-relaxed">先创建本机管理员。RedFox 与大模型可以稍后配置，不影响手工选题和内容项目。</p>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="text-xs text-gray-400 mb-1.5 block" for="setupDisplayName">显示名称</label>
+              <input class="input" id="setupDisplayName" autocomplete="name" maxlength="50" value="管理员" required />
+            </div>
+            <div>
+              <label class="text-xs text-gray-400 mb-1.5 block" for="setupUsername">登录账号</label>
+              <input class="input" id="setupUsername" autocomplete="username" maxlength="32" value="admin" required />
+            </div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="text-xs text-gray-400 mb-1.5 block" for="setupPassword">登录密码</label>
+              <input class="input" type="password" id="setupPassword" autocomplete="new-password" minlength="8" maxlength="128" placeholder="至少 8 位" required />
+            </div>
+            <div>
+              <label class="text-xs text-gray-400 mb-1.5 block" for="setupConfirmPassword">确认密码</label>
+              <input class="input" type="password" id="setupConfirmPassword" autocomplete="new-password" minlength="8" maxlength="128" placeholder="再次输入密码" required />
+            </div>
+          </div>
+          <div>
+            <label class="text-xs text-gray-400 mb-1.5 block" for="setupWorkspaceRoot">内容工作区 <span class="text-gray-600">选填</span></label>
+            <input class="input font-mono text-xs" id="setupWorkspaceRoot" autocomplete="off" placeholder="/Users/你的名字/Downloads/自媒体" />
+            <p class="text-[11px] text-gray-500 mt-1.5">填写后会先校验目录结构；Markdown 与原脚本保持原位。</p>
+          </div>
+          <button type="submit" class="btn btn-primary w-full justify-center py-2.5" id="setup-submit" data-action="setupApp">
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>创建并进入
+          </button>
+        </form>
+        <div id="auth-error" class="hidden mt-4 rounded-lg border border-red-400/20 bg-red-400/[0.06] px-3 py-2.5 text-xs text-red-300" role="alert" aria-live="assertive"></div>
+        <div id="auth-mode-note" class="text-center text-[11px] text-gray-500 mt-4">使用你创建的本机账户登录</div>
       </div>
-      <p class="text-center text-xs text-gray-600 mt-6" data-app-footer>Powered by RedFoxHub</p>
+      <p class="text-center text-xs text-gray-600 mt-6" data-app-footer>本地优先 · RedFox 数据增强</p>
     </div>
   </div>
 </div>
@@ -112,6 +147,10 @@
         <a class="nav-item flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm" data-page="inspiration" data-action="gotoPage">
           <i data-lucide="lightbulb" class="w-4 h-4"></i><span class="nav-text">灵感</span>
           <span class="ml-auto text-[10px] text-gray-500 nav-badge" id="nav-inspiration-count">0</span>
+        </a>
+        <a class="nav-item flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm" data-page="projects" data-action="gotoPage">
+          <i data-lucide="folder-kanban" class="w-4 h-4"></i><span class="nav-text">内容项目</span>
+          <span class="ml-auto text-[10px] text-gray-500 nav-badge" id="nav-content-project-count">…</span>
         </a>
         <a class="nav-item flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm" data-page="search" data-action="gotoPage">
           <i data-lucide="search" class="w-4 h-4"></i><span class="nav-text">搜索</span>
@@ -175,7 +214,7 @@
           <input class="input search-input pl-10 has-right-btn" id="globalSearch" placeholder="搜抖/红/公 三平台爆款、关键词、作者..." />
           <button class="btn btn-primary absolute right-1 top-1/2 -translate-y-1/2 py-1.5 text-xs" data-action="doGlobalSearch">搜索</button>
         </div>
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2 desktop-only">
           <button class="btn btn-ghost" data-action="refreshCurrent"><i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>刷新</button>
           <button class="btn btn-primary" data-action="gotoPage" data-page="creator"><i data-lucide="plus" class="w-3.5 h-3.5"></i>新建创作</button>
         </div>
@@ -282,6 +321,25 @@
 </template>
 
 <!-- HOTLIST -->
+<template id="tpl-projects">
+<div class="p-4 sm:p-6 space-y-5">
+  <div class="page-header">
+    <div>
+      <div class="page-header-title"><i data-lucide="folder-kanban" class="w-5 h-5 text-cyan-400"></i>内容项目</div>
+      <div class="page-header-sub">直接操作现有工作区：扫描、检查、顺序推进与三平台发布</div>
+    </div>
+    <div class="page-header-actions">
+      <button class="btn btn-ghost" data-action="refreshContentProjects"><i data-lucide="refresh-cw" class="w-4 h-4"></i>刷新</button>
+      <button class="btn btn-primary" data-action="newContentProject"><i data-lucide="plus" class="w-4 h-4"></i>新建项目</button>
+    </div>
+  </div>
+  <div id="content-project-config" aria-live="polite"></div>
+  <div id="content-project-summary" class="grid grid-cols-2 lg:grid-cols-4 gap-3"></div>
+  <div id="content-project-list" aria-live="polite"></div>
+</div>
+</template>
+
+<!-- HOTLIST -->
 <template id="tpl-hotlist">
 <div class="p-6 space-y-5">
   <div class="page-header">
@@ -333,6 +391,7 @@
       <div class="page-header-sub">从热点趋势中筛选、分类并生成可执行选题</div>
     </div>
     <div class="page-header-actions">
+      <button class="btn btn-primary" data-action="openManualInspirationModal"><i data-lucide="plus" class="w-4 h-4"></i>新增选题</button>
       <button class="btn btn-ghost" data-action="gotoPage" data-page="settings"><i data-lucide="settings" class="w-4 h-4"></i>自动选题设置</button>
     </div>
   </div>
@@ -589,6 +648,13 @@
       <div class="page-header-sub">素材 → 多平台输出，违禁词检测与 AI 封面是顶部附加工具</div>
     </div>
   </div>
+  <div id="creator-capability-status" class="rounded-xl border border-white/10 bg-white/[0.025] p-3" role="status" aria-live="polite">
+    <div class="flex flex-wrap items-center gap-2">
+      <span class="pill pill-green"><i data-lucide="check" class="w-3 h-3"></i>本地编辑可用</span>
+      <span class="pill pill-gray"><i data-lucide="loader" class="w-3 h-3 animate-spin"></i>正在检查创作能力</span>
+    </div>
+    <div class="text-[11px] text-gray-500 mt-2">手工编辑、复制和本地内容流程不依赖外部服务。</div>
+  </div>
   <div id="creator-source" class="hidden mb-3 p-3 rounded-lg border border-purple-500/30 bg-purple-500/10 text-xs">
     <div class="flex items-start gap-2">
       <i data-lucide="link" class="w-3.5 h-3.5 text-purple-300 flex-shrink-0 mt-0.5"></i>
@@ -608,7 +674,7 @@
         <option value="小红书">小红书</option>
         <option value="公众号" selected>公众号</option>
       </select>
-      <button class="btn btn-ghost py-0.5 text-xs" data-action="doCheckWord">检测</button>
+      <button class="btn btn-ghost py-0.5 text-xs" id="checkWordBtn" data-action="doCheckWord" disabled>检测</button>
     </div>
     <div class="h-4 w-px bg-white/10"></div>
     <div class="flex items-center gap-1.5">
@@ -618,7 +684,7 @@
         <option value="1024x1536">竖图 2:3</option>
         <option value="1536x1024">横图 3:2</option>
       </select>
-      <button class="btn btn-ghost py-0.5 text-xs" data-action="generateCover">生成</button>
+      <button class="btn btn-ghost py-0.5 text-xs" id="generateCoverBtn" data-action="generateCover" disabled>生成</button>
     </div>
     <div class="h-4 w-px bg-white/10"></div>
     <div class="flex items-center gap-1.5">
@@ -654,7 +720,7 @@
       <div class="panel-forged p-5 flex flex-col">
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-sm font-semibold flex items-center gap-1.5"><i data-lucide="flame" class="w-4 h-4 text-amber-400"></i>多平台输出</h3>
-          <button class="btn btn-primary py-1.5 px-3 text-xs" data-action="doRewrite" id="doRewriteBtn"><i data-lucide="wand-sparkles" class="w-3.5 h-3.5"></i><span id="doRewriteLabel">开始创作</span></button>
+          <button class="btn btn-primary py-1.5 px-3 text-xs" data-action="doRewrite" id="doRewriteBtn" disabled><i data-lucide="wand-sparkles" class="w-3.5 h-3.5"></i><span id="doRewriteLabel">开始创作</span></button>
         </div>
 
         <select class="hidden" id="rewritePlatform">
@@ -695,7 +761,7 @@
           </select>
           <div class="ml-auto flex items-center gap-1 min-h-[28px]">
             <span id="rewrite-skill-badge" class="pill pill-gray !text-[10px] !py-0.5 !px-1.5 hidden"></span>
-            <button class="btn btn-ghost py-1 px-2 text-xs" id="hotspotAnalyzeBtn" data-action="analyzeRewriteHotspots"><i data-lucide="trending-up" class="w-3.5 h-3.5"></i>分析热点</button>
+            <button class="btn btn-ghost py-1 px-2 text-xs" id="hotspotAnalyzeBtn" data-action="analyzeRewriteHotspots" disabled><i data-lucide="trending-up" class="w-3.5 h-3.5"></i>分析热点</button>
             <button class="btn btn-ghost py-1 px-2 text-xs" data-action="openActionLogs"><i data-lucide="scroll-text" class="w-3.5 h-3.5"></i>日志</button>
           </div>
         </div>
@@ -932,16 +998,67 @@ description: 描述这个 skill 做什么、Claude 什么时候应该用它。
   <div class="page-header">
     <div>
       <div class="page-header-title"><i data-lucide="settings" class="w-5 h-5 text-purple-400"></i>设置</div>
-      <div class="page-header-sub">API Key、定时任务、通知渠道与自动选题配置</div>
+      <div class="page-header-sub">数据保护、外部服务、定时任务与内容自动化配置</div>
     </div>
   </div>
   <div id="kb-insecure-banner" class="hidden bg-red-500/10 border border-red-500/40 rounded-xl p-4 flex items-start gap-3">
     <i data-lucide="alert-triangle" class="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5"></i>
     <div class="min-w-0">
-      <div class="font-semibold text-red-300">知识库加密未启用</div>
-      <div class="text-xs text-red-200/80 mt-1"><code class="text-red-200">KB_ENCRYPTION_KEY</code> 未配置，Notion 等知识库凭证使用默认弱密钥加密，<b>cache.db 一旦泄漏即等于凭证泄漏</b>。请在 <code class="text-red-200">.env</code> 设置 <code class="text-red-200">KB_ENCRYPTION_KEY</code>（生成命令：<code class="text-red-200">openssl rand -hex 32</code>），重启服务生效。</div>
+      <div class="font-semibold text-red-300">知识库仍在使用旧版密钥</div>
+      <div class="text-xs text-red-200/80 mt-1">系统检测到旧加密数据，因此没有自动换钥，避免已有凭证失效。请先备份数据，再规划凭证重新保存；不要直接修改密钥后重启。</div>
     </div>
   </div>
+  <section class="glass rounded-xl p-5 min-w-0" aria-labelledby="data-protection-title">
+    <div class="settings-card-head gap-3">
+      <div class="min-w-0">
+        <div class="flex items-center gap-2 flex-wrap">
+          <h2 class="settings-card-title" id="data-protection-title"><i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i>数据保护</h2>
+          <span class="pill pill-gray" id="backup-status-pill"><i data-lucide="loader" class="w-3 h-3 animate-spin"></i>读取中</span>
+        </div>
+        <p class="text-[11px] text-gray-500 mt-1">一致性备份本地数据库与配置；原自媒体工作区不复制、不覆盖。</p>
+      </div>
+      <div class="flex items-center gap-2 flex-shrink-0">
+        <button class="btn btn-ghost py-1.5 px-2.5 text-xs" data-action="loadDataBackups"><i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>刷新</button>
+        <button class="btn btn-primary py-1.5 px-2.5 text-xs" data-action="createDataBackup"><i data-lucide="archive" class="w-3.5 h-3.5"></i>立即备份</button>
+      </div>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4" id="backup-summary">
+      <div class="rounded-lg border border-white/10 bg-white/[0.02] p-3"><div class="text-[11px] text-gray-500">最近备份</div><div class="text-sm text-gray-300 mt-1">读取中…</div></div>
+      <div class="rounded-lg border border-white/10 bg-white/[0.02] p-3"><div class="text-[11px] text-gray-500">受管备份</div><div class="text-sm text-gray-300 mt-1">读取中…</div></div>
+      <div class="rounded-lg border border-white/10 bg-white/[0.02] p-3"><div class="text-[11px] text-gray-500">可用空间</div><div class="text-sm text-gray-300 mt-1">读取中…</div></div>
+    </div>
+    <div class="mt-4 rounded-lg border border-white/10 overflow-hidden" id="backup-list">
+      <div class="p-4 text-xs text-gray-500">正在读取备份记录…</div>
+    </div>
+    <div class="mt-3 flex items-start gap-2 text-[11px] text-gray-500 leading-relaxed">
+      <i data-lucide="info" class="w-3.5 h-3.5 text-cyan-400 flex-shrink-0 mt-0.5"></i>
+      <span id="backup-scope-note">备份包含 SQLite、本机配置，以及存在时的受管知识库密钥，副本按本机私有文件保存。恢复会撤销历史登录会话，并保留恢复前安全快照。</span>
+    </div>
+  </section>
+  <section class="glass rounded-xl p-5 min-w-0" aria-labelledby="system-diagnostics-title">
+    <div class="settings-card-head gap-3">
+      <div class="min-w-0">
+        <div class="flex items-center gap-2 flex-wrap">
+          <h2 class="settings-card-title" id="system-diagnostics-title"><i data-lucide="stethoscope" class="w-4 h-4 text-cyan-400"></i>系统诊断</h2>
+          <span class="pill pill-gray" id="diagnostics-status-pill"><i data-lucide="loader" class="w-3 h-3 animate-spin"></i>检查中</span>
+        </div>
+        <p class="text-[11px] text-gray-500 mt-1">只检查本机状态与配置，不读取密钥内容，也不消耗外部服务额度。</p>
+      </div>
+      <button class="btn btn-primary py-1.5 px-2.5 text-xs flex-shrink-0" data-action="loadSystemDiagnostics" id="diagnostics-run-button"><i data-lucide="scan-line" class="w-3.5 h-3.5"></i>重新诊断</button>
+    </div>
+    <div class="diagnostics-summary" id="diagnostics-summary" aria-live="polite">
+      <div class="diagnostics-summary-copy"><div class="text-sm text-gray-300">正在检查服务与工作流…</div><div class="text-[11px] text-gray-500 mt-1">通常只需要几秒钟。</div></div>
+      <div class="diagnostics-counts" aria-hidden="true"><span>— 正常</span><span>— 待处理</span><span>— 异常</span></div>
+    </div>
+    <div class="diagnostics-grid" id="diagnostics-list">
+      <div class="diagnostic-skeleton"><span class="skeleton h-4 w-24"></span><span class="skeleton h-3 w-full"></span><span class="skeleton h-3 w-3/4"></span></div>
+      <div class="diagnostic-skeleton"><span class="skeleton h-4 w-24"></span><span class="skeleton h-3 w-full"></span><span class="skeleton h-3 w-3/4"></span></div>
+    </div>
+    <div class="mt-3 flex items-start gap-2 text-[11px] text-gray-500 leading-relaxed">
+      <i data-lucide="shield" class="w-3.5 h-3.5 text-emerald-400 flex-shrink-0 mt-0.5"></i>
+      <span id="diagnostics-checked-at">检查结果只在当前登录会话中展示，不保存敏感配置。</span>
+    </div>
+  </section>
   <div class="grid grid-cols-1 xl:grid-cols-3 gap-5 items-stretch">
   <div class="glass rounded-xl p-4 min-w-0 h-[240px] flex flex-col">
     <div class="settings-card-head">

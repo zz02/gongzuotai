@@ -2,12 +2,78 @@ import { localApi } from '../api.js';
 import { LS } from '../state.js';
 import { esc, fmt, safeExternalUrl } from '../utils.js';
 import { platName } from '../config.js';
-import { skeleton, toast } from '../components.js';
+import { Modal, skeleton, toast } from '../components.js';
 import { initIcons } from '../icons.js';
 import { renderInspirationConfigs, loadInspirationSources } from './settings.js';
 import { gotoPage } from '../navigation.js';
 
 let inspirationSelection = new Set();
+
+export function openManualInspirationModal() {
+  const modal = new Modal({
+    title: '新增选题',
+    maxWidth: '560px',
+    body: `<form id="manual-inspiration-form" class="space-y-4" novalidate>
+      <div class="rounded-lg border border-amber-400/15 bg-amber-400/[0.04] p-3"><div class="flex items-center gap-2 text-xs text-amber-300"><i data-lucide="pencil-line" class="w-3.5 h-3.5"></i>手工选题</div><p class="text-[11px] text-gray-500 mt-1.5">不依赖 RedFox 或大模型，保存后可直接建立内容项目。</p></div>
+      <div><label class="text-xs text-gray-400 mb-1.5 block" for="manual-inspiration-title">选题标题</label><input class="input" id="manual-inspiration-title" maxlength="100" placeholder="一句话说清本次内容主题" autocomplete="off"><p class="text-[11px] text-gray-500 mt-1.5">建议包含目标读者、问题或明确收益。</p></div>
+      <div><label class="text-xs text-gray-400 mb-1.5 block" for="manual-inspiration-summary">核心摘要</label><textarea class="input resize-y min-h-[90px]" id="manual-inspiration-summary" maxlength="2000" placeholder="补充为什么值得做，以及准备解决什么问题"></textarea></div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div><label class="text-xs text-gray-400 mb-1.5 block" for="manual-inspiration-angle">内容角度</label><input class="input" id="manual-inspiration-angle" maxlength="50" value="手工选题" placeholder="例如：实操教程"></div>
+        <div><label class="text-xs text-gray-400 mb-1.5 block" for="manual-inspiration-platform">目标平台</label><select class="input" id="manual-inspiration-platform"><option>多平台</option><option>公众号</option><option>小红书</option><option>抖音</option></select></div>
+      </div>
+      <div><label class="text-xs text-gray-400 mb-1.5 block" for="manual-inspiration-keywords">关键词</label><input class="input" id="manual-inspiration-keywords" maxlength="300" placeholder="用逗号分隔，最多 20 个"><p class="text-[11px] text-gray-500 mt-1.5">用于检索和归类；建立项目时会写入原资料库。</p></div>
+      <div id="manual-inspiration-error" class="hidden rounded-lg border border-red-400/20 bg-red-400/[0.05] p-3 text-xs text-red-300" role="alert" aria-live="assertive"></div>
+      <div class="flex justify-end gap-2 pt-1"><button type="button" class="btn btn-ghost" data-action="closeModal">取消</button><button type="submit" class="btn btn-primary" id="manual-inspiration-submit"><i data-lucide="check" class="w-4 h-4"></i>保存选题</button></div>
+    </form>`,
+  }).open();
+  const form = modal.bodyElement?.querySelector('#manual-inspiration-form');
+  const titleInput = modal.bodyElement?.querySelector('#manual-inspiration-title');
+  const errorBox = modal.bodyElement?.querySelector('#manual-inspiration-error');
+  const setError = message => {
+    if (!errorBox) return;
+    errorBox.textContent = message || '';
+    errorBox.classList.toggle('hidden', !message);
+  };
+  form?.querySelectorAll('input, textarea, select').forEach(input => input.addEventListener('input', () => setError('')));
+  requestAnimationFrame(() => titleInput?.focus());
+  form?.addEventListener('submit', async event => {
+    event.preventDefault();
+    const title = titleInput?.value.trim() || '';
+    const summary = modal.bodyElement?.querySelector('#manual-inspiration-summary')?.value.trim() || '';
+    const angle = modal.bodyElement?.querySelector('#manual-inspiration-angle')?.value.trim() || '';
+    const targetPlatform = modal.bodyElement?.querySelector('#manual-inspiration-platform')?.value || '多平台';
+    const sourceKeywords = (modal.bodyElement?.querySelector('#manual-inspiration-keywords')?.value || '')
+      .split(/[,，、\n]/).map(value => value.trim()).filter(Boolean);
+    if (!title) { setError('请输入选题标题。'); titleInput?.focus(); return; }
+    if (title.length > 100) { setError('选题标题不能超过 100 个字符。'); titleInput?.focus(); return; }
+    if (sourceKeywords.length > 20 || sourceKeywords.some(value => value.length > 30)) {
+      setError('关键词最多 20 个，每个不超过 30 个字符。');
+      return;
+    }
+    const button = modal.bodyElement?.querySelector('#manual-inspiration-submit');
+    setError('');
+    button.disabled = true;
+    button.setAttribute('aria-busy', 'true');
+    button.innerHTML = '<i data-lucide="loader" class="w-4 h-4 animate-spin"></i>保存中';
+    initIcons(button);
+    try {
+      await localApi('inspirations', {
+        method: 'POST',
+        body: { title, summary, angle, targetPlatform, sourceKeywords, generationType: 'manual', sourceMode: 'manual' },
+      });
+      modal.close();
+      toast('选题已保存', 'success');
+      await renderInspiration();
+    } catch (error) {
+      setError(error.message);
+      toast(error.message, 'error');
+      button.disabled = false;
+      button.removeAttribute('aria-busy');
+      button.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i>保存选题';
+      initIcons(button);
+    }
+  });
+}
 
 export async function renderInspiration() {
   const listEl = document.getElementById('inspiration-list');
@@ -15,12 +81,17 @@ export async function renderInspiration() {
   if (!listEl) return;
   listEl.innerHTML = skeleton(4);
   try {
-    const [filterRes, configs, sources] = await Promise.all([
+    const [filterRes, configs, sources, originLinks] = await Promise.all([
       localApi((document.getElementById('inspirationFilter')?.value || 'all') === 'trash' ? 'inspirations?deleted=1' : 'inspirations'),
       localApi('inspiration-configs'),
       loadInspirationSources(),
+      localApi('content-projects/origins').catch(() => []),
     ]);
-    const ideas = filterRes;
+    const linkedProjects = new Map((originLinks || []).map(link => [link.inspirationId, link]));
+    const ideas = filterRes.map(idea => {
+      const linked = linkedProjects.get(idea.id);
+      return linked ? { ...idea, projectId: linked.projectId, projectTitle: linked.projectTitle } : idea;
+    });
     window._inspirations = ideas;
     window._inspirationConfigs = configs;
     window._inspirationSourceOptions = sources;
@@ -172,7 +243,12 @@ function renderInspirationCard(idea, filter) {
         <button class="btn btn-ghost py-1 px-1.5 text-xs ${idea.feedbackState === 'block' ? 'text-red-400' : 'text-gray-500'}" data-action="feedbackInspiration" data-id="${esc(idea.id)}" data-state="${idea.feedbackState === 'block' ? 'none' : 'block'}" title="加入关键词黑名单"><i data-lucide="ban" class="w-3.5 h-3.5"></i></button>
         <button class="btn btn-ghost py-1 px-1.5 text-xs ${idea.isFavorite ? 'text-amber-300' : 'text-gray-500'}" data-action="toggleInspirationFavorite" data-id="${esc(idea.id)}" data-favorite="${idea.isFavorite ? 'false' : 'true'}" title="收藏"><i data-lucide="bookmark" class="w-3.5 h-3.5"></i></button>
         <button class="btn btn-ghost py-1 px-1.5 text-xs text-gray-500 hover:text-red-400" data-action="trashInspiration" data-id="${esc(idea.id)}" title="移入回收站"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
-        <button class="btn btn-primary py-1 px-3 text-xs ml-auto flex-shrink-0" data-action="sendIdeaToCreator" data-id="${esc(idea.id)}"><i data-lucide="pen-line" class="w-3 h-3"></i>开始创作</button>
+        <div class="ml-auto flex items-center gap-1.5 flex-shrink-0">
+          ${idea.projectId
+            ? `<button class="btn btn-ghost py-1 px-2.5 text-xs text-emerald-300" data-action="openLinkedContentProject" data-id="${esc(idea.projectId)}" title="查看已关联的内容项目"><i data-lucide="folder-check" class="w-3 h-3"></i>查看项目</button>`
+            : `<button class="btn btn-ghost py-1 px-2.5 text-xs text-cyan-300" data-action="createContentProjectFromInspiration" data-id="${esc(idea.id)}" title="携带选题资料与证据建立内容项目"><i data-lucide="folder-plus" class="w-3 h-3"></i>建立项目</button>`}
+          <button class="btn btn-primary py-1 px-3 text-xs" data-action="sendIdeaToCreator" data-id="${esc(idea.id)}"><i data-lucide="pen-line" class="w-3 h-3"></i>开始创作</button>
+        </div>
       </div>`;
 
   return `

@@ -79,11 +79,11 @@ export async function openAccountModal() {
             </div>
             <div>
               <label class="text-xs text-gray-400 block mb-1">新密码</label>
-              <input class="input" type="password" id="account-new-password" name="furnace_new_password" autocomplete="new-password" minlength="6" value="" />
+              <input class="input" type="password" id="account-new-password" name="furnace_new_password" autocomplete="new-password" minlength="8" maxlength="128" value="" />
             </div>
             <div>
               <label class="text-xs text-gray-400 block mb-1">确认新密码</label>
-              <input class="input" type="password" id="account-confirm-password" name="furnace_confirm_password" autocomplete="new-password" minlength="6" value="" />
+              <input class="input" type="password" id="account-confirm-password" name="furnace_confirm_password" autocomplete="new-password" minlength="8" maxlength="128" value="" />
             </div>
             <button type="submit" class="btn btn-primary w-full justify-center" data-action="changeAccountPassword">
               <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>更新密码

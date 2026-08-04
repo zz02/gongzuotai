@@ -8,8 +8,12 @@ import { adaptDY, adaptXHS, adaptGZH } from '../core/adapters.js';
 import { cacheItem } from '../core/itemCache.js';
 import { gotoPage } from '../navigation.js';
 
-export async function showDetail(plat, workId) {
-  gotoPage('detail');
+let currentDetailRequest = null;
+
+export async function showDetail(plat, workId, options = {}) {
+  const { navigate = true } = options;
+  currentDetailRequest = { plat, workId };
+  if (navigate) gotoPage('detail');
   document.getElementById('detail-source').textContent = `加载 ${platName(plat)} 作品 ${workId}…`;
   document.getElementById('detail-content').innerHTML = skeleton(4);
 
@@ -50,7 +54,7 @@ export async function showDetail(plat, workId) {
 
   if (!item) {
     document.getElementById('detail-content').innerHTML = '<div class="col-span-3 text-center text-red-400 py-12">未找到该作品</div>';
-    return;
+    return false;
   }
 
   cacheItem(item);
@@ -186,4 +190,10 @@ export async function showDetail(plat, workId) {
     });
   }
   initIcons(document.getElementById('detail-content'));
+  return true;
+}
+
+export async function refreshDetail() {
+  if (!currentDetailRequest || !document.getElementById('detail-content')) return false;
+  return showDetail(currentDetailRequest.plat, currentDetailRequest.workId, { navigate: false });
 }

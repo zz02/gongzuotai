@@ -8,6 +8,8 @@ const TMP_DATA_DIR = process.env.TEST_DATA_DIR
 
 fs.mkdirSync(TMP_DATA_DIR, { recursive: true });
 process.env.DATA_DIR = TMP_DATA_DIR;
+process.env.INSPRIRA_ENV_FILE = path.join(TMP_DATA_DIR, '.env');
+process.env.NODE_ENV = 'test';
 // 关闭调度器，避免测试进程注册 cron timer
 process.env.ENABLE_SCHEDULER = 'false';
 

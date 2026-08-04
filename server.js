@@ -9,6 +9,16 @@ const { execFile, spawn } = require('child_process');
 const { promisify } = require('util');
 const Database = require('better-sqlite3');
 
+// .env 必须在任何读取环境变量的业务模块之前加载。
+// 否则本地启动时 DATA_DIR、RedFox 与知识库加密配置会在模块初始化阶段被固定为旧值。
+const {
+  EDITABLE_ENV_KEYS, loadEnvFile, readEnvValues, publicEnvConfig, updateEnvConfig, restartCurrentService,
+} = require('./lib/env');
+const ENV_FILE = process.env.INSPRIRA_ENV_FILE
+  ? path.resolve(process.env.INSPRIRA_ENV_FILE)
+  : path.join(__dirname, '.env');
+loadEnvFile(ENV_FILE);
+
 const { scanVault, readEntry, writeNote, updateNote, deleteNote, listFolders, listAllTags } = require('./kb_obsidian');
 const { searchPages, getPage, createPage, updatePage, deletePage } = require('./kb_notion');
 const wersss = require('./kb_wersss');
@@ -21,9 +31,6 @@ const { parseCronExpr, validateCronField, nextCronTime, matchesCronField } = req
 const {
   PASSWORD_SCRYPT_OPTIONS, hashPassword, verifyPassword, validateUsername, validatePassword,
 } = require('./lib/password');
-const {
-  EDITABLE_ENV_KEYS, loadEnvFile, readEnvValues, publicEnvConfig, updateEnvConfig, restartCurrentService,
-} = require('./lib/env');
 const { serveStatic: serveStaticFromLib } = require('./lib/static');
 const {
   REDFOX_HOST, REDFOX_PATH_PREFIX, API_KEY,
@@ -43,6 +50,7 @@ const {
   normalizeRealtimeHotspots,
 } = require('./lib/normalize');
 const { MAX_BODY_SIZE, json, readBody } = require('./lib/http');
+const { createLoginGuard } = require('./lib/login-guard');
 const {
   getWersssConfigRow, getWersssConfig, getValidWersssToken,
   getWersssAuthStatus, syncWersssArticles, prefetchWersssContent,
@@ -60,6 +68,14 @@ const getOfficialQuota = () => {
   const env = readEnvValues(ENV_FILE);
   return getOfficialQuotaRaw(env.REDFOX_HOST || 'redfox.hk', env.REDFOX_WEB_COOKIE || '');
 };
+const loginGuard = createLoginGuard({
+  accountLimit: process.env.LOGIN_ACCOUNT_FAILURE_LIMIT,
+  ipLimit: process.env.LOGIN_IP_FAILURE_LIMIT,
+  windowMs: Number(process.env.LOGIN_FAILURE_WINDOW_MINUTES) * 60 * 1000,
+  lockMs: Number(process.env.LOGIN_LOCK_MINUTES) * 60 * 1000,
+  // 默认绝不信任转发头；只有明确列出反向代理的 socket 地址才启用。
+  trustProxy: process.env.TRUSTED_PROXY_IPS || false,
+});
 const llmLib = require('./lib/llm');
 const { parseLlmJson, WEB_SEARCH_TOOL } = llmLib;
 // doDoubaoWebSearch / formatDoubaoSearchResults 是 hoisted function declarations，
@@ -90,12 +106,9 @@ const APP_VERSION = (() => {
 
 const execFileAsync = promisify(execFile);
 
-const ENV_FILE = path.join(__dirname, '.env');
-loadEnvFile(ENV_FILE);
-
 // 监听 .env 文件变化：用户直接编辑 .env 后自动同步 process.env，无需重启
 // fs.watch 在 Docker bind mount 下也能正常工作（inotify）
-if (fs.existsSync(ENV_FILE)) {
+if (process.env.NODE_ENV !== 'test' && fs.existsSync(ENV_FILE)) {
   let _envReloadTimer = null;
   fs.watch(ENV_FILE, () => {
     // 防抖：编辑器保存时可能触发多次
@@ -134,7 +147,25 @@ const CLAUDE_BIN = process.env.CLAUDE_BIN || 'claude';
 const KIMI_BIN = process.env.KIMI_BIN || 'kimi';
 const OPENCLAW_BIN = process.env.OPENCLAW_BIN || 'openclaw';
 const HERMES_BIN = process.env.HERMES_BIN || 'hermes';
-const { db, ensureColumn, DATA_ROOT } = require('./lib/db');
+const { db, ensureColumn, DATA_ROOT, DB_PATH } = require('./lib/db');
+const backupManager = require('./lib/backups').make({
+  database: db,
+  dbPath: DB_PATH,
+  envFile: ENV_FILE,
+  dataRoot: DATA_ROOT,
+  appVersion: APP_VERSION,
+});
+const diagnostics = require('./lib/diagnostics').make({
+  database: db,
+  backupManager,
+  contentProjects: require('./lib/content-projects'),
+  dataRoot: DATA_ROOT,
+  appVersion: APP_VERSION,
+  schedulerEnabled: ENABLE_SCHEDULER,
+  env: () => process.env,
+  xhsMcpService: require('./lib/xhs-mcp/service'),
+  kbEncryption: { insecure: KB_ENC_INSECURE, source: require('./lib/auth').KB_ENC_SOURCE },
+});
 const SKILLS_ROOT = path.join(DATA_ROOT, 'skills', 'redfox-community', 'skills');
 const SKILLS_REPO_ROOT = path.dirname(SKILLS_ROOT);
 const SKILLS_GITHUB_REPO = 'redfox-data/redfox-community';
@@ -169,6 +200,12 @@ const agentLib = require('./lib/agent').make({
   bins: { CODEX_BIN, CLAUDE_BIN, KIMI_BIN, OPENCLAW_BIN, HERMES_BIN },
 });
 const { listLocalAgents, executeAgent, runLocalAgent } = agentLib;
+const contentSkillRuns = require('./lib/content-skill-runs').make({
+  db,
+  listLocalAgents,
+  executeAgent,
+  logAction,
+});
 const hotLib = require('./lib/hot');
 const {
   HOT_SOURCE_CONFIG, hotBatchId, saveHotBatch, latestHotBatch,
@@ -193,9 +230,6 @@ recoverAiGzhFallbackBatches();
 const WECHAT_ANALYZER_ROOT = path.join(SKILLS_ROOT, 'wechat-account-analyzer');
 const DOUYIN_ANALYZER_ROOT = path.join(SKILLS_ROOT, 'douyin-account-diagnosis');
 const XHS_ANALYZER_ROOT = path.join(SKILLS_ROOT, 'xiaohongshu-account-analyzer');
-const DEFAULT_USERNAME = 'admin';
-const DEFAULT_PASSWORD = '123456';
-
 // DB schema + ensureColumn 已移到 lib/db.js；DATA_ROOT / db 通过 require 获取
 sessionClean();
 db.transaction(() => {
@@ -358,20 +392,6 @@ function registerDefaultCrons() {
   }
 }
 registerDefaultCrons();
-
-function initializeDefaultUser() {
-  if (db.prepare('SELECT COUNT(*) AS count FROM users').get().count > 0) return;
-  const now = Date.now();
-  const result = db.prepare(`
-    INSERT OR IGNORE INTO users
-      (id, username, display_name, password_hash, role, must_change_password, created_at, updated_at)
-    VALUES (?, ?, ?, ?, 'owner', 1, ?, ?)
-  `).run(crypto.randomUUID(), DEFAULT_USERNAME, '管理员', hashPassword(DEFAULT_PASSWORD), now, now);
-  if (result.changes) {
-    console.warn('[auth] 已创建默认账号 admin，请首次登录后立即修改默认密码。');
-  }
-}
-initializeDefaultUser();
 
 function redfoxApplyUrl() {
   return String(process.env.REDFOX_APPLY_URL || '').trim();
@@ -785,7 +805,7 @@ function formatDoubaoSearchResults(data) {
 
 
 async function handleLocalApi(req, res, url) {
-  if (await require('./lib/routes/auth').tryRoute(req, res, url, { APP_VERSION, ENABLE_SCHEDULER, ENV_FILE })) {
+  if (await require('./lib/routes/auth').tryRoute(req, res, url, { APP_VERSION, ENABLE_SCHEDULER, ENV_FILE, loginGuard })) {
     return true;
   }
   if (await require('./lib/routes/misc').tryRoute(req, res, url, {
@@ -795,6 +815,15 @@ async function handleLocalApi(req, res, url) {
     listLocalAgents, runLocalAgent,
     captureHotSnapshot, findRewriteHotspots, rewriteForPlatform,
   })) {
+    return true;
+  }
+  if (await require('./lib/routes/backups').tryRoute(req, res, url, { backupManager, logAction })) {
+    return true;
+  }
+  if (await require('./lib/routes/diagnostics').tryRoute(req, res, url, { diagnostics })) {
+    return true;
+  }
+  if (await require('./lib/routes/content-projects').tryRoute(req, res, url, { contentSkillRuns })) {
     return true;
   }
   if (await require('./lib/routes/skills').tryRoute(req, res, url, {
@@ -877,10 +906,28 @@ function serveStatic(res, pathname) {
 
 const server = http.createServer(async (req, res) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('Referrer-Policy', 'same-origin');
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  res.setHeader('X-Permitted-Cross-Domain-Policies', 'none');
+  res.setHeader('Content-Security-Policy', [
+    "default-src 'self'",
+    "script-src 'self' 'unsafe-inline'",
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data: https:",
+    "font-src 'self' data:",
+    "connect-src 'self'",
+    "object-src 'none'",
+    "base-uri 'none'",
+    "frame-ancestors 'none'",
+    "form-action 'self'",
+  ].join('; '));
   const url = new URL(req.url, `http://${req.headers.host || `${HOST}:${PORT}`}`);
   try {
-    const publicApi = url.pathname === '/api/_/login' || url.pathname === '/api/_/status' || url.pathname === '/api/_/version';
+    const publicApi = url.pathname === '/api/_/login'
+      || url.pathname === '/api/_/setup'
+      || url.pathname === '/api/_/status'
+      || url.pathname === '/api/_/version';
     if (url.pathname.startsWith('/api/') && !publicApi && !isAuthorized(req)) {
       json(res, 401, { ok: false, error: '请先登录' });
       return;
@@ -935,6 +982,7 @@ const server = http.createServer(async (req, res) => {
     json(res, 500, { ok: false, error: error.message });
   }
 });
+server.once('close', () => loginGuard.stop());
 
 setInterval(sessionClean, 60 * 60 * 1000).unref();
 
@@ -1178,11 +1226,33 @@ if (require.main === module) {
   server.listen(PORT, HOST, () => {
     console.log(`灵感熔炉已启动：http://${HOST}:${PORT}`);
     console.log(`RedFox API：${process.env.REDFOX_API_KEY ? '已配置' : '未配置 REDFOX_API_KEY'}`);
-    console.log(`LLM：${process.env.LLM_API_KEY ? `已配置 ${process.env.LLM_MODEL || ''}` : '未配置，选题生成功能不可用'}`);
-    console.log('访问控制：已启用 SQLite 账号登录');
+    console.log(`LLM：${process.env.LLM_API_KEY ? `已配置 ${process.env.LLM_MODEL || ''}` : '未配置，可使用手工选题'}`);
+    const accountCount = db.prepare('SELECT COUNT(*) AS count FROM users').get().count;
+    console.log(accountCount ? '访问控制：已启用本机账号登录' : '首次使用：请打开页面创建本机管理员');
     loadAllCronJobs();
     restoreTrackerRetries();
   });
+
+  let shutdownStarted = false;
+  const shutdown = signal => {
+    if (shutdownStarted) return;
+    shutdownStarted = true;
+    console.log(`[shutdown] 收到 ${signal}，正在安全关闭服务`);
+    const forceExit = setTimeout(() => {
+      console.error('[shutdown] 等待连接退出超时');
+      process.exit(1);
+    }, 10000);
+    forceExit.unref();
+    server.close(() => {
+      try { db.pragma('wal_checkpoint(PASSIVE)'); } catch {}
+      try { db.close(); } catch {}
+      clearTimeout(forceExit);
+      console.log('[shutdown] 服务已安全停止');
+      process.exit(0);
+    });
+  };
+  process.once('SIGTERM', () => shutdown('SIGTERM'));
+  process.once('SIGINT', () => shutdown('SIGINT'));
 }
 
 module.exports = {

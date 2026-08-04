@@ -101,7 +101,7 @@
   .rank-2{background:linear-gradient(135deg,#f59e0b,#ea580c);color:white;}
   .rank-3{background:linear-gradient(135deg,#eab308,#ca8a04);color:white;}
   .rank-default{background:var(--overlay-3);color:var(--fg-2);}
-  .pill{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:500;}
+  .pill{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:500;white-space:nowrap;}
   .pill-hot{background:rgba(239,68,68,.15);color:#fca5a5;border:1px solid rgba(239,68,68,.3);}
   .pill-brand{background:rgba(249,115,22,.18);color:#fdba74;border:1px solid rgba(249,115,22,.40);}
   .pill-green{background:rgba(16,185,129,.18);color:#34d399;border:1px solid rgba(16,185,129,.4);}
@@ -168,6 +168,31 @@
   .modal.flex-col{max-height:90vh;display:flex;flex-direction:column;overflow:hidden;}
   .modal.flex-col > .flex-shrink-0{flex-shrink:0;}
   .modal.flex-col > .overflow-y-auto{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;}
+  .backup-restore-warning{border:1px solid rgba(245,158,11,.35);background:rgba(245,158,11,.12);color:#fde68a;}
+  :root[data-theme="light"] .backup-restore-warning{border-color:rgba(180,83,9,.32);background:rgba(245,158,11,.10);color:#78350f;}
+  .diagnostics-summary{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--overlay-1);}
+  .diagnostics-summary-copy{min-width:0;}
+  .diagnostics-counts{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;justify-content:flex-end;font-size:11px;color:var(--fg-3);}
+  .diagnostics-counts span{padding:3px 8px;border:1px solid var(--line);border-radius:999px;background:var(--overlay-2);white-space:nowrap;}
+  .diagnostics-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.75rem;margin-top:1rem;}
+  .diagnostic-item,.diagnostic-skeleton{min-width:0;padding:14px;border:1px solid var(--line);border-radius:10px;background:var(--overlay-1);}
+  .diagnostic-skeleton{display:flex;flex-direction:column;gap:.6rem;min-height:128px;}
+  .diagnostic-item{position:relative;overflow:hidden;}
+  .diagnostic-item::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--overlay-6);}
+  .diagnostic-item.is-normal::before{background:#10b981;}
+  .diagnostic-item.is-warning::before{background:#f59e0b;}
+  .diagnostic-item.is-error::before{background:#ef4444;}
+  .diagnostic-item-head{display:flex;align-items:flex-start;justify-content:space-between;gap:.75rem;}
+  .diagnostic-item-name{display:flex;align-items:center;gap:.5rem;min-width:0;font-size:13px;font-weight:600;color:var(--fg);}
+  .diagnostic-item-copy{margin-top:.65rem;padding-top:.65rem;border-top:1px solid var(--line);font-size:11px;line-height:1.55;color:var(--fg-3);}
+  .diagnostic-next{display:flex;align-items:flex-start;justify-content:space-between;gap:.75rem;margin-top:.55rem;}
+  .diagnostic-next-copy{min-width:0;color:var(--fg-2);}
+  @media (max-width:767px){
+    .diagnostics-summary{align-items:flex-start;flex-direction:column;}
+    .diagnostics-counts{justify-content:flex-start;}
+    .diagnostics-grid{grid-template-columns:1fr;}
+    .diagnostic-next{flex-direction:column;}
+  }
   /* 设计 token */
   .text-label{font-size:11px;color:var(--fg-3);}
   .mobile-only{display:none !important;}
@@ -176,6 +201,10 @@
   @media (max-width:1023px){.desktop-only{display:none !important;}}
   .btn-sm{height:28px;padding:0 10px;font-size:11px;}
   .btn-md{height:32px;padding:0 14px;font-size:12px;}
+  @media (max-width:640px){
+    .btn{min-height:44px;padding-top:10px;padding-bottom:10px;}
+    .btn-sm,.btn-md{height:auto;}
+  }
   .input-sm{height:28px;padding:4px 10px;font-size:11px;}
   .input-md{height:32px;padding:6px 12px;font-size:12px;}
   /* 侧边栏折叠 */
@@ -495,5 +524,29 @@
   --tw-gradient-to:#fde047;
 }
 .bg-gradient-to-br.from-indigo-500{--tw-gradient-from:#f97316;--tw-gradient-stops:var(--tw-gradient-from),var(--tw-gradient-to);}
+
+/* 内容项目 Skill 预览：只显示章节级前后对比，避免长稿撑开弹窗。 */
+.content-skill-preview{
+  min-height:160px;
+  max-height:420px;
+  overflow:auto;
+  margin:0;
+  padding:14px;
+  border:1px solid var(--line-2);
+  border-radius:10px;
+  background:rgba(0,0,0,.18);
+  color:var(--muted-1);
+  font-family:'SFMono-Regular',Consolas,'Liberation Mono',monospace;
+  font-size:12px;
+  line-height:1.7;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+  overscroll-behavior:contain;
+}
+.content-skill-preview-new{border-color:rgba(34,211,238,.24);color:var(--fg);}
+:root[data-theme="light"] .content-skill-preview{background:rgba(15,23,42,.035);}
+@media(max-width:640px){
+  .content-skill-preview{min-height:128px;max-height:320px;padding:12px;font-size:11px;}
+}
 
 /* admin 头像保持 ember（pink→orange 本来就是 ember 系，无需改） */

@@ -12,8 +12,8 @@ import { renderHotlist, syncHotKeywords, renderHotTab, toggleHotPlatformCron, cl
 import { renderDashboard, renderFeedAndHistory } from './pages/dashboard.js';
 import { renderTracker, bindTrackerGroups, syncTrackersFromServer, openAddAccountModal, submitAddAccount, addToTracker, editTracker, removeTracker, viewTracker, showTrackerWorksEmpty, syncTrackerWorks, showTrackerWorksModal, syncTrackerWorksInModal, diagnoseTracker, showDiagnosisEmpty, runDiagnosis, showDiagnosisModal, reRunDiagnosis, openGzhWork, viewTrackerTrend, toggleTrackerSortMode } from './pages/tracker.js';
 import { showDetail } from './pages/detail.js';
-import { renderSettings, openEnvModal, openRedfoxApply, saveEnvConfig, restartService, loadQuota, renderNotificationSettings, notificationInput, saveNotificationSettings, testNotification, cronCostMeta, renderCronList, toggleCron, runCronNow, openCronModal, submitCron, deleteCron, renderInspirationConfigs, openInspirationConfigDetail, openInspirationConfigModal, parseTermInput, submitInspirationConfig, deleteInspirationConfigUi, runInspirationConfig, toggleInspirationConfig, openXhsMcpConfig, saveXhsMcpConfig, xhsMcpHealth, xhsMcpLoginQr, xhsMcpResetLogin, installXhsMcpCli, copyText, openWersssConfig, saveWersssConfig, forceWersssQr, closeWersssQrModal, refreshWersssQr } from './pages/settings.js';
-import { renderInspiration, renderInspirationCards, onInspirationFilterChange, trashInspiration, restoreInspiration, permanentlyDeleteInspiration, updateInspirationListStatus, updateTrashSelection, toggleAllTrash, batchDeleteTrash, toggleInspirationFavorite, feedbackInspiration, generateInspirations, updateInspirationStatus, sendIdeaToCreator, clearInspirationSelection, batchFavoriteInspirations, batchTrashInspirations, toggleInspirationSourceDropdown } from './pages/inspiration.js';
+import { renderSettings, openEnvModal, openRedfoxApply, saveEnvConfig, restartService, loadQuota, renderNotificationSettings, notificationInput, saveNotificationSettings, testNotification, cronCostMeta, renderCronList, toggleCron, runCronNow, openCronModal, submitCron, deleteCron, renderInspirationConfigs, openInspirationConfigDetail, openInspirationConfigModal, parseTermInput, submitInspirationConfig, deleteInspirationConfigUi, runInspirationConfig, toggleInspirationConfig, openXhsMcpConfig, saveXhsMcpConfig, xhsMcpHealth, xhsMcpLoginQr, xhsMcpResetLogin, installXhsMcpCli, copyText, openWersssConfig, saveWersssConfig, forceWersssQr, closeWersssQrModal, refreshWersssQr, loadDataBackups, createDataBackup, verifyDataBackup, openRestoreBackup, loadSystemDiagnostics } from './pages/settings.js';
+import { renderInspiration, renderInspirationCards, onInspirationFilterChange, trashInspiration, restoreInspiration, permanentlyDeleteInspiration, updateInspirationListStatus, updateTrashSelection, toggleAllTrash, batchDeleteTrash, toggleInspirationFavorite, feedbackInspiration, generateInspirations, updateInspirationStatus, sendIdeaToCreator, clearInspirationSelection, batchFavoriteInspirations, batchTrashInspirations, toggleInspirationSourceDropdown, openManualInspirationModal } from './pages/inspiration.js';
 import { renderKnowledgebase, renderLibrary, addToLibrary, removeFromLibrary, exportLibrary, switchKbTab, switchKbSource, renderKbLibrary, loadKbEntries, renderKbGrid, renderKbFolderTree, searchKb, openKbEntry, openKbEntryModal, analyzeKbEntry, showKbAnalysisResult, reanalyzeKbEntry, matchKbToInspirations, renderMatchedInspirations, linkKbMatchByIndex, openKbConfigModal, saveKbConfig, createKbEntry, submitKbEntry, linkKbToInspiration, linkKbPickerByIndex, sendKbToCreator, renderWersss, addWersssSub, loadWersssAvailable, selectWersssMp, searchWersssMp, confirmAddWersssSub, removeWersssSub, syncWersss, prefetchWersss, openWersssArticle, closeWersssArticleModal, selectKbFolder, toggleKbFolder } from './pages/knowledgebase.js';
 import { renderCreator, sendToCreator, doCheckWord, inspectSensitiveHtml, analyzeRewriteHotspots, openActionLogs, renderRewriteHotspots, selectRewriteHotspot, clearSelectedHotspot, doRewrite, copyRewrite, exportToKb, generateCover, clearCreatorSource } from './pages/creator.js';
 import { renderMyAccounts, addMyAccount, submitMyAccount, removeMyAccount, editMyAccount, extractMyTracks, extractMyStyle, viewMyStyle, presetMyInspirations, createAutoConfigs } from './pages/my.js';
@@ -23,6 +23,7 @@ import { initErrorBoundary } from './errorBoundary.js';
 import { loadCurrentAccount, openAccountModal, saveAccountProfile, changeAccountPassword, logoutAccount } from './account.js';
 import { initTheme, toggleTheme } from './theme.js';
 import { initForgeBar, setForgeState } from './forge-bar.js';
+import { openContentProject, validateContentProject, advanceContentProject, openContentPublishCenter, newContentProject, configureContentWorkspace, refreshContentProjects, runContentSkill, openContentSkillRun, applyContentSkillRun, discardContentSkillRun } from './pages/content-projects.js';
 
 // ============= Item Cache handlers 注册 ============
 registerItemCacheHandlers({
@@ -53,11 +54,11 @@ function applyAppVersion(version) {
   if (brandTitle) brandTitle.setAttribute('title', `灵感熔炉 v${version}`);
 }
 
-function activateApp() {
+function activateApp(preferredPage = '') {
   document.getElementById('page-login').classList.remove('active');
   document.getElementById('page-app').classList.add('active');
   const hashPage = location.hash.replace('#', '');
-  const initialPage = !hashPage || hashPage === 'login' ? 'dashboard' : hashPage;
+  const initialPage = preferredPage || (!hashPage || hashPage === 'login' ? 'dashboard' : hashPage);
   gotoPage(initialPage, { replaceHistory: true });
   localApi('version').then(r => {
     if (r?.version) applyAppVersion(r.version);
@@ -86,6 +87,34 @@ function activateApp() {
   checkApi();
 }
 
+function setAuthError(message = '') {
+  const box = document.getElementById('auth-error');
+  if (!box) return;
+  box.textContent = message;
+  box.classList.toggle('hidden', !message);
+}
+
+function setAuthMode(mode) {
+  const setup = mode === 'setup';
+  document.getElementById('login-form')?.classList.toggle('hidden', setup);
+  document.getElementById('setup-form')?.classList.toggle('hidden', !setup);
+  const title = document.getElementById('auth-mode-title');
+  const note = document.getElementById('auth-mode-note');
+  if (title) title.textContent = setup ? '初始化工作台' : '登录';
+  if (note) note.textContent = setup ? '配置完成后自动登录，之后不会再显示此页面' : '使用你创建的本机账户登录';
+  setAuthError('');
+  requestAnimationFrame(() => document.getElementById(setup ? 'setupDisplayName' : 'loginUser')?.focus());
+}
+
+function setSubmitBusy(buttonId, busy, text, icon) {
+  const button = document.getElementById(buttonId);
+  if (!button) return;
+  button.disabled = busy;
+  button.toggleAttribute('aria-busy', busy);
+  button.innerHTML = `<i data-lucide="${icon}" class="w-4 h-4 ${busy ? 'animate-spin' : ''}"></i>${text}`;
+  initIcons(button);
+}
+
 async function tryAutoLogin() {
   const savedUser = localStorage.getItem('furnace_user') || '';
   localStorage.removeItem('furnace_pass');
@@ -93,6 +122,11 @@ async function tryAutoLogin() {
   clearLoginPassword();
   try {
     const status = await localApi('status');
+    if (status?.setupRequired) {
+      setAuthMode('setup');
+      return false;
+    }
+    setAuthMode('login');
     if (!status?.authenticated) return false;
     activateApp();
     return true;
@@ -104,16 +138,50 @@ async function tryAutoLogin() {
 async function enterApp() {
   const username = document.getElementById('loginUser').value.trim();
   const password = document.getElementById('loginPass').value;
+  setAuthError('');
+  setSubmitBusy('login-submit', true, '登录中', 'loader');
   try {
     await localApi('login', { method: 'POST', body: { username, password } });
     localStorage.setItem('furnace_user', username);
     localStorage.removeItem('furnace_pass');
   } catch (e) {
-    toast(e.message, 'error');
+    setAuthError(e.message);
+    setSubmitBusy('login-submit', false, '进入熔炉', 'log-in');
     return;
   }
   document.getElementById('loginPass').value = '';
+  setSubmitBusy('login-submit', false, '进入熔炉', 'log-in');
   activateApp();
+}
+
+async function setupApp() {
+  const displayName = document.getElementById('setupDisplayName')?.value.trim() || '';
+  const username = document.getElementById('setupUsername')?.value.trim() || '';
+  const password = document.getElementById('setupPassword')?.value || '';
+  const confirmPassword = document.getElementById('setupConfirmPassword')?.value || '';
+  const workspaceRoot = document.getElementById('setupWorkspaceRoot')?.value.trim() || '';
+  setAuthError('');
+  if (password !== confirmPassword) {
+    setAuthError('两次输入的密码不一致');
+    document.getElementById('setupConfirmPassword')?.focus();
+    return;
+  }
+  setSubmitBusy('setup-submit', true, '正在初始化', 'loader');
+  try {
+    await localApi('setup', {
+      method: 'POST',
+      body: { displayName, username, password, confirmPassword, workspaceRoot },
+    });
+    localStorage.setItem('furnace_user', username);
+    localStorage.removeItem('furnace_pass');
+    document.getElementById('setupPassword').value = '';
+    document.getElementById('setupConfirmPassword').value = '';
+    toast('工作台初始化完成', 'success');
+    activateApp('projects');
+  } catch (error) {
+    setAuthError(error.message);
+    setSubmitBusy('setup-submit', false, '创建并进入', 'arrow-right');
+  }
 }
 
 function clearLoginPassword() {
@@ -128,11 +196,17 @@ async function checkApi() {
   const el = document.getElementById('api-status');
   const pill = document.getElementById('api-status-pill');
   if (status?.redfoxConfigured) {
-    el.textContent = 'API 在线';
-    if (pill) pill.innerHTML = '<i data-lucide="check" class="w-3 h-3"></i>在线';
+    el.textContent = 'RedFox 已连接';
+    if (pill) {
+      pill.className = 'pill pill-green';
+      pill.innerHTML = '<i data-lucide="check" class="w-3 h-3"></i>已配置';
+    }
   } else {
-    el.textContent = 'API 异常';
-    if (pill) { pill.className = 'pill pill-hot'; pill.innerHTML = '<i data-lucide="x" class="w-3 h-3"></i>离线'; }
+    el.textContent = '本地模式';
+    if (pill) {
+      pill.className = 'pill pill-gray';
+      pill.innerHTML = '<i data-lucide="minus" class="w-3 h-3"></i>可选';
+    }
   }
   initIcons();
 }
@@ -169,6 +243,13 @@ document.getElementById('globalSearch')?.addEventListener('keypress', e => {
 document.getElementById('login-form')?.addEventListener('submit', e => {
   e.preventDefault();
   enterApp();
+});
+document.getElementById('setup-form')?.addEventListener('submit', e => {
+  e.preventDefault();
+  setupApp();
+});
+document.querySelectorAll('#login-form input, #setup-form input').forEach(input => {
+  input.addEventListener('input', () => setAuthError(''));
 });
 window.addEventListener('pageshow', () => {
   clearLoginPassword();
@@ -248,6 +329,7 @@ document.addEventListener('error', e => {
 
 // ============= 注册 data-action ============
 registerAction('enterApp', () => enterApp());
+registerAction('setupApp', () => setupApp());
 registerAction('doGlobalSearch', () => doGlobalSearch());
 registerAction('refreshCurrent', () => refreshCurrent());
 registerAction('toggleSidebar', () => toggleSidebar());
@@ -255,11 +337,23 @@ registerAction('openMobileSidebar', () => openMobileSidebar());
 registerAction('closeMobileSidebar', () => closeMobileSidebar());
 registerAction('toggleTheme', () => { toggleTheme(); initIcons(document.body); });
 registerAction('gotoPage', (el) => gotoPage(el.dataset.page));
+registerAction('refreshContentProjects', () => refreshContentProjects());
+registerAction('newContentProject', () => newContentProject());
+registerAction('configureContentWorkspace', () => configureContentWorkspace());
+registerAction('openContentProject', (_, d) => openContentProject(d.id));
+registerAction('validateContentProject', (_, d) => validateContentProject(d.id));
+registerAction('advanceContentProject', (_, d) => advanceContentProject(d.id));
+registerAction('openContentPublishCenter', (_, d) => openContentPublishCenter(d.id));
+registerAction('runContentSkill', () => runContentSkill());
+registerAction('openContentSkillRun', (_, d) => openContentSkillRun(d.id));
+registerAction('applyContentSkillRun', (_, d) => applyContentSkillRun(d.id));
+registerAction('discardContentSkillRun', (_, d) => discardContentSkillRun(d.id));
 registerAction('doSearch', () => doSearch());
 registerAction('goBackOrFallback', (_, d) => history.length > 1 ? history.back() : gotoPage(d.fallbackPage || 'dashboard'));
 registerAction('openAddAccountModal', () => openAddAccountModal());
 registerAction('runSnapshot', () => runSnapshot());
 registerAction('generateInspirations', () => generateInspirations());
+registerAction('openManualInspirationModal', () => openManualInspirationModal());
 registerAction('toggleInspirationSourceDropdown', (el) => toggleInspirationSourceDropdown(el));
 registerAction('renderInspiration', () => renderInspiration());
 registerAction('batchDeleteTrash', () => batchDeleteTrash());
@@ -288,6 +382,22 @@ registerAction('toggleInspirationFavorite', (_, d) => toggleInspirationFavorite(
 registerAction('feedbackInspiration', (_, d) => feedbackInspiration(d.id, d.state));
 registerAction('trashInspiration', (_, d) => trashInspiration(d.id));
 registerAction('sendIdeaToCreator', (_, d) => sendIdeaToCreator(d.id));
+registerAction('createContentProjectFromInspiration', (_, d) => {
+  const idea = (window._inspirations || []).find(item => item.id === d.id);
+  if (!idea) { toast('选题不存在或已被移除', 'error'); return; }
+  newContentProject({
+    title: idea.title,
+    originLabel: '灵感与选题库',
+    inspiration: idea,
+    onCreated: project => {
+      idea.status = '创作中';
+      idea.projectId = project.id;
+      idea.projectTitle = project.title;
+      renderInspirationCards();
+    },
+  });
+});
+registerAction('openLinkedContentProject', (_, d) => openContentProject(d.id));
 registerAction('viewTracker', (_, d) => viewTracker(d.id));
 registerAction('diagnoseTracker', (_, d) => diagnoseTracker(d.id));
 registerAction('viewTrackerTrend', (_, d) => viewTrackerTrend(d.id));
@@ -396,6 +506,11 @@ registerAction('saveAccountProfile', () => saveAccountProfile());
 registerAction('changeAccountPassword', () => changeAccountPassword());
 registerAction('logoutAccount', () => logoutAccount());
 registerAction('loadQuota', () => loadQuota());
+registerAction('loadDataBackups', () => loadDataBackups());
+registerAction('loadSystemDiagnostics', () => loadSystemDiagnostics());
+registerAction('createDataBackup', () => createDataBackup());
+registerAction('verifyDataBackup', (_, d) => verifyDataBackup(d.id));
+registerAction('openRestoreBackup', (_, d) => openRestoreBackup(d.id));
 registerAction('openCronModal', (_, d) => openCronModal(d.id || ''));
 registerAction('saveNotificationSettings', () => saveNotificationSettings());
 registerAction('saveEnvConfig', () => saveEnvConfig());

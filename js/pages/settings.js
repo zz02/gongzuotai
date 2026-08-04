@@ -17,12 +17,12 @@ export async function renderSettings() {
     if (kbBanner) kbBanner.classList.toggle('hidden', !status.kbEncryptionInsecure);
     const pill = document.getElementById('api-status-pill');
     if (!pill) return;
-    pill.className = `pill ${status.redfoxConfigured ? 'pill-green' : 'pill-hot'}`;
-    pill.innerHTML = `<i data-lucide="${status.redfoxConfigured ? 'check' : 'x'}" class="w-3 h-3"></i>${status.redfoxConfigured ? '已配置' : '未配置'}`;
+    pill.className = `pill ${status.redfoxConfigured ? 'pill-green' : 'pill-gray'}`;
+    pill.innerHTML = `<i data-lucide="${status.redfoxConfigured ? 'check' : 'minus'}" class="w-3 h-3"></i>${status.redfoxConfigured ? '已配置' : '可选'}`;
     const llmPill = document.getElementById('llm-status-pill');
     if (!llmPill) return;
-    llmPill.className = `pill ${status.llmConfigured ? 'pill-green' : 'pill-hot'}`;
-    llmPill.innerHTML = `<i data-lucide="${status.llmConfigured ? 'check' : 'x'}" class="w-3 h-3"></i>${status.llmConfigured ? '已配置' : '未配置'}`;
+    llmPill.className = `pill ${status.llmConfigured ? 'pill-green' : 'pill-gray'}`;
+    llmPill.innerHTML = `<i data-lucide="${status.llmConfigured ? 'check' : 'minus'}" class="w-3 h-3"></i>${status.llmConfigured ? '已配置' : '可选'}`;
     const githubPill = document.getElementById('github-status-pill');
     if (githubPill) {
       const on = !!status.githubConfigured;
@@ -94,6 +94,8 @@ export async function renderSettings() {
     }
     document.getElementById('api-detail').textContent = '配置变更后需重启服务生效';
     await loadQuota();
+    await loadDataBackups().catch(() => {});
+    await loadSystemDiagnostics().catch(() => {});
     await renderCronList();
     await renderNotificationSettings();
     initIcons(document.getElementById('content-area'));
@@ -101,6 +103,235 @@ export async function renderSettings() {
     const detail = document.getElementById('api-detail');
     if (detail) detail.textContent = e.message;
   }
+}
+
+const DIAGNOSTIC_META = Object.freeze({
+  normal: { label: '正常', pill: 'pill-green', icon: 'check-circle-2' },
+  warning: { label: '待处理', pill: 'pill-amber', icon: 'alert-triangle' },
+  error: { label: '异常', pill: 'pill-hot', icon: 'circle-x' },
+});
+
+const DIAGNOSTIC_ACTIONS = Object.freeze({
+  backup: { action: 'createDataBackup', label: '立即备份' },
+  'content-workspace': { action: 'configureContentWorkspace', label: '配置路径' },
+  redfox: { action: 'openEnvModal', label: '去配置' },
+  llm: { action: 'openEnvModal', label: '去配置' },
+  github: { action: 'openEnvModal', label: '去配置' },
+  notion: { action: 'openKbConfigModal', label: '去配置' },
+  wersss: { action: 'openWersssConfig', label: '去配置' },
+  'xhs-mcp': { action: 'openXhsMcpConfig', label: '去配置' },
+  'credential-security': { action: 'openEnvModal', label: '查看配置' },
+});
+
+function diagnosticDateTime(value) {
+  return backupDateTime(value);
+}
+
+function renderSystemDiagnostics(result) {
+  const pill = document.getElementById('diagnostics-status-pill');
+  const summary = document.getElementById('diagnostics-summary');
+  const list = document.getElementById('diagnostics-list');
+  const checkedAt = document.getElementById('diagnostics-checked-at');
+  if (!pill || !summary || !list) return;
+  const overall = DIAGNOSTIC_META[result?.status] || DIAGNOSTIC_META.error;
+  const counts = result?.counts || { normal: 0, warning: 0, error: 0 };
+  const items = Array.isArray(result?.items) ? result.items : [];
+  pill.className = `pill ${overall.pill}`;
+  pill.innerHTML = `<i data-lucide="${overall.icon}" class="w-3 h-3"></i>${overall.label}`;
+  const headline = counts.error
+    ? `发现 ${counts.error} 项异常，建议先处理后再发布`
+    : counts.warning
+      ? `核心流程可用，还有 ${counts.warning} 项能力待配置`
+      : '所有检查项均正常，可以继续使用';
+  summary.innerHTML = `<div class="diagnostics-summary-copy"><div class="text-sm text-gray-200">${headline}</div><div class="text-[11px] text-gray-500 mt-1">共检查 ${items.length} 项；可选能力未配置不会阻断本地内容流程。</div></div><div class="diagnostics-counts"><span>${Number(counts.normal) || 0} 正常</span><span>${Number(counts.warning) || 0} 待处理</span><span>${Number(counts.error) || 0} 异常</span></div>`;
+  list.innerHTML = items.map(entry => {
+    const meta = DIAGNOSTIC_META[entry.status] || DIAGNOSTIC_META.error;
+    const action = entry.status === 'normal' ? null : DIAGNOSTIC_ACTIONS[entry.id];
+    return `<article class="diagnostic-item is-${esc(entry.status)}">
+      <div class="diagnostic-item-head">
+        <div class="diagnostic-item-name"><i data-lucide="${meta.icon}" class="w-4 h-4 ${entry.status === 'normal' ? 'text-emerald-400' : entry.status === 'warning' ? 'text-amber-400' : 'text-red-400'} flex-shrink-0"></i><span class="truncate">${esc(entry.name)}</span></div>
+        <span class="pill ${meta.pill} !text-[10px] !py-0">${meta.label}</span>
+      </div>
+      <div class="text-xs text-gray-300 mt-2 leading-relaxed">${esc(entry.summary)}</div>
+      <div class="diagnostic-item-copy"><span class="text-gray-500">业务影响：</span>${esc(entry.impact)}</div>
+      <div class="diagnostic-next"><div class="diagnostic-next-copy"><span class="text-gray-500">下一步：</span>${esc(entry.nextStep)}</div>${action ? `<button class="btn btn-ghost py-1 px-2 text-[11px] flex-shrink-0" data-action="${action.action}">${action.label}</button>` : ''}</div>
+    </article>`;
+  }).join('') || '<div class="diagnostic-item is-error text-xs text-red-300">诊断结果为空，请重新诊断。</div>';
+  if (checkedAt) checkedAt.textContent = `检查时间：${diagnosticDateTime(result?.checkedAt)}。结果不包含密钥、Cookie、文件内容或本机路径。`;
+  initIcons(document.getElementById('system-diagnostics-title')?.closest('section'));
+}
+
+function renderDiagnosticsFailure(error) {
+  const pill = document.getElementById('diagnostics-status-pill');
+  const summary = document.getElementById('diagnostics-summary');
+  const list = document.getElementById('diagnostics-list');
+  if (pill) {
+    pill.className = 'pill pill-hot';
+    pill.innerHTML = '<i data-lucide="circle-x" class="w-3 h-3"></i>检查失败';
+  }
+  if (summary) summary.innerHTML = '<div class="diagnostics-summary-copy"><div class="text-sm text-red-300">诊断暂时无法完成</div><div class="text-[11px] text-gray-500 mt-1">这不代表数据已经损坏，可以稍后重试。</div></div>';
+  if (list) list.innerHTML = `<div class="diagnostic-item is-error"><div class="text-xs text-red-300">${esc(error.message)}</div><button class="btn btn-ghost py-1.5 px-2.5 text-xs mt-3" data-action="loadSystemDiagnostics"><i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>重新诊断</button></div>`;
+  initIcons(document.getElementById('system-diagnostics-title')?.closest('section'));
+}
+
+export async function loadSystemDiagnostics() {
+  const buttons = Array.from(document.querySelectorAll('[data-action="loadSystemDiagnostics"]'));
+  buttons.forEach(button => {
+    button.disabled = true;
+    button.setAttribute('aria-busy', 'true');
+    button.innerHTML = '<i data-lucide="loader" class="w-3.5 h-3.5 animate-spin"></i>检查中';
+  });
+  initIcons(document.getElementById('system-diagnostics-title')?.closest('section'));
+  try {
+    const result = await localApi('diagnostics', { abortKey: 'settings-diagnostics' });
+    window._systemDiagnostics = result;
+    renderSystemDiagnostics(result);
+    return result;
+  } catch (error) {
+    if (error.name === 'AbortError') return null;
+    renderDiagnosticsFailure(error);
+    throw error;
+  } finally {
+    buttons.forEach(button => {
+      button.disabled = false;
+      button.removeAttribute('aria-busy');
+      button.innerHTML = '<i data-lucide="scan-line" class="w-3.5 h-3.5"></i>重新诊断';
+    });
+    initIcons(document.getElementById('system-diagnostics-title')?.closest('section'));
+  }
+}
+
+function backupBytes(value) {
+  const bytes = Number(value) || 0;
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 ** 2) return `${(bytes / 1024).toFixed(1)} KB`;
+  if (bytes < 1024 ** 3) return `${(bytes / 1024 ** 2).toFixed(1)} MB`;
+  return `${(bytes / 1024 ** 3).toFixed(1)} GB`;
+}
+
+function backupDateTime(value) {
+  if (!value) return '—';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '—';
+  const pad = number => String(number).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
+function backupTrigger(value) {
+  return ({ manual: '手动备份', 'pre-restore': '恢复前快照', 'password-reset': '密码恢复前', upgrade: '升级前' })[value] || '系统备份';
+}
+
+function renderBackupList(status) {
+  const pill = document.getElementById('backup-status-pill');
+  const summary = document.getElementById('backup-summary');
+  const list = document.getElementById('backup-list');
+  const scope = document.getElementById('backup-scope-note');
+  if (!pill || !summary || !list) return;
+  const backups = Array.isArray(status?.backups) ? status.backups : [];
+  const latest = backups.find(item => item.status !== 'invalid') || null;
+  const invalidCount = backups.filter(item => item.status === 'invalid').length;
+  pill.className = `pill ${invalidCount ? 'pill-hot' : latest ? 'pill-green' : 'pill-gray'}`;
+  pill.innerHTML = invalidCount
+    ? `<i data-lucide="alert-triangle" class="w-3 h-3"></i>${invalidCount} 个异常`
+    : latest
+      ? '<i data-lucide="check" class="w-3 h-3"></i>可恢复'
+      : '<i data-lucide="minus" class="w-3 h-3"></i>尚未备份';
+  summary.innerHTML = `
+    <div class="rounded-lg border border-white/10 bg-white/[0.02] p-3"><div class="text-[11px] text-gray-500">最近备份</div><div class="text-sm text-gray-200 mt-1">${latest ? backupDateTime(latest.createdAt) : '尚未创建'}</div></div>
+    <div class="rounded-lg border border-white/10 bg-white/[0.02] p-3"><div class="text-[11px] text-gray-500">受管备份</div><div class="text-sm text-gray-200 mt-1">${Number(status?.count) || 0} 个 · ${backupBytes(status?.managedSize)}</div></div>
+    <div class="rounded-lg border border-white/10 bg-white/[0.02] p-3"><div class="text-[11px] text-gray-500">可用空间</div><div class="text-sm text-gray-200 mt-1">${status?.availableBytes == null ? '无法读取' : backupBytes(status.availableBytes)}</div></div>`;
+
+  if (!backups.length) {
+    list.innerHTML = `<div class="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3"><div><div class="text-sm text-gray-300">还没有可校验的受管备份</div><div class="text-[11px] text-gray-500 mt-1">首次正式使用前，建议先创建一个完整备份。</div></div><button class="btn btn-primary py-1.5 px-2.5 text-xs flex-shrink-0" data-action="createDataBackup"><i data-lucide="archive" class="w-3.5 h-3.5"></i>立即备份</button></div>`;
+  } else {
+    list.innerHTML = backups.slice(0, 8).map(backup => {
+      const invalid = backup.status === 'invalid';
+      return `<div class="p-3.5 border-b border-white/10 last:border-b-0 flex flex-col md:flex-row md:items-center gap-3 ${invalid ? 'bg-red-500/[0.04]' : 'bg-white/[0.01]'}">
+        <div class="min-w-0 flex-1">
+          <div class="flex items-center gap-2 flex-wrap"><code class="text-xs text-gray-200 break-all">${esc(backup.id)}</code><span class="pill ${invalid ? 'pill-hot' : 'pill-green'} !text-[10px] !py-0">${invalid ? '异常' : '已校验'}</span><span class="pill pill-gray !text-[10px] !py-0">${esc(backupTrigger(backup.trigger))}</span></div>
+          <div class="text-[11px] text-gray-500 mt-1.5">${invalid ? esc(backup.error || '备份清单无效') : `${backupDateTime(backup.createdAt)} · ${backupBytes(backup.totalSize)} · ${backup.configIncluded ? '含本机配置' : '无配置副本'} · ${backup.encryptionKeyIncluded ? '含知识库密钥' : '无受管密钥'} · 校验于 ${backupDateTime(backup.lastVerifiedAt)}`}</div>
+        </div>
+        <div class="flex items-center gap-2 flex-shrink-0">
+          <button class="btn btn-ghost py-1.5 px-2.5 text-xs" data-action="verifyDataBackup" data-id="${esc(backup.id)}"><i data-lucide="badge-check" class="w-3.5 h-3.5"></i>校验</button>
+          ${invalid ? '' : `<button class="btn btn-ghost py-1.5 px-2.5 text-xs text-amber-300" data-action="openRestoreBackup" data-id="${esc(backup.id)}"><i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>恢复说明</button>`}
+        </div>
+      </div>`;
+    }).join('');
+  }
+  if (scope) {
+    const legacy = Number(status?.legacyCount) || 0;
+    scope.textContent = `备份包含 SQLite、本机配置，以及存在时的受管知识库密钥；原自媒体工作区与日志不纳入覆盖。恢复会撤销历史登录会话，并先创建安全快照。${legacy ? `另保留 ${legacy} 个旧版散装备份，不支持直接恢复。` : ''}`;
+  }
+  initIcons(document.getElementById('data-protection-title')?.closest('section'));
+}
+
+export async function loadDataBackups() {
+  try {
+    const status = await localApi('backups', { abortKey: 'settings-backups' });
+    window._dataBackups = status;
+    renderBackupList(status);
+    return status;
+  } catch (error) {
+    if (error.name === 'AbortError') return null;
+    const pill = document.getElementById('backup-status-pill');
+    const list = document.getElementById('backup-list');
+    if (pill) {
+      pill.className = 'pill pill-hot';
+      pill.innerHTML = '<i data-lucide="alert-triangle" class="w-3 h-3"></i>读取失败';
+    }
+    if (list) list.innerHTML = `<div class="p-4 text-xs text-red-300">${esc(error.message)}</div>`;
+    initIcons(document.getElementById('data-protection-title')?.closest('section'));
+    throw error;
+  }
+}
+
+export async function createDataBackup() {
+  const buttons = Array.from(document.querySelectorAll('[data-action="createDataBackup"]'));
+  buttons.forEach(button => {
+    button.disabled = true;
+    button.setAttribute('aria-busy', 'true');
+    button.innerHTML = '<i data-lucide="loader" class="w-3.5 h-3.5 animate-spin"></i>备份中';
+  });
+  initIcons(document.getElementById('data-protection-title')?.closest('section'));
+  try {
+    const backup = await localApi('backups', { method: 'POST', body: {} });
+    toast(`备份已创建：${backup.id}`, 'success');
+    await loadDataBackups();
+  } finally {
+    buttons.forEach(button => {
+      button.disabled = false;
+      button.removeAttribute('aria-busy');
+      button.innerHTML = '<i data-lucide="archive" class="w-3.5 h-3.5"></i>立即备份';
+    });
+    initIcons(document.getElementById('data-protection-title')?.closest('section'));
+  }
+}
+
+export async function verifyDataBackup(id) {
+  if (!id) return;
+  toast('正在校验备份…', 'info');
+  const backup = await localApi(`backups/${encodeURIComponent(id)}/verify`, { method: 'POST', body: {} });
+  toast(`校验通过：${backup.id}`, 'success');
+  await loadDataBackups();
+}
+
+export function openRestoreBackup(id) {
+  const backup = window._dataBackups?.backups?.find(item => item.id === id && item.status !== 'invalid');
+  if (!backup) { toast('备份不存在或状态异常', 'error'); return; }
+  const command = `npm run backup:restore -- ${id} --confirm ${id}`;
+  const databaseOnly = `${command} --database-only`;
+  const modal = document.createElement('div');
+  modal.className = 'modal-mask';
+  modal.innerHTML = `<div class="modal" style="max-width:640px" role="dialog" aria-modal="true" aria-label="恢复数据">
+    <div class="flex items-center justify-between mb-4"><div><h2 class="text-lg font-bold flex items-center gap-2"><i data-lucide="rotate-ccw" class="w-5 h-5 text-amber-400"></i>恢复数据</h2><p class="text-[11px] text-gray-500 mt-1">备份时间：${backupDateTime(backup.createdAt)}</p></div><button class="btn btn-ghost py-1 px-2" data-action="closeModal" aria-label="关闭"><i data-lucide="x" class="w-4 h-4"></i></button></div>
+    <div class="backup-restore-warning rounded-lg p-3 text-xs leading-relaxed">恢复会短暂停止本机服务，替换 SQLite，并撤销全部历史登录会话。系统会先创建“恢复前快照”；原自媒体工作区不会被修改。</div>
+    <div class="mt-4"><div class="text-xs font-medium text-gray-300">恢复数据库、配置与受管密钥</div><div class="mt-2 rounded-lg border border-white/10 bg-black/20 p-3 flex items-start gap-3"><code class="text-[11px] text-cyan-300 break-all flex-1 select-all">${esc(command)}</code><button class="btn btn-ghost py-1 px-2 text-xs flex-shrink-0" data-action="copyText" data-text="${esc(command)}"><i data-lucide="copy" class="w-3.5 h-3.5"></i>复制</button></div></div>
+    <div class="mt-4"><div class="text-xs font-medium text-gray-300">只恢复数据库</div><div class="mt-2 rounded-lg border border-white/10 bg-black/20 p-3 flex items-start gap-3"><code class="text-[11px] text-gray-300 break-all flex-1 select-all">${esc(databaseOnly)}</code><button class="btn btn-ghost py-1 px-2 text-xs flex-shrink-0" data-action="copyText" data-text="${esc(databaseOnly)}"><i data-lucide="copy" class="w-3.5 h-3.5"></i>复制</button></div></div>
+    <div class="mt-4 text-[11px] text-gray-500 leading-relaxed">请在 Insprira 项目目录的本机终端执行。备份编号必须重复输入，避免误恢复；当前数据路径、监听地址和端口会保持不变。只有确认当前知识库密钥仍与历史数据匹配时，才使用“只恢复数据库”。</div>
+    <div class="flex justify-end mt-5"><button class="btn btn-ghost" data-action="closeModal">关闭</button></div>
+  </div>`;
+  document.body.appendChild(modal);
+  initIcons(modal);
 }
 
 export async function openRedfoxApply() {
@@ -406,9 +637,10 @@ export async function openEnvModal() {
       ['LLM_BASE_URL','LLM Base URL','text'],
       ['LLM_API_KEY','LLM API Key','password'],
       ['LLM_MODEL','LLM 模型','text'],
-      ['KB_ENCRYPTION_KEY','知识库加密密钥','password','用于加密 Notion 凭证。已有数据请勿随意修改。'],
+      ['KB_ENCRYPTION_KEY','知识库加密密钥','password','默认由 data/kb-encryption.key 自动管理。已有凭证后请勿直接换钥。'],
       ['GITHUB_API_TOKEN','GitHub API Token','password','可选。Skill 中心更新走 GitHub API，未配置时匿名请求频率 60/hr 容易 403；配置后提升到 5000/hr。Personal access token 即可，无需勾选任何权限。','https://github.com/settings/tokens'],
       ['ENABLE_SCHEDULER','启用调度器','text',''],
+      ['CONTENT_WORKSPACE_ROOT','内容工作区','text','现有自媒体工作区根目录。Markdown 与脚本保持原位，不迁移到 insprira。'],
     ];
     const modal = document.createElement('div');
     modal.className = 'modal-mask';

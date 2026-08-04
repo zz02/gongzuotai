@@ -9,6 +9,11 @@ import { initIcons } from '../icons.js';
 let rewriteHotspots = [];
 let selectedRewriteHotspot = null;
 let currentCreatorMode = 'create';  // create / rewrite
+let creatorCapabilities = {
+  loaded: false,
+  llmConfigured: false,
+  redfoxConfigured: false,
+};
 const MODE_META = {
   create:  { label: '开始创作', hint: '创作模式：基于主题/大纲从零写，可适当发挥但遵守事实底线' },
   rewrite: { label: '开始改写', hint: '改写模式：在原素材基础上打磨、扩展结构或换风格，保留事实' },
@@ -72,11 +77,95 @@ function bindCreatorModeTabs() {
   });
 }
 
-export function renderCreator() {
+function setCapabilityButton(id, enabled, unavailableReason) {
+  const button = document.getElementById(id);
+  if (!button) return;
+  button.disabled = !enabled;
+  if (enabled) {
+    button.removeAttribute('aria-disabled');
+    button.removeAttribute('title');
+  } else {
+    button.setAttribute('aria-disabled', 'true');
+    button.title = unavailableReason;
+  }
+}
+
+function renderCreatorCapabilities(status = null, error = null) {
+  const host = document.getElementById('creator-capability-status');
+  if (!host) return;
+  const loaded = Boolean(status && !error);
+  creatorCapabilities = {
+    loaded,
+    llmConfigured: loaded && Boolean(status.llmConfigured),
+    redfoxConfigured: loaded && Boolean(status.redfoxConfigured),
+  };
+
+  const llmReason = loaded ? '请先在设置中配置 LLM 服务' : '创作能力状态暂不可用，请刷新重试';
+  const redfoxReason = loaded ? '请先在设置中配置 RedFox' : 'RedFox 状态暂不可用，请刷新重试';
+  setCapabilityButton('doRewriteBtn', creatorCapabilities.llmConfigured, llmReason);
+  setCapabilityButton('hotspotAnalyzeBtn', creatorCapabilities.llmConfigured, llmReason);
+  setCapabilityButton('checkWordBtn', creatorCapabilities.redfoxConfigured, redfoxReason);
+  setCapabilityButton('generateCoverBtn', creatorCapabilities.redfoxConfigured, redfoxReason);
+
+  if (!loaded) {
+    host.className = 'rounded-xl border border-red-500/25 bg-red-500/10 p-3';
+    host.innerHTML = `
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="pill pill-green"><i data-lucide="check" class="w-3 h-3"></i>本地编辑可用</span>
+        <span class="pill pill-hot"><i data-lucide="circle-alert" class="w-3 h-3"></i>能力状态读取失败</span>
+        <button class="btn btn-ghost py-1 px-2 text-[11px] ml-auto" data-action="gotoPage" data-page="settings">打开设置</button>
+      </div>
+      <div class="text-[11px] text-red-200/80 mt-2">${esc(error?.message || '请点击页面顶部“刷新”重试。')}</div>`;
+    initIcons(host);
+    return;
+  }
+
+  const llmPill = creatorCapabilities.llmConfigured
+    ? '<span class="pill pill-green"><i data-lucide="check" class="w-3 h-3"></i>AI 创作可用</span>'
+    : '<span class="pill pill-gray"><i data-lucide="minus" class="w-3 h-3"></i>AI 创作待配置</span>';
+  const redfoxPill = creatorCapabilities.redfoxConfigured
+    ? '<span class="pill pill-green"><i data-lucide="check" class="w-3 h-3"></i>RedFox 可用</span>'
+    : '<span class="pill pill-gray"><i data-lucide="minus" class="w-3 h-3"></i>RedFox 待配置</span>';
+  const missing = [];
+  if (!creatorCapabilities.llmConfigured) missing.push('创作、改写与热点分析');
+  if (!creatorCapabilities.redfoxConfigured) missing.push('违禁词、封面与在线热点刷新');
+  host.className = 'rounded-xl border border-white/10 bg-white/[0.025] p-3';
+  host.innerHTML = `
+    <div class="flex flex-wrap items-center gap-2">
+      <span class="pill pill-green"><i data-lucide="check" class="w-3 h-3"></i>本地编辑可用</span>
+      ${llmPill}
+      ${redfoxPill}
+      ${missing.length ? '<button class="btn btn-ghost py-1 px-2 text-[11px] ml-auto" data-action="gotoPage" data-page="settings">前往设置</button>' : ''}
+    </div>
+    <div class="text-[11px] text-gray-500 mt-2">${missing.length
+      ? `${esc(missing.join('、'))}暂不可用；手工编辑、复制、导出和本地内容流程仍可使用。`
+      : '创作、热点分析与 RedFox 增强能力均已就绪。'}</div>`;
+  initIcons(host);
+
+  const checkResult = document.getElementById('checkResult');
+  if (checkResult && !creatorCapabilities.redfoxConfigured) checkResult.textContent = '配置 RedFox 后可使用违禁词检测';
+  const coverResult = document.getElementById('coverResult');
+  if (coverResult && !creatorCapabilities.redfoxConfigured) coverResult.textContent = '配置 RedFox 后可生成 AI 封面';
+}
+
+async function loadCreatorCapabilities() {
+  try {
+    const status = await localApi('status', { abortKey: 'creator-capability-status' });
+    renderCreatorCapabilities(status);
+    return true;
+  } catch (error) {
+    if (error.name === 'AbortError') return false;
+    renderCreatorCapabilities(null, error);
+    return false;
+  }
+}
+
+export async function renderCreator() {
   const source = LS.get('creatorSource', null);
   const sourceEl = document.getElementById('creator-source');
   if (source) {
-    document.getElementById('creatorInput').value = source.title + '\n\n' + (source.desc || source.summary || '');
+    const input = document.getElementById('creatorInput');
+    if (input && !input.value.trim()) input.value = source.title + '\n\n' + (source.desc || source.summary || '');
     const metaEl = document.getElementById('creator-source-meta');
     const titleEl = document.getElementById('creator-source-title');
     if (metaEl) {
@@ -92,12 +181,16 @@ export function renderCreator() {
     sourceEl.classList.add('hidden');
   }
   initIcons(document.getElementById('content-area'));
-  loadStyleProfiles();
   bindCreatorModeTabs();
   bindPlatformSkillBadge();
   bindPlatformPills();
   bindTonePills();
   bindCopyButtons();
+  const [, capabilityResult] = await Promise.allSettled([
+    loadStyleProfiles(),
+    loadCreatorCapabilities(),
+  ]);
+  return capabilityResult.status === 'fulfilled' && capabilityResult.value === true;
 }
 
 async function loadStyleProfiles() {
@@ -135,6 +228,10 @@ export function sendToCreator(item) {
 }
 
 export async function doCheckWord() {
+  if (!creatorCapabilities.redfoxConfigured) {
+    toast('请先在设置中配置 RedFox', 'error');
+    return;
+  }
   const text = document.getElementById('creatorInput').value.trim();
   const platform = document.getElementById('checkPlatform').value;
   if (!text) { toast('请先输入文案', 'error'); return; }
@@ -200,6 +297,10 @@ export function inspectSensitiveHtml(html) {
 }
 
 export async function analyzeRewriteHotspots() {
+  if (!creatorCapabilities.llmConfigured) {
+    toast('请先在设置中配置 LLM 服务', 'error');
+    return;
+  }
   const text = document.getElementById('creatorInput').value.trim();
   if (!text) { toast('请先输入文章素材', 'error'); return; }
   const button = document.getElementById('hotspotAnalyzeBtn');
@@ -209,6 +310,12 @@ export async function analyzeRewriteHotspots() {
   try {
     let result = await localApi('rewrite/hotspots', { method: 'POST', body: { text, allowApi: false } });
     if (result.needsApiConfirmation) {
+      if (!creatorCapabilities.redfoxConfigured) {
+        const source = document.getElementById('rewriteHotspotSource');
+        if (source) source.textContent = `本地数据库暂无 ${result.dataDate} 的热点；配置 RedFox 后可在线刷新。`;
+        toast('本地暂无当天热点，RedFox 未配置，未发起在线调用', 'info');
+        return;
+      }
       const approved = confirm(`本地数据库没有 ${result.dataDate} 的实时热点。是否调用 RedFox API 刷新当天热点？`);
       if (!approved) {
         toast('已取消 API 调用', 'info');
@@ -288,6 +395,10 @@ export function clearSelectedHotspot() {
 }
 
 export async function doRewrite() {
+  if (!creatorCapabilities.llmConfigured) {
+    toast('请先在设置中配置 LLM 服务', 'error');
+    return;
+  }
   const text = document.getElementById('creatorInput').value.trim();
   const resultEl = document.getElementById('rewriteResult');
   if (!text) { toast('请先输入素材', 'error'); return; }
@@ -408,6 +519,10 @@ export async function exportToKb() {
 }
 
 export async function generateCover() {
+  if (!creatorCapabilities.redfoxConfigured) {
+    toast('请先在设置中配置 RedFox', 'error');
+    return;
+  }
   const content = [
     document.getElementById('rewriteTitle').value.trim(),
     document.getElementById('rewriteIntro').value.trim(),

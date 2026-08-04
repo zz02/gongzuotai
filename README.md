@@ -1,58 +1,273 @@
 # 灵感熔炉
 
-本地自媒体工作台。
+本地优先的全平台自媒体工作台。它把热点、选题、知识库、创作、账号追踪和现有内容项目放进同一个入口，同时保留原有 Markdown、脚本与目录结构。
 
-## 功能
+## 产品边界
 
-- **热榜与趋势**：全网热点聚合；抖音 / 小红书 / 公众号 / AI 公众号 / AI B站 / AI 小红书 / AI 抖音 / AI 快手 / AI 视频号 / 短剧抖音 / 短剧公众号等 11 个源；7/14 天增长 / 稳定 / 冷却趋势
-- **Skill 中心**：从 [redfox-community](https://github.com/redfox-community/skills) 拉取并热更新；LLM 自动分类（热点 / 帐号 / 信息源 / 创作 / 分析 / 检索 / 生成工具）；热点 Skill 可一键绑定为热榜 Tab
-- **热榜动态 Tab**：默认只显示抖音 / 小红书 / 公众号 3 个基础 Tab，其余平台通过 Skill 绑定后动态创建，解绑即移除
-- **选题生成**：基于本地热榜证据 + 公众号爆款搜索，调用 OpenAI 兼容 LLM 生成选题；可联网补全
-- **账号追踪**：分组订阅、作品同步、公众号 / 抖音 / 小红书诊断、趋势图表（粉丝 / 红狐指数 / 评分 / 作品数）
-- **知识库**：Obsidian / Notion 双源接入 + WeRss（we-mp-rss）公众号文章同步；成稿可一键导出
-- **内容创作**：多平台改写（小红书 / 公众号 / 知乎 / 抖音 / 视频号 / 快手 / B站）、RedFox `gpt-image-2` 封面生成、违禁词检测
-- **本地 Agent**：Codex / Claude Code / Kimi / OpenClaw / Hermes 子进程集成
-- **CRON 调度**：内置每日热榜快照、缓存清理、WeRss 同步、账号追踪刷新等任务；支持自定义、拖拽排序
-- **Docker 部署**：Dockerfile + Docker Compose，支持 linux/amd64 与 linux/arm64
+灵感熔炉有三层能力，外部服务未配置时不会阻断本地核心流程。
 
-## 启动
+| 能力层 | 开箱可用 | 配置后增强 |
+|---|---|---|
+| 本地核心 | 手工选题、内容项目、原工作流检查与推进、本地知识库、本地 Agent | 无 |
+| 全网数据 | 已保存的本地快照 | RedFox 热榜、搜索、账号与作品数据 |
+| AI 处理 | 原脚本与人工创作流程 | OpenAI 兼容模型的选题、分析与改写 |
 
-需 Node.js ≥ 20 或 Docker。**推荐用 Docker dev 工作流**——源码挂载 + `node --watch` 改代码即热重启。
+RedFox 是正式数据源之一，不会被移除；它是增强能力，不是首次启动前置。
 
-### Docker dev（推荐）
+## 五分钟开始使用
+
+需要 Node.js 20 或更高版本。
+
+正式版本可从 GitHub Releases 下载 `insprira-版本号.tar.gz`。同一版本会附带 `.sha256` 校验文件；校验通过后解压并进入目录。
+
+```bash
+shasum -a 256 -c insprira-版本号.tar.gz.sha256
+tar -xzf insprira-版本号.tar.gz
+cd insprira-版本号
+```
+
+也可以直接使用已检出的源码目录。进入项目后执行：
+
+```bash
+./start.sh start
+```
+
+发布前可以在本机生成当前工作树的候选包，用于干净目录安装验收：
+
+```bash
+npm run release:candidate
+shasum -a 256 -c dist/insprira-版本号-candidate.tar.gz.sha256
+```
+
+候选包会同时检查必需文件、符号链接、目录结构与运行时数据泄漏。GitHub 正式发布使用同一构建器，但只打包已提交并打标签的版本。
+
+启动脚本会自动完成以下操作：
+
+1. 创建本机 `.env`，不要求预先填写 RedFox 或大模型密钥。
+2. 只安装缺失的运行依赖，不安装开发工具链。
+3. 检查数据库原生模块是否匹配当前 Node 运行时；版本切换后会自动重建。
+4. 在后台启动服务；只有 HTTP 健康检查通过后才输出访问地址，失败时显示最近日志并清理无效 PID。
+
+打开 [http://127.0.0.1:8080](http://127.0.0.1:8080)。新安装会进入“初始化工作台”：
+
+1. 创建本机管理员，没有固定默认密码。
+2. 可选填写现有自媒体工作区路径。
+3. 系统校验目录后直接进入“内容项目”。
+
+常用命令：
+
+```bash
+./start.sh status
+./start.sh logs
+./start.sh restart
+./start.sh stop
+```
+
+### macOS 推荐：安装常驻服务
+
+准备正式长期使用时，建议让 macOS 接管服务。安装后，登录系统会自动启动；服务异常退出或在设置页触发重启时，也会自动恢复。
+
+```bash
+npm run service:install
+```
+
+安装完成后仍可继续使用原来的统一命令：
+
+```bash
+./start.sh status
+./start.sh restart
+./start.sh logs
+./start.sh stop
+./start.sh start
+```
+
+也可以使用完整的服务命令：
+
+```bash
+npm run service:status
+npm run service:restart
+npm run service:logs
+npm run service:uninstall
+```
+
+卸载常驻服务只会移除 macOS 启动项，不会删除数据库、配置、日志或原自媒体工作区。
+
+### 忘记管理员密码
+
+密码不会以明文保存，无法找回原密码。可以在本机项目目录执行安全恢复：
+
+```bash
+npm run password:reset -- --username admin
+```
+
+命令会隐藏密码输入、校验两次输入是否一致，并在修改前自动备份 SQLite。密码更新后，旧密码立即失效，该账号已经登录的所有设备也会被退出。
+
+## 无损接入现有工作流
+
+配置 `CONTENT_WORKSPACE_ROOT` 后，灵感熔炉直接读取原目录，不迁移也不复制业务文件。工作区至少包含：
+
+```text
+自媒体/
+├── .claude/
+│   └── skills/              # 可选：内容项目中的本地写作 Skill
+├── 内容工作台/
+│   └── 项目/
+│       └── 进行中/
+└── scripts/
+    ├── new_content_project.sh
+    └── content_project.py
+```
+
+项目创建仍由原脚本完成。系统先在同一磁盘的隔离目录创建，完整成功后再原子移入正式目录；失败不会留下半成品。
+
+从“灵感”建立项目时，系统会继续沿用原脚本，并把以下内容写入新项目的原 Markdown：
+
+- 选题摘要、内容角度、目标平台与关键词。
+- RedFox、本地榜单或关键词搜索产生的参考证据。
+- 选题生成依据与来源关联。
+
+所有外部证据统一标记为“待核验”。没有真实证据的手工选题或大模型推理不会伪造来源，也不会绕过资料阶段检查。同一选题只能关联一个内容项目，避免重复生产。
+
+### 在内容项目中运行本地 Skill
+
+内容项目详情页可以直接调用工作区 `.claude/skills/` 中的写作 Skill。第一版采用受控的“生成预览 → 人工确认 → 章节级回写”流程：
+
+1. 服务端只开放审核过的本地写作 Skill 和四个固定产物槽位。
+2. 本地 Agent 在只读模式中接收项目卡、资料库、母稿和 RedFox 证据上下文。
+3. 生成结果先显示回写前后对比，不会直接修改原文件。
+4. 用户确认后，只替换目标 Markdown 的指定章节；其他章节保持原样。
+5. 如果预览生成后原文件被手工修改，系统会拒绝覆盖并要求重新生成。
+
+这里的“只读”表示 Agent 不能直接修改工作区文件，不代表一定离线运行。项目上下文会交给所选 Agent 及其配置的模型服务，可能消耗对应账号额度。不应离开本机的内容，请选择离线 Agent 或继续使用原手工工作流。
+
+图片生成、发布和创建新 Skill 等会联网、运行脚本或创建额外文件的能力暂不进入第一版白名单，仍可沿用原工作流执行。每次预览、失败、确认回写和放弃都会留在本地审计记录中。
+
+## Docker 部署
 
 ```bash
 cp .env.example .env
-# 填写 .env
-docker compose -f docker-compose.yaml -f docker-compose.dev.yaml up
+docker compose up -d --build
+docker compose ps
 ```
 
-数据落在 `./data/`（与生产编排一致）。改 `server.js` / `js/*` / `index.html` 等会自动重启或刷新。
+默认只在宿主机 `127.0.0.1:8080` 暴露服务。首次打开页面创建管理员。数据保存在 `./data/`，容器健康检查会持续验证服务状态。
 
-### Docker 生产
+如需让局域网或公网访问，请先完成管理员初始化，再自行配置反向代理、HTTPS 和访问控制，不要直接暴露首次设置页面。
+
+反向代理只需转发工作台地址，不要把项目目录作为静态目录单独发布。应用自身仅允许浏览器读取 `index.html`、`css/`、`js/` 与 `vendor/`；`.env`、SQLite、备份、日志和后端源码不会通过页面地址返回。
+
+## 外部服务配置
+
+登录后进入“设置 → API Key 与环境”维护配置。敏感字段不会回显。
+
+| 配置 | 用途 | 是否必需 |
+|---|---|---|
+| `REDFOX_API_KEY` | 全网热榜、搜索、账号与作品数据 | 否 |
+| `LLM_API_KEY` | 自动选题、趋势分析、多平台改写 | 否 |
+| `CONTENT_WORKSPACE_ROOT` | 接入现有自媒体内容项目 | 否，但建议配置 |
+| `GITHUB_API_TOKEN` | 提升 Skill 社区更新频率 | 否 |
+| `KB_ENCRYPTION_KEY` | 自行托管知识库加密密钥 | 否，默认自动管理 |
+
+完整字段与说明见 [`.env.example`](.env.example)。
+
+## 一键系统诊断
+
+登录后进入“设置 → 系统诊断”，可以一次检查工作台服务、本机数据库、受管备份、磁盘空间、原内容工作区、凭证保护、RedFox、LLM、Skill 更新、Notion、WeRss 与小红书 MCP。
+
+诊断只读取本机健康状态和“是否已配置”，不会返回密钥、Cookie、文件内容或本机路径，也不会请求外部服务和消耗调用额度。每个检查项都会说明业务影响和下一步；RedFox 等可选能力未配置时标记为“待处理”，不会误报为本地核心流程故障。
+
+## 数据与备份
+
+登录后进入“设置 → 数据保护”，可以创建受管备份。每个备份都会：
+
+- 使用 SQLite 在线备份接口生成一致性数据库快照，不直接复制正在写入的数据库文件。
+- 保存本机 `.env` 和系统受管的知识库加密密钥（存在时）。
+- 记录文件大小和 SHA-256，创建后立即执行数据库完整性校验。
+- 使用私有目录与 `0600` 文件权限保存，不通过网页静态地址开放。
+
+备份不会复制或覆盖 `CONTENT_WORKSPACE_ROOT` 指向的原自媒体工作区。Markdown、素材、工作区内 Skills 和发布包仍由原目录管理。
+
+也可以在本机终端执行：
 
 ```bash
-cp .env.example .env
-docker compose up -d
+npm run backup:create
+npm run backup:list
+npm run backup:verify -- backup-YYYYMMDD-HHMMSS-编号
 ```
 
-镜像：[`ghcr.io/coracoo/insprira`](https://github.com/coracoo/insprira/pkgs/container/insprira)
-
-### 本地 npm（无 Docker 备选）
+恢复前先在设置页打开对应备份的“恢复说明”，复制带二次确认编号的命令：
 
 ```bash
-npm install
-cp .env.example .env
-npm run dev    # node --watch，热重启
-# 或
-npm start      # 一次性启动
+npm run backup:restore -- backup-YYYYMMDD-HHMMSS-编号 --confirm backup-YYYYMMDD-HHMMSS-编号
 ```
 
-数据默认落在 `./data/`（与 Docker 一致）。
+恢复命令会再次校验备份、生成“恢复前快照”、停止并重新启动受 macOS 托管的服务，同时撤销备份中的历史登录会话。当前数据路径、数据库路径、监听地址和端口不会被旧配置改写。只恢复数据库、不恢复 `.env` 和受管密钥时，可在命令末尾增加 `--database-only`；已有知识库凭证时不建议使用该选项。
 
-## 配置
+未由 macOS 托管的本机服务需要先停止后再恢复。Docker 部署使用同一数据卷执行：
 
-见 [`.env.example`](.env.example)。
+```bash
+docker compose stop insprira
+docker compose run --rm --no-deps insprira node scripts/restore-backup.js 备份编号 --confirm 备份编号
+docker compose up -d insprira
+```
+
+交付或迁移时至少保留：
+
+- `data/cache.db`：账户、灵感、配置、快照与运行记录。
+- `data/kb-encryption.key`：系统自动管理的知识库加密密钥。
+- `.env`：外部服务配置与自定义路径。
+- `data/backups/`：受管备份、升级与密码恢复前留下的安全副本。
+- 原自媒体工作区：Markdown、素材、脚本与发布包的事实源。
+
+`cache.db` 与 `kb-encryption.key` 必须一起备份。已有知识库凭证后不要直接更换加密密钥。
+
+## 安全默认值
+
+- 本地安装默认监听 `127.0.0.1`。
+- 新安装由用户创建管理员，不再使用 `admin / 123456`。
+- 密码使用 scrypt 加盐哈希，长度要求为 8-128 位。
+- 登录同时按账号和来源地址统计失败次数，达到上限后临时锁定；不存在的账号使用相同响应与密码校验成本，默认不信任转发地址头。
+- 会话 Cookie 使用 `HttpOnly` 与 `SameSite=Strict`；HTTPS 下自动增加 `Secure`。
+- 密码恢复只能从本机终端执行；每次恢复都会先备份数据库并撤销该账号全部会话。
+- 知识库加密密钥默认在数据目录自动生成，文件权限为 `0600`。
+- API 与前端静态资源禁用缓存，避免配置响应缓存和前后端版本错配。
+- 静态文件采用明确白名单，配置、数据库、备份、日志和后端源码不能通过 HTTP 读取。
+- 受管备份使用 SQLite 一致性快照、SHA-256 清单和恢复前自动快照；损坏备份在替换数据前会被拒绝。
+- 页面默认禁止第三方站点嵌入，并限制摄像头、麦克风、定位和脚本来源。
+
+旧版本升级时不会删除账号或业务数据。如果仍在使用旧默认密码，登录后会继续提示修改。
+
+## 主要功能
+
+- RedFox 多平台热榜与趋势快照
+- 手工选题与大模型自动选题
+- 灵感卡一键建立内容项目
+- 内容项目扫描、检查、顺序推进与发布中心
+- 内容项目内本地 Skill 只读预览、章节级确认回写与执行审计
+- 一键一致性备份、备份校验与本机安全恢复
+- 一键系统诊断与可执行处理清单
+- 抖音、小红书、公众号账号追踪与诊断
+- Obsidian、Notion、WeRss 知识库接入
+- 多平台改写、违禁词检查与封面生成
+- Codex、Claude Code、Kimi、OpenClaw、Hermes 本地 Agent
+- CRON 调度、通知与调用审计
+
+## 开发验证
+
+```bash
+npm test
+npm run check
+npm run build
+npm run preflight
+```
+
+`npm run preflight` 是发布前统一门禁：校验版本与交付结构、浏览器模块引用、页面动作注册、Git 运行时文件泄漏风险，并依次执行完整测试、语法检查、样式构建和变更格式检查。GitHub Release 也使用同一门禁。
+
+## 二次开发与源码提供
+
+本项目基于 [coracoo/insprira](https://github.com/coracoo/insprira) 二次开发，v0.6.0 的修改日期为 `2026-08-04`。主要改动、来源与无担保声明见 [`NOTICE`](NOTICE)。
+
+修改版继续使用 AGPL-3.0。候选包和正式源码发行包均包含对应源代码；如果将修改版部署为他人可访问的网络服务，部署者还需要向这些用户提供当前运行版本对应源代码的获取方式。发布到自己的公开仓库后，应把该仓库作为源码入口，不要把上游仓库误写成修改版源码地址。
 
 ## License
 

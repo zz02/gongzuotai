@@ -39,17 +39,17 @@
 
 services:
   insprira:
-    image: insprira:latest
-    container_name: insprira-dev
+    build: .
+    image: insprira:local
+    container_name: insprira
     restart: unless-stopped
-    command: ["node", "--watch", "server.js"]
     # entrypoint: ["/app/docker-entrypoint.sh"]   # ← Agent: 启用后启动时同步 /seed/ 凭证到 /data/agent-home
     env_file:
       - .env
     environment:
       HOST: 0.0.0.0
       DATA_DIR: /data
-      NODE_ENV: development
+      NODE_ENV: production
       XHS_MCP_URL: http://xiaohongshu-mcp:18060  # ← xiaohongshu-mcp 容器内网地址（profile xhs-mcp 启用后可达）
       # ===== Agent 接入（默认注释）=====
       # HOME: /data/agent-home          # ← Agent: CLI 的 ~/.xxx 重定向到 data 卷，session 跟着迁移走
@@ -58,9 +58,6 @@ services:
       # CODEX_BIN: /host/npm-global/bin/codex
       # KIMI_BIN: /host/kimi-bin/kimi
     volumes:
-      # 源码（dev 热重启）
-      - ./:/app
-      - /app/node_modules
       # 数据持久化（cache.db + skills/ + agent-home/）
       - ./data:/data
       # ===== Agent 接入（默认注释）=====
@@ -75,7 +72,13 @@ services:
       # - ${HOME}/.kimi-code/credentials:/seed/kimi-credentials:ro
       # - ${HOME}/.kimi-code/config.toml:/seed/kimi-config.toml:ro
     ports:
-      - "8080:8080"
+      - "127.0.0.1:8080:8080"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8080/api/_/status').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     # network_mode: host   # ← Agent: claude 走宿主本地代理时打开（ports 自动失效）
     extra_hosts:
       - "xiaohongshu-mcp:172.21.0.1"   # xiaohongshu-mcp 用 host 网络时，insprira 通过网关访问

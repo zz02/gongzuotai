@@ -53,6 +53,7 @@ export const ROUTES = {
   dashboard:     { tpl: 'tpl-dashboard' },
   hotlist:       { tpl: 'tpl-hotlist' },
   inspiration:   { tpl: 'tpl-inspiration' },
+  projects:      { tpl: 'tpl-projects' },
   search:        { tpl: 'tpl-search' },
   detail:        { tpl: 'tpl-detail' },
   tracker:       { tpl: 'tpl-tracker' },

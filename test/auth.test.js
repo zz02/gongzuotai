@@ -62,8 +62,8 @@ test('validateUsername 拒绝非法用户名', () => {
 });
 
 test('validatePassword 长度边界', () => {
-  assert.equal(validatePassword('123456'), '123456'); // 6 位刚好
-  assert.throws(() => validatePassword('12345'), /6-128/);     // 5 位太短
+  assert.equal(validatePassword('12345678'), '12345678'); // 8 位刚好
+  assert.throws(() => validatePassword('1234567'), /8-128/);     // 7 位太短
   assert.equal(validatePassword('a'.repeat(128)), 'a'.repeat(128)); // 128 位刚好
-  assert.throws(() => validatePassword('a'.repeat(129)), /6-128/);  // 129 位太长
+  assert.throws(() => validatePassword('a'.repeat(129)), /8-128/);  // 129 位太长
 });

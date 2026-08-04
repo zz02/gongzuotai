@@ -1,15 +1,31 @@
 {
   "name": "insprira",
-  "version": "0.1.14",
+  "version": "0.6.0",
   "private": true,
+  "license": "AGPL-3.0-only",
   "type": "commonjs",
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js",
+    "password:reset": "bash scripts/reset-password.sh",
+    "backup:create": "node scripts/backup.js create",
+    "backup:list": "node scripts/backup.js list",
+    "backup:verify": "node scripts/backup.js verify",
+    "backup:restore": "node scripts/restore-backup.js",
+    "service:install": "node scripts/macos-service.js install",
+    "service:start": "node scripts/macos-service.js start",
+    "service:stop": "node scripts/macos-service.js stop",
+    "service:restart": "node scripts/macos-service.js restart",
+    "service:status": "node scripts/macos-service.js status",
+    "service:logs": "node scripts/macos-service.js logs",
+    "service:uninstall": "node scripts/macos-service.js uninstall",
+    "release:build": "node scripts/build-release.js",
+    "release:candidate": "node scripts/build-release.js --worktree",
     "build": "npm run build:css",
     "build:css": "tailwindcss -i ./css/tailwind-input.css -o ./css/tailwind.css --minify",
     "check": "node --check server.js",
-    "test": "node --test"
+    "preflight": "node scripts/preflight.js",
+    "test": "node --test --test-concurrency=1"
   },
   "engines": {
     "node": ">=20"
