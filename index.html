@@ -248,7 +248,7 @@
           <div><p class="eyebrow">点灯的曾曾 / 创作实验</p><h1>内容创作</h1><p class="muted">公众号 · 小红书 · 抖音 / 图文与录屏讲解</p></div>
           <div class="goal"><span class="muted">粉丝总量</span><strong id="fans-value">未更新</strong><button class="plain-button" data-action="fans">更新数据</button><small>起点 50 · 目标 20,050（不保证）</small></div>
         </div>
-        <section class="weekly-strip" aria-label="每周节奏"><div><strong>18 h</strong><span>基础投入 / 另留 0～4 h 缓冲</span></div><p>2 个选题 → 2 组图文 ＋ 1 条录屏 → 1 篇公众号 → 登记与复盘</p></section>
+        <section class="weekly-strip" aria-label="每周节奏"><div><strong>18 h</strong><span>基础投入 / 另留 0～4 h 缓冲</span></div><p>先完成一篇：读者问题 → 实测素材 → 正文与配图 → 发布与复盘</p></section>
         <section id="empty" class="empty-state" hidden><span class="empty-icon">✳</span><h2>从一次真实的 AI 实测开始</h2><p>写下你想帮谁解决什么问题，再补上截图、步骤和实际结果。</p><button class="pui-btn pui-btn-primary" data-action="new">新建内容</button><p class="muted">也可以先载入示例，检查排版与导出流程。</p><button class="pui-btn" data-action="example">载入示例</button></section>
         <section id="editor" hidden>
           <div id="capability-callout" class="capability-callout" hidden></div>
@@ -257,6 +257,17 @@
             <button id="creator-tab-knowledge" role="tab" aria-selected="false" aria-controls="creator-panel-knowledge" tabindex="-1" data-tab="knowledge">知识库</button>
             <button id="creator-tab-materials" role="tab" aria-selected="true" aria-controls="creator-panel-materials" tabindex="0" data-tab="materials">01 选题母稿</button><button id="creator-tab-wechat" role="tab" aria-selected="false" aria-controls="creator-panel-wechat" tabindex="-1" data-tab="wechat">02 公众号</button><button id="creator-tab-xhs" role="tab" aria-selected="false" aria-controls="creator-panel-xhs" tabindex="-1" data-tab="xhs">03 小红书</button><button id="creator-tab-douyin" role="tab" aria-selected="false" aria-controls="creator-panel-douyin" tabindex="-1" data-tab="douyin">04 抖音图文</button><button id="creator-tab-video" role="tab" aria-selected="false" aria-controls="creator-panel-video" tabindex="-1" data-tab="video">05 视频制作</button><button id="creator-tab-images" role="tab" aria-selected="false" aria-controls="creator-panel-images" tabindex="-1" data-tab="images">06 图片</button><button id="creator-tab-publish" role="tab" aria-selected="false" aria-controls="creator-panel-publish" tabindex="-1" data-tab="publish">07 发布复盘</button>
           </nav>
+          <section class="creator-assistant" aria-labelledby="assistant-heading">
+            <div class="assistant-heading"><h3 id="assistant-heading">创作助手</h3><span class="pui-tag">db 方法适配</span><span class="muted">每次一项 · 原稿不改</span></div>
+            <form id="assistant-form" class="assistant-controls">
+              <label class="pui-field"><span class="pui-label">解决问题</span><select id="assistant-kind" name="kind" class="pui-control" aria-describedby="assistant-description"></select></label>
+              <label class="pui-field"><span class="pui-label">检查对象</span><select id="assistant-target" name="draftField" class="pui-control"><option value="brief">实测素材</option><option value="master">事实母稿</option><option value="wechat">公众号正文</option><option value="xhs">小红书逐页稿</option><option value="douyinPhoto">抖音图文稿</option></select></label>
+              <label class="pui-field"><span class="pui-label">目标平台</span><select id="assistant-platform" name="platform" class="pui-control"><option>公众号</option><option>小红书</option><option>抖音图文</option></select></label>
+              <button class="pui-btn" type="submit" id="assistant-run">运行助手</button>
+            </form>
+            <p class="pui-help" id="assistant-description" aria-live="polite"></p>
+            <p class="pui-help">方法为非商业许可；商业用途另行授权。发布检查不保证过审。</p>
+          </section>
           <section class="pui-panel workspace-panel" id="creator-panel-knowledge" role="tabpanel" aria-labelledby="creator-tab-knowledge" data-panel="knowledge" hidden>
             <div class="pui-panel-head"><h3 class="pui-panel-title">Obsidian 知识库</h3><button class="pui-btn" data-action="archive-confirm">归档到 OB</button></div>
             <div class="pui-panel-body">

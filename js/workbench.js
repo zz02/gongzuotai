@@ -6,7 +6,7 @@ export function renderWorkbench(options = {}) {
   let disposed = false, operations = 0;
   const escape = s => String(s ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const base = '/api/_/workbench';
-  const labels = {wechat:'公众号初稿',xhs:'图文逐页稿',video:'录屏脚本',review:'内容检查',topics:'选题建议',image:'Codex 生图',xhsImage:'AI 图卡',imagePrompt:'封面提示词',hooks:'标题开头建议',cards:'文字卡片 · 非 AI 生图',import:'导入图片',footage:'导入成片',master:'事实母稿',topicPlan:'可立项选题',wechatPack:'公众号整稿',xhsPack:'小红书整稿',douyinPack:'抖音图文整稿',videoPack:'视频整稿',douyinCards:'抖音图文卡片',draftImport:'导入候选稿',recording:'原始录屏',narration:'本人配音',videoRender:'录屏成片'};
+  const labels = {wechat:'公众号初稿',xhs:'图文逐页稿',video:'录屏脚本',review:'内容价值检查',audience:'读者需求',contentPlan:'内容组织',resonate:'共鸣审稿',expression:'表达检查',risk:'发布检查',topics:'选题建议',image:'Codex 生图',xhsImage:'AI 图卡',imagePrompt:'封面提示词',hooks:'标题封面建议',cards:'文字卡片 · 非 AI 生图',import:'导入图片',footage:'导入成片',master:'事实母稿',topicPlan:'可立项选题',wechatPack:'公众号整稿',xhsPack:'小红书整稿',douyinPack:'抖音图文整稿',videoPack:'视频整稿',douyinCards:'抖音图文卡片',draftImport:'导入候选稿',recording:'原始录屏',narration:'本人配音',videoRender:'录屏成片'};
   const statuses = {running:'生成中',done:'已完成',failed:'失败',applied:'已采用'};
   const fields=['title','audience','brief','sources','wechat','xhs','video','imagePrompt','nextAction','master','wechatTitle','wechatSummary','xhsTitle','xhsCaption','douyinPhoto','douyinTitle','douyinCaption','videoTitle','videoCaption','subtitles'];
   const names=['内容标题','目标读者','实测素材','参考来源','公众号正文','图文逐页稿','视频脚本','图片提示词','下一步改进','事实母稿','公众号标题','文章摘要','小红书标题','小红书配文','抖音图文稿','抖音图文标题','抖音图文配文','视频标题','视频配文','字幕时间轴'];
@@ -42,6 +42,33 @@ export function renderWorkbench(options = {}) {
   function renderList(){ $('#project-list').innerHTML=state.projects.map(p=>`<button data-project="${p.id}" class="${current?.id===p.id?'is-active':''}" ${current?.id===p.id?'aria-current="page"':''}>${escape(p.title)}<small>${p.publications.length?'已登记 '+p.publications.length+' 条作品':'创作中'} · ${datetime(p.updatedAt).slice(0,10)}</small></button>`).join(''); }
   function renderProfile(){ $('#fans-value').textContent=state.profile.fans===null?'未更新':state.profile.fans.toLocaleString();$('#runtime').textContent=runtime?(runtime.loggedIn?runtime.imageEnabled?'Codex 已登录 · 生图已启用':'Codex 已登录 · 生图待检查':runtime.installed?'Codex 待登录':'Codex 未安装'):'Codex 待检查'; }
   function showCapability(){const c=selectedCapability;$('#capability-callout').hidden=!c;if(c)$('#capability-callout').innerHTML=`<div><strong>${escape(c.name)} · ${escape(c.author)}</strong><p>${escape(c.description)} / ${escape(c.mode)}。请确认当前稿件再运行。</p></div><button class="pui-btn pui-btn-primary" data-action="run-capability">运行能力</button>`;}
+  function renderAssistant(){
+    const items=capabilities.filter(c=>c.assistant);
+    const previous=$('#assistant-kind').value;
+    $('#assistant-kind').innerHTML=items.map(c=>`<option value="${escape(c.kind)}" ${c.available?'':'disabled'}>${escape(c.name)}${c.available?'':' · 源码缺失'}</option>`).join('');
+    const chosen=selectedCapability?.assistant?selectedCapability.kind:previous;
+    if(items.some(c=>c.kind===chosen&&c.available))$('#assistant-kind').value=chosen;
+    assistantDescription();
+  }
+  function assistantDescription(){
+    const c=capabilities.find(c=>c.kind===$('#assistant-kind').value&&c.assistant);
+    const fixed={wechat:'公众号',xhs:'小红书',douyinPhoto:'抖音图文'}[$('#assistant-target').value];
+    $('#assistant-platform').disabled=Boolean(fixed);
+    if(fixed)$('#assistant-platform').value=fixed;
+    $('#assistant-description').textContent=c?`${c.description}。${c.requiresDraft?'请先填写选中的稿件；':''}结果见下方生成记录，需人工核对。`:'助手方法未就绪，请在 Skills 中心同步来源。';
+    $('#assistant-run').disabled=!c?.available||Boolean(state?.busy);
+  }
+  function assistantTarget(name){
+    const field={wechat:'wechat',xhs:'xhs',douyin:'douyinPhoto'}[name];
+    if(field)$('#assistant-target').value=field;
+    else if(name==='materials'||name==='knowledge')$('#assistant-target').value=current?.master?.trim()?'master':'brief';
+    assistantDescription();
+  }
+  function methodNote(j){
+    if(!j.method)return '';
+    const stale=dirty||j.baseVersion!==current.version;
+    return `<p class="method-note">${escape(j.method.draftName)} · ${escape(j.method.platform)} · db ${escape(j.method.commit?.slice(0,12)||'版本未确认')} · <span data-method-version="${j.baseVersion}">${stale?'稿件有修改，请重新核对建议。':'建议未写入原稿。'}</span></p>`;
+  }
   const assetUrl=(j,file)=>`${base}/assets/${j.id}/${encodeURIComponent(file)}`;
   const jobTitle=j=>j.kind==='xhsImage'?`AI 图卡 · 第 ${j.pageIndex+1} 页${j.pageIndex===0?' · 封面':''}`:labels[j.kind]||j.kind;
   function renderJobs(){
@@ -50,13 +77,14 @@ export function renderWorkbench(options = {}) {
     const cover=jobs.find(j=>j.kind==='xhsImage'&&j.pageIndex===0&&j.status==='done'&&j.seriesKey===current.xhsSeriesKey);
     const imageNote=j=>j.kind!=='xhsImage'?'':(j.seriesKey!==current.xhsSeriesKey||$('[data-field="xhs"]').value!==current.xhs)?'旧稿图片，请勿与当前稿混用。':j.pageIndex>0&&j.status==='done'?(!j.coverJobId?'封面参考待核对。':j.coverJobId!==cover?.id?'参考封面已更新，请重新生成本页。':'当前逐页稿'):'当前逐页稿';
     $('#job-status').textContent=state.busy?'有任务运行中，草稿仍可编辑':'候选稿需要采用后写入正文';
-    $('#jobs').innerHTML=jobs.length?jobs.map(j=>`<article class="job"><div class="job-head"><strong>${escape(jobTitle(j))}</strong><span class="state-${j.status}">${escape(statuses[j.status]||j.status)}</span><span class="job-date">${datetime(j.startedAt)}</span>${j.result?`<button class="plain-button" data-preview="${j.id}">查看结果</button>`:''}${j.status==='failed'?j.kind==='videoRender'?'<button class="plain-button" data-tab="video">调整重试</button>':`<button class="plain-button" data-kind="${j.kind}" data-page-index="${j.pageIndex??0}">重新生成</button>`:''}</div>${imageNote(j)?`<p class="panel-note">${escape(imageNote(j))}</p>`:''}${j.error?`<p class="job-error">${escape(j.error)}</p>`:''}${j.assets.length?`<div class="job-assets">${j.assets.map(file=>{
+    $('#jobs').innerHTML=jobs.length?jobs.map(j=>`<article class="job"><div class="job-head"><strong>${escape(jobTitle(j))}</strong><span class="state-${j.status}">${escape(statuses[j.status]||j.status)}</span><span class="job-date">${datetime(j.startedAt)}</span>${j.result?`<button class="plain-button" data-preview="${j.id}">查看结果</button>`:''}${j.status==='failed'?j.kind==='videoRender'?'<button class="plain-button" data-tab="video">调整重试</button>':`<button class="plain-button" data-kind="${j.kind}" ${j.method?`data-retry="${j.id}"`:''} data-page-index="${j.pageIndex??0}">重新生成</button>`:''}</div>${methodNote(j)}${imageNote(j)?`<p class="panel-note">${escape(imageNote(j))}</p>`:''}${j.error?`<p class="job-error">${escape(j.error)}</p>`:''}${j.assets.length?`<div class="job-assets">${j.assets.map(file=>{
       const url=assetUrl(j,file);
       const filename=j.kind==='xhsImage'?`图卡-${String(j.seriesKey||'旧版').slice(0,8)}-${String(j.pageIndex+1).padStart(2,'0')}-${j.id.slice(0,8)}.${file.split('.').pop()}`:file;
       return /\.(png|jpg|jpeg|webp)$/i.test(file)?`<div class="asset-card"><a href="${url}" target="_blank" rel="noopener"><img src="${url}" alt="${escape(jobTitle(j)+' · '+file)}" loading="lazy"></a><span>${escape(filename)}</span><div class="actions"><a href="${url}" download="${escape(filename)}">下载原图</a><button class="plain-button" data-insert="${escape(url)}">插入正文</button></div></div>`:/\.mp4$/i.test(file)?`<div><video controls preload="metadata" src="${url}"></video><p><a href="${url}" download>${j.kind==='recording'?'下载录屏':'下载成片'}</a></p></div>`:/\.(mp3|wav|m4a)$/i.test(file)?`<div><audio controls preload="metadata" src="${url}"></audio><a href="${url}" download>下载配音</a></div>`:`<a href="${url}" download="${escape(file)}">下载 ${escape(file)}</a>`;
     }).join('')}</div>`:''}</article>`).join(''):'<p class="muted panel-note">还没有生成记录。先保存素材，再生成候选稿。</p>';
     $$('[data-kind], [data-action="run-capability"], [data-action="xhs-image-plan"]').forEach(b=>b.disabled=state.busy);
     $('#render-video-button').disabled=state.busy;
+    assistantDescription();
     renderMedia();
   }
   function renderMedia(){
@@ -72,11 +100,11 @@ export function renderWorkbench(options = {}) {
       return `<article class="publication"><strong>${escape(p.platform)} · ${escape(p.at)}</strong><a href="${escape(p.url)}" target="_blank" rel="noopener">${escape(p.url)}</a><small>${o?['views','likes','saves','follows'].map((k,i)=>`${['阅读／播放','点赞','收藏','新增关注'][i]} ${o[k]===null?'未填':o[k]}`).join(' · '):'尚未记录表现'}</small>${o?.note?`<p>${escape(o.note)}</p>`:''}<button class="plain-button" data-observe="${p.id}">记录表现</button></article>`;
     }).join(''):'<p class="muted">还没有登记作品，发布后再回来记录。</p>';
   }
-  function tab(name){ localStorage.setItem('creator-tab',name); $$('[data-tab]').forEach(b=>{b.setAttribute('aria-selected',String(b.dataset.tab===name));b.tabIndex=b.dataset.tab===name?0:-1;});$$('[data-panel]').forEach(p=>p.hidden=p.dataset.panel!==name); }
+  function tab(name){ localStorage.setItem('creator-tab',name); $$('[data-tab]').forEach(b=>{b.setAttribute('aria-selected',String(b.dataset.tab===name));b.tabIndex=b.dataset.tab===name?0:-1;});$$('[data-panel]').forEach(p=>p.hidden=p.dataset.panel!==name);assistantTarget(name); }
   function newForm(){modal('新建内容',`<form id="create-form"><label class="pui-field"><span class="pui-label">内容标题</span><input name="title" class="pui-control" maxlength="120" placeholder="例如：我用 AI 做了一次需求评审" required></label><label class="pui-field"><span class="pui-label">读者问题</span><textarea name="brief" class="pui-control" maxlength="30000" placeholder="谁遇到了什么问题？你想验证什么？"></textarea></label><button class="pui-btn pui-btn-primary" type="submit">创建内容</button></form>`); }
   async function create(input){ await saveIfNeeded();const p=await api(`${base}/projects`,'POST',input);state.projects.unshift(p);setCurrent(p);tab(selectedCapability?.tab||'materials');close();toast('内容已创建。'); }
   async function saveIfNeeded(){if(savePromise)await savePromise;if(recoveryDraft&&!recoverySaved)throw new Error('请先导出未合并修改。');if(current&&dirty)await save();}
-  async function generate(kind,extra={}){ await save();const j=await api(projectPath('generate'),'POST',{kind,...extra});state.jobs.unshift(j);state.busy=j.status==='running';renderJobs();toast(kind==='cards'?'正在导出文字卡片。':'已提交生成任务，完成后会出现在下方。');schedulePoll(); }
+  async function generate(kind,extra={}){ await save();const assistant=capabilities.some(c=>c.kind===kind&&c.assistant)||kind==='topics';const input={kind,version:current.version,...(assistant?{draftField:$('#assistant-target').value,platform:$('#assistant-platform').value}:{}),...extra};const j=await api(projectPath('generate'),'POST',input);state.jobs.unshift(j);state.busy=j.status==='running';renderJobs();toast(assistant?'已提交助手任务，建议不会覆盖原稿。':kind==='cards'?'正在导出文字卡片。':'已提交生成任务，完成后会出现在下方。');schedulePoll(); }
   function schedulePoll(){ clearTimeout(pollTimer);if(disposed)return;pollTimer=setTimeout(poll,4000); }
   async function poll(){
     if(polling||disposed)return;polling=true;
@@ -84,7 +112,7 @@ export function renderWorkbench(options = {}) {
     catch(e){if(state.busy)toast('暂时无法读取任务状态；原稿仍在编辑器中。');}
     finally{polling=false;schedulePoll();}
   }
-  function preview(id){const j=state.jobs.find(x=>x.id===id);if(!j)return;const draft=j.draft?Object.entries(j.draft).map(([key,value])=>`${names[fields.indexOf(key)]||'稿件'}\n\n${value}`).join('\n\n────────\n\n'):j.result;modal(jobTitle(j)||'生成结果',`<p class="panel-note">候选结果未修改原稿。生成后有修改时，请复制后手工合并。</p>${j.topics?j.topics.map((t,i)=>`<article class="topic-choice"><h3>${escape(t.title)}</h3><p>${escape(t.problem)}</p><p>${escape(t.reason)}</p><p>${escape(t.action)}</p><button class="pui-btn pui-btn-primary" data-topic="${j.id}" data-index="${i}">创建选题</button></article>`).join(''):`<pre class="candidate">${escape(draft)}</pre>`}<div class="dialog-actions"><button class="pui-btn" data-copy-result="${j.id}">复制结果</button>${(['wechat','xhs','video','imagePrompt','master'].includes(j.kind)||j.draft)&&j.status==='done'?`<button class="pui-btn pui-btn-primary" data-apply="${j.id}">采用稿件</button>`:''}</div>`); }
+  function preview(id){const j=state.jobs.find(x=>x.id===id);if(!j)return;const draft=j.draft?Object.entries(j.draft).map(([key,value])=>`${names[fields.indexOf(key)]||'稿件'}\n\n${value}`).join('\n\n────────\n\n'):j.result;modal(jobTitle(j)||'生成结果',`<p class="panel-note">候选结果未修改原稿。生成后有修改时，请复制后手工合并。</p>${methodNote(j)}${j.topics?j.topics.map((t,i)=>`<article class="topic-choice"><h3>${escape(t.title)}</h3><p>${escape(t.problem)}</p><p>${escape(t.reason)}</p><p>${escape(t.action)}</p><button class="pui-btn pui-btn-primary" data-topic="${j.id}" data-index="${i}">创建选题</button></article>`).join(''):`<pre class="candidate">${escape(draft)}</pre>`}<div class="dialog-actions"><button class="pui-btn" data-copy-result="${j.id}">复制结果</button>${(['wechat','xhs','video','imagePrompt','master'].includes(j.kind)||j.draft)&&j.status==='done'?`<button class="pui-btn pui-btn-primary" data-apply="${j.id}">采用稿件</button>`:''}</div>`); }
   function downloadText(text,name,type='text/markdown;charset=utf-8'){const a=document.createElement('a');const url=URL.createObjectURL(new Blob([text],{type}));a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),10000);}
   async function copyText(text){await navigator.clipboard.writeText(text);toast('已复制。');}
   function importForm(){const name=$('[data-tab][aria-selected="true"]').dataset.tab;const field={wechat:'wechat',xhs:'xhs',douyin:'douyinPhoto',video:'video'}[name]||'master';modal('导入已有正文',`<form id="draft-import-form"><p class="panel-note">粘贴或读取本机 Markdown／TXT，先形成候选稿，不覆盖原文。</p><label class="pui-field"><span class="pui-label">导入位置</span><select name="field" class="pui-control">${[['master','事实母稿'],['wechat','公众号正文'],['xhs','小红书逐页稿'],['douyinPhoto','抖音图文稿'],['video','视频脚本']].map(([f,label])=>`<option value="${f}" ${field===f?'selected':''}>${label}</option>`).join('')}</select></label><label class="pui-field"><span class="pui-label">本机文件</span><input id="draft-file" type="file" class="pui-control" accept=".md,.txt,text/plain,text/markdown"></label><label class="pui-field"><span class="pui-label">正文内容</span><textarea name="content" class="pui-control tall" maxlength="60000" required></textarea></label><button class="pui-btn pui-btn-primary" type="submit">导入候选</button></form>`);}
@@ -191,6 +219,7 @@ export function renderWorkbench(options = {}) {
       else if(b.dataset.noteSelect)await selectNote(b.dataset.noteSelect);
       else if(b.dataset.noteRemove)await selectNote(b.dataset.noteRemove,true);
       else if(b.dataset.noteDraft){await saveIfNeeded();modal('导入候选稿',`<form id="vault-draft" data-path="${escape(b.dataset.noteDraft)}"><p class="panel-note">原稿不会直接覆盖；导入后需在生成记录中确认采用。</p><label class="pui-field"><span class="pui-label">稿件类型</span><select name="kind" class="pui-control"><option value="master">事实母稿</option><option value="wechat">公众号</option><option value="xhs">小红书</option><option value="douyinPhoto">抖音图文</option><option value="video">视频脚本</option></select></label><button class="pui-btn pui-btn-primary" type="submit">导入稿件</button></form>`);}
+      else if(b.dataset.retry){const j=state.jobs.find(j=>j.id===b.dataset.retry);if(!j?.method)throw new Error('重试任务不存在。');await generate(j.kind,{draftField:j.method.draftField,platform:j.method.platform});}
       else if(b.dataset.kind==='xhsImage')await doAction('xhs-image-plan',{pageIndex:Number(b.dataset.pageIndex||0)});
       else if(b.dataset.kind)await generate(b.dataset.kind);
       else if(b.dataset.preview)preview(b.dataset.preview);
@@ -201,7 +230,8 @@ export function renderWorkbench(options = {}) {
       else if(b.dataset.observe){await save();observeForm(b.dataset.observe);}
     }catch(err){toast(err.message);}finally{operations--;}
   },{signal:lifetime.signal});
-  root.addEventListener('input',e=>{if((e.target.dataset.field||e.target.closest('#video-render-form'))&&current){dirty=true;if(recoveryDraft)recoverySaved=false;$('#delivery-summary').innerHTML='<p class="muted">稿件已修改，请重新检查成品。</p>';updateStatus();if(e.target.dataset.field==='xhs')renderJobs();}},{signal:lifetime.signal});
+  root.addEventListener('change',e=>{if(['assistant-kind','assistant-target','assistant-platform'].includes(e.target.id))assistantDescription();},{signal:lifetime.signal});
+  root.addEventListener('input',e=>{if((e.target.dataset.field||e.target.closest('#video-render-form'))&&current){dirty=true;if(recoveryDraft)recoverySaved=false;$('#delivery-summary').innerHTML='<p class="muted">稿件已修改，请重新检查成品。</p>';updateStatus();$$('[data-method-version]').forEach(n=>n.textContent='稿件有修改，请重新核对建议。');if(e.target.dataset.field==='xhs')renderJobs();}},{signal:lifetime.signal});
   root.addEventListener('keydown',e=>{
     if(!e.target.dataset.tab||!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;
     e.preventDefault();const tabs=$$('[data-tab]');const i=tabs.indexOf(e.target);
@@ -212,6 +242,7 @@ export function renderWorkbench(options = {}) {
     e.preventDefault();e.stopPropagation();if(operations){toast('当前操作尚未完成，请稍后重试。');return;}operations++;const f=e.target;const values=Object.fromEntries(new FormData(f));const button=f.querySelector('button[type=submit]');if(button)button.disabled=true;
     try{
       if(f.id==='create-form')await create(values);
+      else if(f.id==='assistant-form'){const c=capabilities.find(c=>c.kind===values.kind&&c.assistant);if(!c?.available)throw new Error('助手方法未就绪，请先同步来源。');await generate(values.kind,{draftField:values.draftField,platform:$('#assistant-platform').value});}
       else if(f.id==='draft-import-form'){const j=await api(projectPath('draft-import'),'POST',{...values,version:current.version});state.jobs.unshift(j);renderJobs();preview(j.id);toast('已导入候选稿，请核对后采用。');}
       else if(f.id==='video-render-form'){
         await save();const input={recordingId:values.recordingId,narrationId:values.narrationId,aspect:values.aspect,start:Number(values.start),version:current.version};if(values.end!=='')input.end=Number(values.end);
@@ -226,7 +257,7 @@ export function renderWorkbench(options = {}) {
       else if(f.id==='publish-form'){const p=await api(projectPath('publish'),'POST',{...values,version:current.version});setCurrent(p);close();toast('作品已登记。');}
       else if(f.id==='observe-form'){const data={...values,publicationId:f.dataset.publication,version:current.version};['views','likes','saves','follows'].forEach(k=>data[k]=values[k]===''?null:Number(values[k]));setCurrent(await api(projectPath('observe'),'POST',data));close();toast('表现已记录。');}
     }catch(err){toast(err.message);}
-    finally{operations--;if(button)button.disabled=f.id==='video-render-form'&&Boolean(state?.busy);}
+    finally{operations--;if(button)button.disabled=['video-render-form','assistant-form'].includes(f.id)&&Boolean(state?.busy);if(f.id==='assistant-form')assistantDescription();}
   },{signal:lifetime.signal});
   root.addEventListener('change',async e=>{
     if(e.target.id==='draft-file'){
@@ -258,12 +289,12 @@ export function renderWorkbench(options = {}) {
   async function init(){
     $('#workspace-loading').hidden=false;$('#workspace-error').hidden=true;
     try{
-      [state,capabilities,runtime]=await Promise.all([api(base),api(`${base}/capabilities`),api(`${base}/runtime`)]);selectedCapability=capabilities.find(c=>c.id===options.capability);renderProfile();renderList();showCapability();
+      [state,capabilities,runtime]=await Promise.all([api(base),api(`${base}/capabilities`),api(`${base}/runtime`)]);selectedCapability=capabilities.find(c=>c.id===options.capability);renderProfile();renderList();showCapability();renderAssistant();
       const selected=state.projects.find(p=>p.id===options.projectId)||state.projects.find(p=>p.id===localStorage.getItem('creator-project'))||state.projects[0];
       if(options.projectId&&!state.projects.some(p=>p.id===options.projectId))toast('关联稿件不存在，请选择已有内容。');
-      if(selected){setCurrent(selected);const name=options.projectId?'materials':localStorage.getItem('creator-tab');if($$('[data-tab]').some(b=>b.dataset.tab===name)){tab(name);if(name==='knowledge')await loadKnowledge();}}
+      if(selected){setCurrent(selected);const name=options.projectId?'materials':localStorage.getItem('creator-tab')||'materials';if($$('[data-tab]').some(b=>b.dataset.tab===name)){tab(name);if(name==='knowledge')await loadKnowledge();}}
       else{$('#editor').hidden=true;$('#empty').hidden=false;}
-      if(selectedCapability&&selected){tab(selectedCapability.tab);if(selectedCapability.tab==='knowledge')await loadKnowledge();toast('已选择能力，请确认素材后运行。');}
+      if(selectedCapability&&selected){const previousTarget=$('#assistant-target').value;tab(selectedCapability.tab);if(selectedCapability.assistant){$('#assistant-target').value=previousTarget;assistantDescription();}if(selectedCapability.tab==='knowledge')await loadKnowledge();toast('已选择能力，请确认素材后运行。');}
       schedulePoll();
       if(options.new)newForm();
     }catch(err){

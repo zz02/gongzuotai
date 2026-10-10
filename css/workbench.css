@@ -32,6 +32,14 @@
 .creator-workspace .delivery-item button{flex-shrink:0}
 .creator-workspace .topic-choice{padding:12px 0 24px;border-bottom:1px solid var(--line-2)}
 .creator-workspace .topic-choice p{white-space:pre-wrap;overflow-wrap:anywhere}
+.creator-workspace .creator-assistant{padding:18px 0 20px;margin-bottom:20px;border-bottom:1px solid var(--line-2)}
+.creator-workspace .assistant-heading{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.creator-workspace .assistant-heading h3{font-size:14px;margin:0}.creator-workspace .assistant-heading .muted{font-size:11px}
+.creator-workspace .assistant-controls{display:grid;grid-template-columns:minmax(150px,1.3fr) minmax(150px,1fr) minmax(120px,1fr) auto;gap:12px;align-items:end}
+.creator-workspace .assistant-controls .pui-field{margin:0;min-width:0}.creator-workspace .assistant-controls select{width:100%}
+.creator-workspace .creator-assistant .pui-help{margin:10px 0 0}.creator-workspace .method-note{font-size:11px;line-height:1.8;color:var(--fg-3);margin:10px 0 0;overflow-wrap:anywhere}
+@media(max-width:900px){.creator-workspace .assistant-controls{grid-template-columns:1fr 1fr}.creator-workspace .assistant-controls .pui-control,.creator-workspace .assistant-controls .pui-btn{min-height:44px}}
+@media(max-width:480px){.creator-workspace .assistant-controls{grid-template-columns:1fr}.creator-workspace .assistant-controls .pui-btn{justify-self:start}.creator-workspace .assistant-heading .muted{width:100%}}
 .creator-workspace .job-assets audio{max-width:100%;width:280px}
 .creator-workspace button:focus-visible,.creator-workspace a:focus-visible{outline:2px solid var(--brand);outline-offset:3px}
 @media(max-width:1080px){.creator-workspace{padding:20px}.creator-workspace .work-tabs{gap:16px}}

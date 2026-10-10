@@ -4,12 +4,12 @@ const rootDir=path.resolve(__dirname,'..');
 test('能力来源缺失时禁用操作，不生成虚假仓库链接',()=>{
   const {list}=require('../lib/creator-capabilities');
   const items=list(rootDir,[]);
-  assert.equal(items.length,10);
+  assert.equal(items.length,require('../lib/creator-capabilities').CAPABILITIES.length);
   assert.ok(items.every(c=>!c.available&&c.sourceRepo===''&&c.url===''&&c.commit===''));
 });
 function fixture(t,runner=async()=> '候选正文'){const db=new Database(':memory:');const dataRoot=fs.mkdtempSync(path.join(os.tmpdir(),'creator-test-'));const w=make({db,dataRoot,rootDir,runner});t.after(()=>{db.close();fs.rmSync(dataRoot,{recursive:true,force:true});});return {w,dataRoot};}
 async function settled(w){for(let i=0;i<100;i++){if(!w.state().busy)return;await new Promise(r=>setTimeout(r,10));}throw new Error('任务没有结束');}
-test('创作能力来源完整，新增提示词候选可采用',async t=>{const {w}=fixture(t);assert.equal(w.capabilities().length,10);assert.ok(w.capabilities().every(c=>c.available));const p=w.create({title:'实测',brief:'已确认素材'});const j=await w.generate(p.id,{kind:'imagePrompt'});await settled(w);assert.equal(w.get(p.id).imagePrompt,'');assert.equal(w.apply(p.id,j.id,p.version).imagePrompt,'候选正文');});
+test('创作能力来源完整，新增提示词候选可采用',async t=>{const {w}=fixture(t);assert.equal(w.capabilities().length,require('../lib/creator-capabilities').CAPABILITIES.length);assert.ok(w.capabilities().every(c=>c.available));const p=w.create({title:'实测',brief:'已确认素材'});const j=await w.generate(p.id,{kind:'imagePrompt'});await settled(w);assert.equal(w.get(p.id).imagePrompt,'');assert.equal(w.apply(p.id,j.id,p.version).imagePrompt,'候选正文');});
 test('小红书原生图卡封面锚点、参数边界与草稿变更',async t=>{
   let calls=[];const png=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jC1kAAAAASUVORK5CYII=','base64');
   const {w}=fixture(t,async x=>{calls.push(x);fs.writeFileSync(path.join(x.cwd,'image.png'),png);return '原图';});let p=w.create({title:'AI 实测'});p=w.save(p.id,{version:1,xhs:'## 封面\n真实问题\n---\n## 步骤\n记录成本'});

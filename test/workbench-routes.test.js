@@ -26,13 +26,25 @@ test('免密钥资讯与能力仍需登录，无效资讯不建稿',async()=>{
  for(const route of ['/news','/capabilities','/runtime'])assert.equal((await req('/api/_/workbench'+route)).status,401);
  assert.equal((await req('/api/_/workbench/news/refresh',{method:'POST',body:{}})).status,401);
  const news=await call('/news');assert.equal(news.status,200);assert.equal(news.json.data.sources.length,8);
- const caps=await call('/capabilities');assert.equal(caps.status,200);assert.equal(caps.json.data.length,10);
+ const caps=await call('/capabilities');assert.equal(caps.status,200);assert.equal(caps.json.data.length,require('../lib/creator-capabilities').CAPABILITIES.length);
  assert.ok(caps.json.data.every(c=>c.sourceRepo));
  for(const c of caps.json.data)assert.ok(c.url.startsWith(`https://github.com/${c.sourceRepo}/blob/`));
  const count=(await call('')).json.data.projects.length;
  assert.equal((await call('/news/handoff','POST',[])).status,400);
  assert.equal((await call('/news/handoff','POST',{id:'unknown',sourceId:'aihot',url:'https://127.0.0.1/private'})).status,404);
  assert.equal((await call('')).json.data.projects.length,count);
+});
+test('创作助手路由保留登录、空稿与版本冲突校验，不偷偷启动 Codex',async()=>{
+ const caps=(await call('/capabilities')).json.data.filter(c=>c.assistant);
+ assert.equal(caps.length,8);assert.ok(caps.every(c=>c.license.includes('非商业')));
+ assert.ok(caps.find(c=>c.kind==='hooks').url.includes('dbs-title-cover-intro'));
+ const p=(await call('/projects','POST',{title:'助手校验',brief:'只有素材'})).json.data;
+ const route=`/api/_/workbench/projects/${p.id}/generate`;
+ assert.equal((await req(route,{method:'POST',body:{kind:'risk',draftField:'xhs'}})).status,401);
+ const empty=await call(`/projects/${p.id}/generate`,'POST',{kind:'risk',draftField:'xhs'});assert.equal(empty.status,400);assert.match(empty.json.error,/小红书逐页稿/);
+ const wrong=await call(`/projects/${p.id}/generate`,'POST',{kind:'audience',draftField:'sources'});assert.equal(wrong.status,400);
+ const stale=await call(`/projects/${p.id}/generate`,'POST',{kind:'audience',draftField:'brief',version:0});assert.equal(stale.status,409);
+ assert.ok(!(await call('')).json.data.jobs.some(j=>j.projectId===p.id));
 });
 test('OB 真实 HTTP 连接、搜索、关联、导入、归档与权限保护',async t=>{
  const vault=fs.mkdtempSync(path.join(os.tmpdir(),'creator-route-vault-'));t.after(()=>fs.rmSync(vault,{recursive:true,force:true}));fs.mkdirSync(path.join(vault,'.obsidian'));fs.mkdirSync(path.join(vault,'素材'));fs.writeFileSync(path.join(vault,'素材/学习卡.md'),'实际素材。');
