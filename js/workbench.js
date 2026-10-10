@@ -6,9 +6,10 @@ export function renderWorkbench(options = {}) {
   let disposed = false, operations = 0;
   const escape = s => String(s ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const base = '/api/_/workbench';
-  const labels = {wechat:'公众号初稿',xhs:'图文逐页稿',video:'录屏脚本',review:'内容检查',topics:'选题建议',image:'Codex 生图',xhsImage:'AI 图卡',imagePrompt:'封面提示词',hooks:'标题开头建议',cards:'文字卡片 · 非 AI 生图',import:'导入图片',footage:'导入成片'};
+  const labels = {wechat:'公众号初稿',xhs:'图文逐页稿',video:'录屏脚本',review:'内容检查',topics:'选题建议',image:'Codex 生图',xhsImage:'AI 图卡',imagePrompt:'封面提示词',hooks:'标题开头建议',cards:'文字卡片 · 非 AI 生图',import:'导入图片',footage:'导入成片',master:'事实母稿',topicPlan:'可立项选题',wechatPack:'公众号整稿',xhsPack:'小红书整稿',douyinPack:'抖音图文整稿',videoPack:'视频整稿',douyinCards:'抖音图文卡片',draftImport:'导入候选稿',recording:'原始录屏',narration:'本人配音',videoRender:'录屏成片'};
   const statuses = {running:'生成中',done:'已完成',failed:'失败',applied:'已采用'};
-  const fields=['title','audience','brief','sources','wechat','xhs','video','imagePrompt','nextAction'];
+  const fields=['title','audience','brief','sources','wechat','xhs','video','imagePrompt','nextAction','master','wechatTitle','wechatSummary','xhsTitle','xhsCaption','douyinPhoto','douyinTitle','douyinCaption','videoTitle','videoCaption','subtitles'];
+  const names=['内容标题','目标读者','实测素材','参考来源','公众号正文','图文逐页稿','视频脚本','图片提示词','下一步改进','事实母稿','公众号标题','文章摘要','小红书标题','小红书配文','抖音图文稿','抖音图文标题','抖音图文配文','视频标题','视频配文','字幕时间轴'];
   let state, current, dirty=false, layoutHtml='', toastTimer, pollTimer, polling=false, recoveryDraft, recoverySaved=false, savePromise;
   let capabilities=[],selectedCapability,runtime;
   const datetime = d => new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}).format(new Date(d));
@@ -24,7 +25,7 @@ export function renderWorkbench(options = {}) {
   function close(){ $('#dialog').close(); }
   function projectPath(action='') { if(!current)throw new Error('请先新建内容。');return `${base}/projects/${current.id}${action?'/'+action:''}`; }
   function updateStatus(){ $('#save-status').textContent=dirty?'有未保存修改':`已保存 · ${datetime(current.updatedAt)}`; }
-  function readDraft(){ const input={version:current.version};fields.forEach(f=>input[f]=$(`[data-field="${f}"]`).value);return input; }
+  function readDraft(){ const input={version:current.version};fields.forEach(f=>input[f]=$(`[data-field="${f}"]`).value);input.videoSettings=JSON.stringify(Object.fromEntries(new FormData($('#video-render-form'))));return input; }
   async function save(){
     if(savePromise)return savePromise;
     savePromise=persistDraft();
@@ -37,7 +38,7 @@ export function renderWorkbench(options = {}) {
     catch(e){if(e.status===409 || e.status===401){recoveryDraft=readDraft();recoverySaved=false;$('#recovery-export').hidden=false;modal(e.status===401?'登录已失效':'保存冲突',`<p class="panel-note">${e.status===401?'请先导出当前修改，再重新登录。':'其他窗口已保存新版本。请先导出当前修改，再手工合并。'}</p><div class="dialog-actions"><button class="pui-btn pui-btn-primary" data-action="export-recovery">导出副本</button><button class="pui-btn" data-action="reload-project">载入最新</button><button class="pui-btn" data-action="close">保留编辑</button></div><p class="pui-help">副本在本窗口保留，刷新前请先导出。</p>`);}throw e;}
     finally{controls.forEach(c=>c.disabled=false);}
   }
-  function setCurrent(p){ current=p;state.projects=state.projects.map(x=>x.id===p.id?p:x);dirty=false;fields.forEach(f=>$(`[data-field="${f}"]`).value=p[f]||'');$('#project-heading').textContent=p.title;$('#editor').hidden=false;$('#empty').hidden=true;localStorage.setItem('creator-project',p.id);updateStatus();renderList();renderJobs();renderPublications(); }
+  function setCurrent(p){ current=p;state.projects=state.projects.map(x=>x.id===p.id?p:x);dirty=false;$('#video-render-form').reset();fields.forEach(f=>$(`[data-field="${f}"]`).value=p[f]||'');$('#delivery-summary').innerHTML='<p class="muted">点击“检查成品”核对当前版本。</p>';$('#project-heading').textContent=p.title;$('#editor').hidden=false;$('#empty').hidden=true;localStorage.setItem('creator-project',p.id);updateStatus();renderList();renderJobs();try{const s=JSON.parse(p.videoSettings||'{}');for(const key of ['recordingId','narrationId','start','end','aspect'])if(typeof s[key]==='string')$('#video-render-form').elements[key].value=s[key];}catch{}renderPublications(); }
   function renderList(){ $('#project-list').innerHTML=state.projects.map(p=>`<button data-project="${p.id}" class="${current?.id===p.id?'is-active':''}" ${current?.id===p.id?'aria-current="page"':''}>${escape(p.title)}<small>${p.publications.length?'已登记 '+p.publications.length+' 条作品':'创作中'} · ${datetime(p.updatedAt).slice(0,10)}</small></button>`).join(''); }
   function renderProfile(){ $('#fans-value').textContent=state.profile.fans===null?'未更新':state.profile.fans.toLocaleString();$('#runtime').textContent=runtime?(runtime.loggedIn?runtime.imageEnabled?'Codex 已登录 · 生图已启用':'Codex 已登录 · 生图待检查':runtime.installed?'Codex 待登录':'Codex 未安装'):'Codex 待检查'; }
   function showCapability(){const c=selectedCapability;$('#capability-callout').hidden=!c;if(c)$('#capability-callout').innerHTML=`<div><strong>${escape(c.name)} · ${escape(c.author)}</strong><p>${escape(c.description)} / ${escape(c.mode)}。请确认当前稿件再运行。</p></div><button class="pui-btn pui-btn-primary" data-action="run-capability">运行能力</button>`;}
@@ -49,12 +50,21 @@ export function renderWorkbench(options = {}) {
     const cover=jobs.find(j=>j.kind==='xhsImage'&&j.pageIndex===0&&j.status==='done'&&j.seriesKey===current.xhsSeriesKey);
     const imageNote=j=>j.kind!=='xhsImage'?'':(j.seriesKey!==current.xhsSeriesKey||$('[data-field="xhs"]').value!==current.xhs)?'旧稿图片，请勿与当前稿混用。':j.pageIndex>0&&j.status==='done'?(!j.coverJobId?'封面参考待核对。':j.coverJobId!==cover?.id?'参考封面已更新，请重新生成本页。':'当前逐页稿'):'当前逐页稿';
     $('#job-status').textContent=state.busy?'有任务运行中，草稿仍可编辑':'候选稿需要采用后写入正文';
-    $('#jobs').innerHTML=jobs.length?jobs.map(j=>`<article class="job"><div class="job-head"><strong>${escape(jobTitle(j))}</strong><span class="state-${j.status}">${escape(statuses[j.status]||j.status)}</span><span class="job-date">${datetime(j.startedAt)}</span>${j.result?`<button class="plain-button" data-preview="${j.id}">查看结果</button>`:''}${j.status==='failed'?`<button class="plain-button" data-kind="${j.kind}" data-page-index="${j.pageIndex??0}">重新生成</button>`:''}</div>${imageNote(j)?`<p class="panel-note">${escape(imageNote(j))}</p>`:''}${j.error?`<p class="job-error">${escape(j.error)}</p>`:''}${j.assets.length?`<div class="job-assets">${j.assets.map(file=>{
+    $('#jobs').innerHTML=jobs.length?jobs.map(j=>`<article class="job"><div class="job-head"><strong>${escape(jobTitle(j))}</strong><span class="state-${j.status}">${escape(statuses[j.status]||j.status)}</span><span class="job-date">${datetime(j.startedAt)}</span>${j.result?`<button class="plain-button" data-preview="${j.id}">查看结果</button>`:''}${j.status==='failed'?j.kind==='videoRender'?'<button class="plain-button" data-tab="video">调整重试</button>':`<button class="plain-button" data-kind="${j.kind}" data-page-index="${j.pageIndex??0}">重新生成</button>`:''}</div>${imageNote(j)?`<p class="panel-note">${escape(imageNote(j))}</p>`:''}${j.error?`<p class="job-error">${escape(j.error)}</p>`:''}${j.assets.length?`<div class="job-assets">${j.assets.map(file=>{
       const url=assetUrl(j,file);
       const filename=j.kind==='xhsImage'?`图卡-${String(j.seriesKey||'旧版').slice(0,8)}-${String(j.pageIndex+1).padStart(2,'0')}-${j.id.slice(0,8)}.${file.split('.').pop()}`:file;
-      return /\.(png|jpg|jpeg|webp)$/i.test(file)?`<div class="asset-card"><a href="${url}" target="_blank" rel="noopener"><img src="${url}" alt="${escape(jobTitle(j)+' · '+file)}" loading="lazy"></a><span>${escape(filename)}</span><div class="actions"><a href="${url}" download="${escape(filename)}">下载原图</a><button class="plain-button" data-insert="${escape(url)}">插入正文</button></div></div>`:/\.mp4$/i.test(file)?`<div><video controls preload="metadata" src="${url}"></video><p><a href="${url}" download>下载成片</a></p></div>`:`<a href="${url}" download="${escape(file)}">下载 ${escape(file)}</a>`;
+      return /\.(png|jpg|jpeg|webp)$/i.test(file)?`<div class="asset-card"><a href="${url}" target="_blank" rel="noopener"><img src="${url}" alt="${escape(jobTitle(j)+' · '+file)}" loading="lazy"></a><span>${escape(filename)}</span><div class="actions"><a href="${url}" download="${escape(filename)}">下载原图</a><button class="plain-button" data-insert="${escape(url)}">插入正文</button></div></div>`:/\.mp4$/i.test(file)?`<div><video controls preload="metadata" src="${url}"></video><p><a href="${url}" download>${j.kind==='recording'?'下载录屏':'下载成片'}</a></p></div>`:/\.(mp3|wav|m4a)$/i.test(file)?`<div><audio controls preload="metadata" src="${url}"></audio><a href="${url}" download>下载配音</a></div>`:`<a href="${url}" download="${escape(file)}">下载 ${escape(file)}</a>`;
     }).join('')}</div>`:''}</article>`).join(''):'<p class="muted panel-note">还没有生成记录。先保存素材，再生成候选稿。</p>';
     $$('[data-kind], [data-action="run-capability"], [data-action="xhs-image-plan"]').forEach(b=>b.disabled=state.busy);
+    $('#render-video-button').disabled=state.busy;
+    renderMedia();
+  }
+  function renderMedia(){
+    const jobs=state.jobs.filter(j=>j.projectId===current.id&&j.status==='done');
+    for(const [kind,id,placeholder] of [['recording','recording-select','请先导入录屏'],['narration','narration-select','保留录屏声音']]){
+      const sel=$('#'+id),old=sel.value;sel.innerHTML=`<option value="">${placeholder}</option>`+jobs.filter(j=>j.kind===kind).map(j=>`<option value="${j.id}">${datetime(j.startedAt)} · ${j.media.duration.toFixed(1)} 秒${kind==='recording'?` · ${j.media.width} × ${j.media.height}`:''}</option>`).join('');
+      if([...sel.options].some(o=>o.value===old))sel.value=old;
+    }
   }
   function renderPublications(){
     $('#publications').innerHTML=current.publications.length?current.publications.map(p=>{
@@ -74,9 +84,15 @@ export function renderWorkbench(options = {}) {
     catch(e){if(state.busy)toast('暂时无法读取任务状态；原稿仍在编辑器中。');}
     finally{polling=false;schedulePoll();}
   }
-  function preview(id){const j=state.jobs.find(x=>x.id===id);if(!j)return;modal(jobTitle(j)||'生成结果',`<p class="panel-note">候选结果未修改原稿。生成后有修改时，请复制后手工合并。</p><pre class="candidate">${escape(j.result)}</pre><div class="dialog-actions"><button class="pui-btn" data-copy-result="${j.id}">复制结果</button>${['wechat','xhs','video','imagePrompt'].includes(j.kind)&&j.status==='done'?`<button class="pui-btn pui-btn-primary" data-apply="${j.id}">采用稿件</button>`:''}</div>`); }
+  function preview(id){const j=state.jobs.find(x=>x.id===id);if(!j)return;const draft=j.draft?Object.entries(j.draft).map(([key,value])=>`${names[fields.indexOf(key)]||'稿件'}\n\n${value}`).join('\n\n────────\n\n'):j.result;modal(jobTitle(j)||'生成结果',`<p class="panel-note">候选结果未修改原稿。生成后有修改时，请复制后手工合并。</p>${j.topics?j.topics.map((t,i)=>`<article class="topic-choice"><h3>${escape(t.title)}</h3><p>${escape(t.problem)}</p><p>${escape(t.reason)}</p><p>${escape(t.action)}</p><button class="pui-btn pui-btn-primary" data-topic="${j.id}" data-index="${i}">创建选题</button></article>`).join(''):`<pre class="candidate">${escape(draft)}</pre>`}<div class="dialog-actions"><button class="pui-btn" data-copy-result="${j.id}">复制结果</button>${(['wechat','xhs','video','imagePrompt','master'].includes(j.kind)||j.draft)&&j.status==='done'?`<button class="pui-btn pui-btn-primary" data-apply="${j.id}">采用稿件</button>`:''}</div>`); }
   function downloadText(text,name,type='text/markdown;charset=utf-8'){const a=document.createElement('a');const url=URL.createObjectURL(new Blob([text],{type}));a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),10000);}
   async function copyText(text){await navigator.clipboard.writeText(text);toast('已复制。');}
+  function importForm(){const name=$('[data-tab][aria-selected="true"]').dataset.tab;const field={wechat:'wechat',xhs:'xhs',douyin:'douyinPhoto',video:'video'}[name]||'master';modal('导入已有正文',`<form id="draft-import-form"><p class="panel-note">粘贴或读取本机 Markdown／TXT，先形成候选稿，不覆盖原文。</p><label class="pui-field"><span class="pui-label">导入位置</span><select name="field" class="pui-control">${[['master','事实母稿'],['wechat','公众号正文'],['xhs','小红书逐页稿'],['douyinPhoto','抖音图文稿'],['video','视频脚本']].map(([f,label])=>`<option value="${f}" ${field===f?'selected':''}>${label}</option>`).join('')}</select></label><label class="pui-field"><span class="pui-label">本机文件</span><input id="draft-file" type="file" class="pui-control" accept=".md,.txt,text/plain,text/markdown"></label><label class="pui-field"><span class="pui-label">正文内容</span><textarea name="content" class="pui-control tall" maxlength="60000" required></textarea></label><button class="pui-btn pui-btn-primary" type="submit">导入候选</button></form>`);}
+  async function deliveryCheck(){
+    await save();const checks=await api(projectPath('readiness'));tab('publish');
+    $('#delivery-summary').innerHTML=checks.map(c=>`<article class="delivery-item"><div><strong>${escape(c.platform)}</strong><p>${c.ready?'标题、配文与当前稿成品已齐全。':`尚缺：${escape(c.missing.join('、'))}`}</p></div>${c.ready?`<button class="pui-btn" data-delivery="${escape(c.platform)}">导出发布包</button>`:`<button class="pui-btn" data-tab="${c.platform==='公众号'?'wechat':c.platform==='小红书'?'xhs':'douyin'}">继续制作</button>`}</article>`).join('')+'<p class="pui-help">齐全不等于事实核验或已经发布；请自行审校。</p>';
+    toast('已检查当前稿件；缺失项不会伪装完成。');
+  }
   function noteRow(n, selected=false){
     return `<article class="vault-note"><div><strong>${escape(n.title)}</strong><small>${escape(n.path)}</small>${selected?`<span class="pui-tag">${escape(n.status)}</span> <small>${n.characters.toLocaleString()} 字符</small>`:''}</div><div class="actions"><a class="pui-link" href="${escape(n.uri)}">打开 OB</a><button class="pui-btn" data-note="${escape(n.path)}">预览</button>${selected?`<button class="pui-btn" data-note-select="${escape(n.path)}">刷新引用</button><button class="pui-btn" data-note-remove="${escape(n.path)}">移除</button>`:''}</div></article>`;
   }
@@ -138,9 +154,11 @@ export function renderWorkbench(options = {}) {
         return modal('归档完成',`<p class="panel-note">${escape(result.path)}</p><p>已归档 ${result.files} 篇笔记、${result.assets} 个附件。</p><a class="pui-btn pui-btn-primary" href="${escape(result.uri)}">打开 OB</a><p class="pui-help">独立快照，不会自动覆盖 OB 内的修改。</p>`);
       }finally{if(button){button.disabled=false;button.textContent='确认归档';}}
     }
-    if(action==='export-recovery'){if(dirty)recoveryDraft=readDraft();if(!recoveryDraft)throw new Error('没有待合并副本。');const names=['内容标题','目标读者','实测素材','参考来源','公众号正文','图文逐页稿','视频脚本','图片提示词','下一步改进'];downloadText(fields.map((f,i)=>`# ${names[i]}\n\n${recoveryDraft[f]}`).join('\n\n'),'未合并修改.md');recoverySaved=true;return;}
+    if(action==='export-recovery'){if(dirty)recoveryDraft=readDraft();if(!recoveryDraft)throw new Error('没有待合并副本。');downloadText(fields.map((f,i)=>`# ${names[i]}\n\n${recoveryDraft[f]||''}`).join('\n\n')+'\n\n# 视频制作设置\n\n'+(recoveryDraft.videoSettings||''),'未合并修改.md');recoverySaved=true;return;}
     if(action==='reload-project'){const p=await api(projectPath());setCurrent(p);close();return modal('合并修改',`<p class="panel-note">已载入最新版本。之前的修改仍可导出，供你手工合并。</p><div class="dialog-actions"><button class="pui-btn" data-action="export-recovery">导出副本</button><button class="pui-btn pui-btn-primary" data-action="close">继续编辑</button></div>`);}
     if(action==='new'){await saveIfNeeded();return newForm();}
+    if(action==='import-draft'){await saveIfNeeded();return importForm();}
+    if(action==='delivery')return deliveryCheck();
     if(action==='save'){await save();return toast('草稿已保存。');}
     if(action==='layout')return layout();
     if(action==='copy-layout')return copyLayout();
@@ -167,21 +185,23 @@ export function renderWorkbench(options = {}) {
       if(b.dataset.action)await doAction(b.dataset.action);
       else if(b.dataset.tab){tab(b.dataset.tab);if(b.dataset.tab==='knowledge')await loadKnowledge();}
       else if(b.dataset.project){await saveIfNeeded();setCurrent(await api(`${base}/projects/${b.dataset.project}`));if(!$('[data-panel="knowledge"]').hidden)await loadKnowledge();}
+      else if(b.dataset.topic){await saveIfNeeded();const r=await api(projectPath('topic-create'),'POST',{jobId:b.dataset.topic,index:Number(b.dataset.index)});if(!state.projects.some(p=>p.id===r.project.id))state.projects.unshift(r.project);setCurrent(r.project);tab('materials');close();toast(r.reused?'已打开原选题，未重复创建。':'已创建独立选题，请完成真实验证。');}
+      else if(b.dataset.delivery){await save();const result=await api(projectPath('export-platform'),'POST',{platform:b.dataset.delivery,version:current.version});downloadText(result.html,`${current.title.replace(/[\\/:*?"<>|]/g,'-')}-${b.dataset.delivery}-发布包.html`,'text/html;charset=utf-8');toast(result.note);}
       else if(b.dataset.note)await notePreview(b.dataset.note);
       else if(b.dataset.noteSelect)await selectNote(b.dataset.noteSelect);
       else if(b.dataset.noteRemove)await selectNote(b.dataset.noteRemove,true);
-      else if(b.dataset.noteDraft){await saveIfNeeded();modal('导入候选稿',`<form id="vault-draft" data-path="${escape(b.dataset.noteDraft)}"><p class="panel-note">原稿不会直接覆盖；导入后需在生成记录中确认采用。</p><label class="pui-field"><span class="pui-label">稿件类型</span><select name="kind" class="pui-control"><option value="wechat">公众号</option><option value="xhs">小红书</option><option value="video">抖音脚本</option></select></label><button class="pui-btn pui-btn-primary" type="submit">导入稿件</button></form>`);}
+      else if(b.dataset.noteDraft){await saveIfNeeded();modal('导入候选稿',`<form id="vault-draft" data-path="${escape(b.dataset.noteDraft)}"><p class="panel-note">原稿不会直接覆盖；导入后需在生成记录中确认采用。</p><label class="pui-field"><span class="pui-label">稿件类型</span><select name="kind" class="pui-control"><option value="master">事实母稿</option><option value="wechat">公众号</option><option value="xhs">小红书</option><option value="douyinPhoto">抖音图文</option><option value="video">视频脚本</option></select></label><button class="pui-btn pui-btn-primary" type="submit">导入稿件</button></form>`);}
       else if(b.dataset.kind==='xhsImage')await doAction('xhs-image-plan',{pageIndex:Number(b.dataset.pageIndex||0)});
       else if(b.dataset.kind)await generate(b.dataset.kind);
       else if(b.dataset.preview)preview(b.dataset.preview);
       else if(b.dataset.export){await save();downloadText(current[b.dataset.export],`${current.title.replace(/[\\/:*?"<>|]/g,'-')}-${b.dataset.export}.md`);}
       else if(b.dataset.copyResult)await copyText(state.jobs.find(j=>j.id===b.dataset.copyResult).result);
-      else if(b.dataset.apply){if(dirty)throw new Error('编辑器中有未保存修改，请复制结果后手工合并。');const p=await api(projectPath('apply'),'POST',{jobId:b.dataset.apply,version:current.version});state.jobs.find(j=>j.id===b.dataset.apply).status='applied';state.projects=state.projects.map(x=>x.id===p.id?p:x);setCurrent(p);close();const kind=state.jobs.find(j=>j.id===b.dataset.apply).kind;tab(kind==='imagePrompt'?'images':kind);toast('候选稿已采用。');}
+      else if(b.dataset.apply){if(dirty)throw new Error('编辑器中有未保存修改，请复制结果后手工合并。');const job=state.jobs.find(j=>j.id===b.dataset.apply);const p=await api(projectPath('apply'),'POST',{jobId:b.dataset.apply,version:current.version});job.status='applied';state.projects=state.projects.map(x=>x.id===p.id?p:x);setCurrent(p);close();const field=job.kind==='draftImport'?Object.keys(job.draft)[0]:job.kind;tab(({imagePrompt:'images',master:'materials',wechatPack:'wechat',xhsPack:'xhs',douyinPack:'douyin',douyinPhoto:'douyin',videoPack:'video'})[field]||field);toast('候选稿已采用。');}
       else if(b.dataset.insert){const input=$('[data-field="wechat"]');input.value+=`\n\n![配图](${b.dataset.insert})\n`;dirty=true;updateStatus();tab('wechat');toast('已插入正文，请保存草稿。');}
       else if(b.dataset.observe){await save();observeForm(b.dataset.observe);}
     }catch(err){toast(err.message);}finally{operations--;}
   },{signal:lifetime.signal});
-  root.addEventListener('input',e=>{if(e.target.dataset.field&&current){dirty=true;if(recoveryDraft)recoverySaved=false;updateStatus();if(e.target.dataset.field==='xhs')renderJobs();}},{signal:lifetime.signal});
+  root.addEventListener('input',e=>{if((e.target.dataset.field||e.target.closest('#video-render-form'))&&current){dirty=true;if(recoveryDraft)recoverySaved=false;$('#delivery-summary').innerHTML='<p class="muted">稿件已修改，请重新检查成品。</p>';updateStatus();if(e.target.dataset.field==='xhs')renderJobs();}},{signal:lifetime.signal});
   root.addEventListener('keydown',e=>{
     if(!e.target.dataset.tab||!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;
     e.preventDefault();const tabs=$$('[data-tab]');const i=tabs.indexOf(e.target);
@@ -192,6 +212,12 @@ export function renderWorkbench(options = {}) {
     e.preventDefault();e.stopPropagation();if(operations){toast('当前操作尚未完成，请稍后重试。');return;}operations++;const f=e.target;const values=Object.fromEntries(new FormData(f));const button=f.querySelector('button[type=submit]');if(button)button.disabled=true;
     try{
       if(f.id==='create-form')await create(values);
+      else if(f.id==='draft-import-form'){const j=await api(projectPath('draft-import'),'POST',{...values,version:current.version});state.jobs.unshift(j);renderJobs();preview(j.id);toast('已导入候选稿，请核对后采用。');}
+      else if(f.id==='video-render-form'){
+        await save();const input={recordingId:values.recordingId,narrationId:values.narrationId,aspect:values.aspect,start:Number(values.start),version:current.version};if(values.end!=='')input.end=Number(values.end);
+        const env=await api(`${base}/video-runtime`);$('#video-runtime-status').textContent=env.note+(env.subtitles?` 字幕：${env.subtitlesEngine}。`:'');if(!env.available)throw new Error(env.note);
+        const j=await api(projectPath('video-render'),'POST',input);state.jobs.unshift(j);state.busy=true;renderJobs();toast('正在本地生成成片，原始素材不会覆盖。');schedulePoll();
+      }
       else if(f.id==='xhs-image-form'){await generate('xhsImage',{pageIndex:Number(values.pageIndex)});close();}
       else if(f.id==='vault-form'){const connected=await api(`${base}/obsidian`,'PUT',{...values,scopes:values.scopes.split('\n').map(s=>s.trim()).filter(Boolean)});close();toast(`已连接知识库，范围内有 ${connected.count} 篇笔记。`);if(current){tab('knowledge');await loadKnowledge();}}
       else if(f.id==='vault-search')await loadKnowledge(values.q);
@@ -200,7 +226,15 @@ export function renderWorkbench(options = {}) {
       else if(f.id==='publish-form'){const p=await api(projectPath('publish'),'POST',{...values,version:current.version});setCurrent(p);close();toast('作品已登记。');}
       else if(f.id==='observe-form'){const data={...values,publicationId:f.dataset.publication,version:current.version};['views','likes','saves','follows'].forEach(k=>data[k]=values[k]===''?null:Number(values[k]));setCurrent(await api(projectPath('observe'),'POST',data));close();toast('表现已记录。');}
     }catch(err){toast(err.message);}
-    finally{operations--;if(button)button.disabled=false;}
+    finally{operations--;if(button)button.disabled=f.id==='video-render-form'&&Boolean(state?.busy);}
+  },{signal:lifetime.signal});
+  root.addEventListener('change',async e=>{
+    if(e.target.id==='draft-file'){
+      const file=e.target.files[0];if(!file)return;try{if(file.size>200*1024||! /\.(md|txt)$/i.test(file.name))throw new Error('请选择不超过 200 KB 的 Markdown 或 TXT。');const content=await file.text();if(content.includes('\u0000')||content.length>60000)throw new Error('文件不是有效文本或正文超限。');$('#draft-import-form [name=content]').value=content;}catch(err){toast(err.message);}return;
+    }
+    const kind={'recording-file':'recording','narration-file':'narration'}[e.target.id];if(!kind)return;
+    const file=e.target.files[0];if(!file)return;if(operations){e.target.value='';return toast('当前操作尚未完成。');}operations++;
+    try{await save();if(file.size>(kind==='recording'?200:30)*1024*1024)throw new Error('素材文件超过大小限制。');const ext=file.name.split('.').pop().toLowerCase(),mime=kind==='recording'?({mp4:'video/mp4',mov:'video/quicktime'})[ext]:({mp3:'audio/mpeg',wav:'audio/wav',m4a:'audio/mp4'})[ext];if(!mime)throw new Error('录屏支持 MP4、MOV；配音支持 MP3、WAV、M4A。');const r=await fetch(projectPath(kind),{method:'POST',headers:{'Content-Type':mime},body:file,signal:lifetime.signal});const j=await r.json();if(!r.ok||!j.ok)throw new Error(j.error||'素材导入失败。');state.jobs.unshift(j.data);renderJobs();$(kind==='recording'?'#recording-select':'#narration-select').value=j.data.id;dirty=true;updateStatus();toast('素材已导入并检查，可设置截取范围后生成成片。');}catch(err){toast(err.message);}finally{operations--;e.target.value='';}
   },{signal:lifetime.signal});
   $('#image-file').addEventListener('change',async e=>{
     const file=e.target.files[0];if(!file)return;if(operations){e.target.value='';return toast('当前操作尚未完成。');}operations++;

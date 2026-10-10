@@ -44,6 +44,22 @@ test('OB 稿件先进入候选，原稿保留，修改后不能直接采用',t=>
   const j2=w.obsidian.candidate(p.id,{version:p.version,path:'素材/AI实测.md',kind:'wechat'});p=w.save(p.id,{version:p.version,wechat:'新修改'});assert.throws(()=>w.apply(p.id,j2.id,p.version),/不能直接覆盖/);
   fs.appendFileSync(path.join(vault,'素材/AI实测.md'),'\n![[图.png]]');assert.throws(()=>w.obsidian.candidate(p.id,{version:p.version,path:'素材/AI实测.md',kind:'wechat'}),/图片缺失/);
 });
+test('OB 导入事实母稿和抖音图文需确认采用，归档保留各平台元信息',t=>{
+  const {w,connect,vault}=fixture(t);connect();let p=w.create({title:'新创作流程'});
+  const original=fs.readFileSync(path.join(vault,'素材/AI实测.md'),'utf8');
+  for(const kind of ['master','douyinPhoto']){
+    const job=w.obsidian.candidate(p.id,{version:p.version,path:'素材/AI实测.md',kind});
+    assert.equal(w.get(p.id)[kind]||'','');assert.equal(job.kind,'draftImport');
+    p=w.apply(p.id,job.id,p.version);assert.ok(p[kind].includes('真实结果'));
+  }
+  p=w.save(p.id,{version:p.version,wechatTitle:'公众号标题',wechatSummary:'公众号摘要',xhsTitle:'小红书标题',xhsCaption:'小红书配文',douyinTitle:'抖音图文标题',douyinCaption:'抖音图文配文',videoTitle:'视频标题',videoCaption:'视频配文',subtitles:'字幕原文'});
+  const result=w.obsidian.archive(p.id,{version:p.version}),dir=path.dirname(path.join(vault,result.path));
+  assert.match(fs.readFileSync(path.join(dir,'素材与来源.md'),'utf8'),/真实结果/);
+  assert.match(fs.readFileSync(path.join(dir,'公众号.md'),'utf8'),/公众号摘要/);
+  assert.match(fs.readFileSync(path.join(dir,'小红书.md'),'utf8'),/小红书配文/);
+  const videoNote=fs.readFileSync(path.join(dir,'抖音脚本.md'),'utf8');assert.match(videoNote,/抖音图文配文/);assert.match(videoNote,/视频配文/);assert.match(videoNote,/字幕原文/);
+  assert.equal(fs.readFileSync(path.join(vault,'素材/AI实测.md'),'utf8'),original);
+});
 test('归档可迁移图片、保存三端与复盘，重复归档不覆盖 OB 修改',t=>{
   const {w,connect,vault}=fixture(t);connect();let p=w.create({title:"曾曾's 实测",brief:'母素材'});p=w.obsidian.select(p.id,{version:1,path:'素材/AI实测.md'}).project;
   const png='iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jC1kAAAAASUVORK5CYII=';const j=w.importImage(p.id,{base64:png});p=w.save(p.id,{version:p.version,wechat:`正文\n![配图](/api/_/workbench/assets/${j.id}/image.png)`,xhs:'## 封面\n内容',video:'录屏脚本',nextAction:'验证开头'});

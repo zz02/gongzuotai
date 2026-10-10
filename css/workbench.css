@@ -25,6 +25,14 @@
 .creator-workspace .job-assets video{max-width:100%;width:300px}
 .creator-workspace .state-running{color:var(--brand)}
 .creator-workspace .weekly-strip{line-height:1.8}
+.creator-workspace .production-form{display:grid;gap:18px;margin:24px 0;padding-top:24px;border-top:1px solid var(--line-2)}
+.creator-workspace .production-form>button{justify-self:start}
+.creator-workspace .delivery-item{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid var(--line-2)}
+.creator-workspace .delivery-item p{margin:6px 0 0;font-size:12px;overflow-wrap:anywhere}
+.creator-workspace .delivery-item button{flex-shrink:0}
+.creator-workspace .topic-choice{padding:12px 0 24px;border-bottom:1px solid var(--line-2)}
+.creator-workspace .topic-choice p{white-space:pre-wrap;overflow-wrap:anywhere}
+.creator-workspace .job-assets audio{max-width:100%;width:280px}
 .creator-workspace button:focus-visible,.creator-workspace a:focus-visible{outline:2px solid var(--brand);outline-offset:3px}
 @media(max-width:1080px){.creator-workspace{padding:20px}.creator-workspace .work-tabs{gap:16px}}
 @media(max-width:760px){
@@ -32,6 +40,7 @@
  .creator-workspace .project-shelf{padding:14px}.creator-workspace .project-tools{gap:8px}
  .creator-workspace .project-tools strong{width:100%}.creator-workspace .project-tools #runtime{margin-left:0}
  .creator-workspace .pui-btn{min-height:44px}.creator-workspace .editor-head,.creator-workspace .section-head{flex-wrap:wrap}
+ .creator-workspace .plain-button{min-height:44px;display:inline-flex;align-items:center}
  .creator-workspace .goal{min-width:110px}.creator-workspace .image-options label{min-width:100px}
  .creator-workspace .workspace-feedback{flex-wrap:wrap}.creator-workspace .creator-dialog{max-height:85vh;padding:18px}
 }
