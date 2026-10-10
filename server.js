@@ -206,6 +206,7 @@ const contentSkillRuns = require('./lib/content-skill-runs').make({
   executeAgent,
   logAction,
 });
+const workbench = require('./lib/workbench').make({ db, dataRoot: require('./lib/db').DATA_ROOT, rootDir: __dirname });
 const hotLib = require('./lib/hot');
 const {
   HOT_SOURCE_CONFIG, hotBatchId, saveHotBatch, latestHotBatch,
@@ -805,6 +806,7 @@ function formatDoubaoSearchResults(data) {
 
 
 async function handleLocalApi(req, res, url) {
+  if (await require('./lib/routes/workbench').tryRoute(req, res, url, { workbench })) return true;
   if (await require('./lib/routes/auth').tryRoute(req, res, url, { APP_VERSION, ENABLE_SCHEDULER, ENV_FILE, loginGuard })) {
     return true;
   }

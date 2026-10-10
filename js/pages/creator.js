@@ -221,10 +221,13 @@ export function clearCreatorSource() {
   toast('已清除来源绑定', 'success');
 }
 
-export function sendToCreator(item) {
+export async function sendToCreator(item) {
   LS.set('creatorSource', item);
-  toast('已发送到 AI 创作助手', 'success');
-  gotoPage('creator');
+  const { openCreatorWithSource } = await import('../creator-bridge.js');
+  return openCreatorWithSource({ kind: 'reference', sourceId: `${item.plat || '参考'}:${item.workId || item.url || item.title}`,
+    title: item.title, brief: `参考内容：\n${item.summary || item.content || ''}\n\n自己的问题、步骤、实测结果：待补。不能把参考作者的经历写成自己的。`,
+    sources: `参考作者：${item.author || '未填'}\n平台：${item.plat || '未填'}\n链接：${item.url || item.link || '待补'}\n作品编号：${item.workId || '未填'}\n来源内容尚待核验。`,
+  });
 }
 
 export async function doCheckWord() {

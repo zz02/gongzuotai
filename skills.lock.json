@@ -1,0 +1,8 @@
+{
+  "gzh-design": {"repo":"isjiamu/gzh-design-skill","commit":"339840b1343c86b0159d97a06a0e9eba7c09f9ba","license":"AGPL-3.0"},
+  "guizang-social-card": {"repo":"op7418/guizang-social-card-skill","commit":"cf4b810fac1c73fb65a2bb31d8c9278d82cbc4c5","license":"AGPL-3.0"},
+  "khazix": {"repo":"KKKKhazix/khazix-skills","commit":"322346ded8129436b3f64707789a73e732ae24d9","license":"MIT"},
+  "dbskill": {"repo":"dontbesilent2025/dbskill","commit":"564a794ffa8d08eb9c28ede8b2446237c1f67ada","license":"CC-BY-NC-4.0"},
+  "baoyu": {"repo":"JimLiu/baoyu-skills","commit":"1567581c26ec29f4216c6e6835415bf30343b0e3","license":"MIT"},
+  "obsidian": {"repo":"kepano/obsidian-skills","commit":"3ccff5338ea700537839b21900aa5358a0402c98","license":"MIT"}
+}

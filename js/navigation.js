@@ -12,8 +12,21 @@ import { renderSkills } from './pages/agent.js';
 import { renderAgent } from './pages/agent.js';
 import { renderSettings } from './pages/settings.js';
 import { renderContentProjects } from './pages/content-projects.js';
+import { renderWorkbench } from './workbench.js';
+import { renderCreatorNews } from './pages/creator-news.js';
+
+let pageController = null;
+let leavePromise = null;
+
+export function prepareLeaveCurrentPage() {
+  if (!pageController?.beforeLeave) return Promise.resolve(true);
+  if (!leavePromise) leavePromise = Promise.resolve(pageController.beforeLeave()).finally(() => { leavePromise = null; });
+  return leavePromise;
+}
 
 export const PAGES = {
+  workbench: { tpl: 'tpl-workbench', init: renderWorkbench },
+  news: {tpl:'tpl-creator-news',init:renderCreatorNews},
   dashboard: { tpl: 'tpl-dashboard', init: renderDashboard },
   hotlist:   { tpl: 'tpl-hotlist',   init: () => renderHotlist() },
   inspiration: { tpl: 'tpl-inspiration', init: renderInspiration },
@@ -52,8 +65,23 @@ export function closeMobileSidebar() {
 }
 
 export function gotoPage(page, options = {}) {
-  const { updateHistory = true, replaceHistory = false } = options;
   const p = page === 'library' ? 'knowledgebase' : page;
+  if (p !== 'login' && !PAGES[p]) return false;
+  if (!pageController) return navigate(p, options);
+  const previous = pageController;
+  return prepareLeaveCurrentPage().then(allowed => {
+    if (!allowed || pageController !== previous) {
+      if (options.updateHistory === false) history.replaceState({ page: 'workbench' }, '', '#workbench');
+      return false;
+    }
+    return navigate(p, options);
+  });
+}
+
+function navigate(p, options) {
+  const { updateHistory = true, replaceHistory = false } = options;
+  pageController?.dispose?.();
+  pageController = null;
   closeMobileSidebar();
   if (p === 'login') {
     // 首次初始化页与登录页共用同一个容器。初始化完成后退出登录时，
@@ -71,28 +99,35 @@ export function gotoPage(page, options = {}) {
     }
     document.getElementById('page-login').classList.add('active');
     document.getElementById('page-app').classList.remove('active');
+    document.getElementById('content-area').innerHTML = '';
+    setCurrentPage('login');
     requestAnimationFrame(() => document.getElementById('loginUser')?.focus());
     if (updateHistory) {
       const method = replaceHistory ? 'replaceState' : 'pushState';
       history[method]({ page: p }, '', '#' + p);
     }
-    return;
+    return true;
   }
   const cfg = PAGES[p]; if (!cfg) return;
   cancelAllApi();
   document.getElementById('modal-host').innerHTML = '';
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => { n.classList.remove('active'); n.removeAttribute('aria-current'); });
   const nav = document.querySelector(`.nav-item[data-page="${p}"]`);
-  if (nav) nav.classList.add('active');
+  if (nav) { nav.classList.add('active'); nav.setAttribute('aria-current', 'page'); }
   const tpl = document.getElementById(cfg.tpl);
   const host = document.getElementById('content-area');
   host.innerHTML = '';
   host.appendChild(tpl.content.cloneNode(true));
+  host.scrollTop = 0;
   setCurrentPage(p);
-  if (cfg.init) cfg.init();
+  if (cfg.init) {
+    const result = cfg.init(options.workbench || {});
+    if (result?.dispose || result?.beforeLeave) pageController = result;
+  }
   initIcons(host);
   if (updateHistory) {
     const method = replaceHistory ? 'replaceState' : 'pushState';
     history[method]({ page: p }, '', '#' + p);
   }
+  return true;
 }

@@ -730,7 +730,7 @@ export async function linkKbPickerByIndex(index) {
   }
 }
 
-export function sendKbToCreator(entry) {
+export async function sendKbToCreator(entry) {
   LS.set('creatorSource', {
     plat: 'kb',
     title: entry.title,
@@ -738,8 +738,11 @@ export function sendKbToCreator(entry) {
     tags: entry.tags,
     savedAt: new Date().toLocaleString('zh-CN'),
   });
-  toast('已发送到创作助手', 'success');
-  gotoPage('creator');
+  const { openCreatorWithSource } = await import('../creator-bridge.js');
+  return openCreatorWithSource({ kind: 'knowledge', sourceId: String(entry.entry_key || entry.path || `${entry.plat}:${entry.workId || entry.title}`),
+    title: entry.title, brief: `知识库参考：\n${entry.content || entry.content_preview || entry.summary || ''}\n\n本篇实测步骤、真实结果与限制：待补。`,
+    sources: `来源：知识库\n条目：${entry.entry_key || entry.path || entry.title || '未填'}\n链接：${entry.url || '未填'}\n本次使用引用快照，不改动原笔记。`,
+  });
 }
 
 export function renderLibrary() { renderKnowledgebase(); }

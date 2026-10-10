@@ -11,4 +11,12 @@
 
 本版本继续按 AGPL-3.0 提供，不提供任何明示或默示担保。完整许可条款见同目录的 `LICENSE`。
 
+## 点灯自媒体工作台扩展（2026-10-10）
+
+本仓库的 main 分支在 v0.6.0 基础上增加统一创作入口、多源 AI 资讯、Codex 写作与原生生图、小红书图卡、Skill 中心、公众号排版、Obsidian 快照归档和复盘。本次同步对应源码，不代表创建新的版本 Release。
+
+第三方能力来源和固定版本见 `skills.lock.json`。保留原作者归属：卡兹克（KKKKhazix/khazix-skills）、宝玉（JimLiu/baoyu-skills）、dontbesilent（dontbesilent2025/dbskill）、甲木 × 摸鱼小李（isjiamu/gzh-design-skill）、归藏（op7418/guizang-social-card-skill）和 Kepano（kepano/obsidian-skills）。
+
+第三方 Skill 源码不打包或提交；本机通过 `npm run skills:sync` 获取锁定版本。各来源分别遵守自己的 MIT、AGPL-3.0 或 CC-BY-NC-4.0 许可；项目的 AGPL 许可不改变这些来源的许可，尤其不授予 db 资料商业使用权。UI 的本地 PUI 样式与交互文件位于 `vendor/pui/`，随本项目对应源码提供。
+
 候选包和正式源码发行包包含运行、修改与重新构建本版本所需的对应源代码。若通过网络向他人提供修改版服务，部署者应同时向这些用户提供该修改版对应源代码的获取方式。

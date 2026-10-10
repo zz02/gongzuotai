@@ -19,6 +19,8 @@ export { gotoPage, toggleSidebar, openMobileSidebar, closeMobileSidebar } from '
 export async function refreshCurrent() {
   let refresh = null;
   if (currentPage === 'dashboard') refresh = () => renderDashboard();
+  else if (currentPage === 'workbench') refresh = () => gotoPage('workbench', { replaceHistory: true });
+  else if (currentPage === 'news') refresh = () => gotoPage('news', {replaceHistory:true});
   else if (currentPage === 'hotlist') refresh = () => { clearHotCache(); return renderHotlist(); };
   else if (currentPage === 'inspiration') refresh = () => renderInspiration();
   else if (currentPage === 'projects') refresh = () => renderContentProjects();
@@ -48,10 +50,10 @@ export async function refreshCurrent() {
   }
 }
 
-export function doGlobalSearch() {
+export async function doGlobalSearch() {
   const kw = document.getElementById('globalSearch').value.trim();
   if (!kw) return;
-  gotoPage('search');
+  if (await gotoPage('search') === false) return;
   document.getElementById('searchInput').value = kw;
   doSearch();
 }

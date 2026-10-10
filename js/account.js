@@ -2,7 +2,7 @@ import { localApi } from './api.js';
 import { Modal, toast } from './components.js';
 import { esc } from './utils.js';
 import { initIcons } from './icons.js';
-import { gotoPage } from './navigation.js';
+import { gotoPage, prepareLeaveCurrentPage } from './navigation.js';
 
 let currentAccount = null;
 let accountModal = null;
@@ -147,6 +147,7 @@ export async function changeAccountPassword() {
 }
 
 export async function logoutAccount() {
+  if (!await prepareLeaveCurrentPage()) return;
   try {
     await localApi('logout', { method: 'POST', body: {} });
   } catch {}

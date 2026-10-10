@@ -14,6 +14,7 @@ let agentThreads = [];
 let currentAgentThreadId = null;
 let currentAgentId = null;
 let skillUpdateStatus = null;
+let creatorSkillCount = null;
 const agentRuntimeErrors = new Map();
 
 export function clearSkillCache() {
@@ -24,11 +25,15 @@ export async function loadSkills(force = false) {
   if (force) skillCache = [];
   if (!skillCache.length) skillCache = await localApi('skills');
   const navCount = document.getElementById('nav-skill-count');
-  if (navCount) navCount.textContent = skillCache.length;
+  if(creatorSkillCount===null){try{creatorSkillCount=(await localApi('workbench/capabilities')).filter(c=>c.available).length;}catch{}}
+  if (navCount) navCount.textContent = skillCache.length+(creatorSkillCount||0);
   return skillCache;
 }
 
 export async function renderSkills() {
+  _skillTabBound=false;
+  bindSkillTabs();
+  renderCreatorCapabilities();
   try {
     const skills = await loadSkills();
     document.getElementById('skill-local-count').textContent = `${skills.length} 个已下载`;
@@ -45,13 +50,15 @@ export async function renderSkills() {
 
 let _skillTabBound = false;
 export function bindSkillTabs() {
-  if (_skillTabBound) return;
+  const host=document.getElementById('skill-tabs');
+  if (!host || host.dataset.bound) return;
+  host.dataset.bound='true';
   _skillTabBound = true;
   document.querySelectorAll('.skill-tab').forEach(btn => {
     btn.addEventListener('click', () => {
       const tab = btn.dataset.skillTab;
       document.querySelectorAll('.skill-tab').forEach(b => b.classList.toggle('active', b === btn));
-      ['redfox', 'hub', 'custom', 'template'].forEach(t => {
+      ['creator', 'redfox', 'hub', 'custom', 'template'].forEach(t => {
         const pane = document.getElementById(`skill-pane-${t}`);
         if (pane) pane.classList.toggle('hidden', t !== tab);
       });
@@ -66,11 +73,24 @@ export function bindSkillTabs() {
 }
 
 let _hubSearchBound = false;
+async function renderCreatorCapabilities(){
+  const grid=document.getElementById('creator-capability-grid'),runtime=document.getElementById('creator-capability-runtime');
+  if(!grid)return;
+  grid.textContent='正在读取已接入能力';
+  if(runtime)runtime.textContent='检查 Codex 登录与生图能力';
+  try{
+    const [items,status]=await Promise.all([localApi('workbench/capabilities'),localApi('workbench/runtime').catch(()=>({note:'运行环境检测失败，请点击顶部刷新重试。'}))]);
+    if(!grid.isConnected)return;
+    if(runtime)runtime.textContent=status.note;
+    grid.innerHTML=items.length?items.map(c=>`<article class="glass capability-card"><span class="pill ${c.available?'pill-green':'pill-gray'}">${c.available?'已接入':'源码缺失'}</span><h3>${esc(c.name)}</h3><p>${esc(c.description)}</p><small>作者：${esc(c.author)} · ${esc(c.mode)}</small><small>来源：${esc(c.sourceRepo||'来源未确认')}</small><small>版本：${esc(c.commit?.slice(0,12)||'版本未确认')} · 许可：${esc(c.license||'许可未确认')}</small><div class="news-actions"><button class="btn btn-primary" data-capability="${esc(c.id)}" ${c.available?'':'disabled'}>用于创作</button>${c.url?`<a class="btn btn-ghost" href="${esc(c.url)}" target="_blank" rel="noopener">查看来源</a>`:''}</div></article>`).join(''):'<div class="news-empty">暂无创作能力，请同步来源后刷新。</div>';
+    // Re-rendering replaces the one handler instead of accumulating navigation calls.
+    grid.onclick=e=>{const b=e.target.closest('[data-capability]');if(b&&!b.disabled)gotoPage('workbench',{workbench:{capability:b.dataset.capability}});};
+  }catch(e){if(grid.isConnected){grid.textContent=`创作能力读取失败：${e.message}。请点击顶部刷新重试。`;if(runtime)runtime.textContent='创作能力尚未加载。';}}
+}
 function bindHubSearchInput() {
-  if (_hubSearchBound) return;
-  _hubSearchBound = true;
   const input = document.getElementById('hubSearchInput');
-  if (input) {
+  if (input && !input.dataset.bound) {
+    input.dataset.bound='true';
     input.addEventListener('keydown', e => {
       if (e.key === 'Enter') { e.preventDefault(); searchHubSkills(); }
     });

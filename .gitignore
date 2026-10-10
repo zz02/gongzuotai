@@ -24,12 +24,16 @@ yarn-error.log*
 
 # 截图与 Playwright 调试脚本（本地开发产物）
 .screenshots/
+# 本机账号与私人知识库截图，只留在本机
+docs/assets/workbench-login-2026-10-10.png
+docs/assets/obsidian-home-2026-10-09.png
 
 # Docker / 本地数据挂载目录
 data/
 
 # Skill 目录（从官方仓库拉取/热更新，非本仓库源码）
 skills/
+skill-sources/
 
 # 备份压缩包
 *.zip

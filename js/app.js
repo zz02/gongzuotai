@@ -42,7 +42,7 @@ localApi('version').then(r => {
 }).catch(() => {});
 
 window.addEventListener('popstate', (e) => {
-  const hash = location.hash.replace('#', '') || 'dashboard';
+  const hash = location.hash.replace('#', '') || 'workbench';
   gotoPage(hash, { updateHistory: false });
 });
 
@@ -51,14 +51,14 @@ function applyAppVersion(version) {
   const tag = document.querySelector('[data-app-version]');
   if (tag) tag.textContent = `v${version}`;
   const brandTitle = document.querySelector('.sidebar-brand-text .font-bold');
-  if (brandTitle) brandTitle.setAttribute('title', `灵感熔炉 v${version}`);
+  if (brandTitle) brandTitle.setAttribute('title', `点灯自媒体工作台 v${version} · 基于灵感熔炉`);
 }
 
 function activateApp(preferredPage = '') {
   document.getElementById('page-login').classList.remove('active');
   document.getElementById('page-app').classList.add('active');
   const hashPage = location.hash.replace('#', '');
-  const initialPage = preferredPage || (!hashPage || hashPage === 'login' ? 'dashboard' : hashPage);
+  const initialPage = preferredPage || (!hashPage || hashPage === 'login' ? 'workbench' : hashPage);
   gotoPage(initialPage, { replaceHistory: true });
   localApi('version').then(r => {
     if (r?.version) applyAppVersion(r.version);
@@ -75,10 +75,7 @@ function activateApp(preferredPage = '') {
   }).catch(error => {
     if (error.name !== 'AbortError') console.warn('灵感统计加载失败：', error.message);
   });
-  localApi('skills').then(skills => {
-    const navCount = document.getElementById('nav-skill-count');
-    if (navCount) navCount.textContent = Array.isArray(skills) ? skills.length : 0;
-  }).catch(error => {
+  loadSkills().catch(error => {
     if (error.name !== 'AbortError') console.warn('Skill 列表加载失败：', error.message);
   });
   loadCurrentAccount({ promptPasswordChange: true }).catch(error => {
@@ -146,11 +143,11 @@ async function enterApp() {
     localStorage.removeItem('furnace_pass');
   } catch (e) {
     setAuthError(e.message);
-    setSubmitBusy('login-submit', false, '进入熔炉', 'log-in');
+    setSubmitBusy('login-submit', false, '进入工作台', 'log-in');
     return;
   }
   document.getElementById('loginPass').value = '';
-  setSubmitBusy('login-submit', false, '进入熔炉', 'log-in');
+  setSubmitBusy('login-submit', false, '进入工作台', 'log-in');
   activateApp();
 }
 
@@ -177,7 +174,7 @@ async function setupApp() {
     document.getElementById('setupPassword').value = '';
     document.getElementById('setupConfirmPassword').value = '';
     toast('工作台初始化完成', 'success');
-    activateApp('projects');
+    activateApp('workbench');
   } catch (error) {
     setAuthError(error.message);
     setSubmitBusy('setup-submit', false, '创建并进入', 'arrow-right');
@@ -337,6 +334,7 @@ registerAction('openMobileSidebar', () => openMobileSidebar());
 registerAction('closeMobileSidebar', () => closeMobileSidebar());
 registerAction('toggleTheme', () => { toggleTheme(); initIcons(document.body); });
 registerAction('gotoPage', (el) => gotoPage(el.dataset.page));
+registerAction('newUnifiedContent', () => gotoPage('workbench', { workbench: { new: true } }));
 registerAction('refreshContentProjects', () => refreshContentProjects());
 registerAction('newContentProject', () => newContentProject());
 registerAction('configureContentWorkspace', () => configureContentWorkspace());

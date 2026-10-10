@@ -192,7 +192,7 @@ function renderInspirationCard(idea, filter) {
       <div class="w-9 h-9 rounded-lg bg-amber-500/10 text-amber-300 flex items-center justify-center flex-shrink-0"><i data-lucide="lightbulb" class="w-4 h-4"></i></div>
       <div class="flex-1 min-w-0">
         <h3 class="font-semibold leading-snug text-[15px]">${esc(idea.title)}</h3>
-        <div class="text-[10px] text-gray-600 mt-0.5">${new Date(idea.createdAt).toLocaleString('zh-CN')}</div>
+        <div class="text-[10px] text-gray-600 mt-0.5">${new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}).format(new Date(idea.createdAt))}</div>
       </div>
       ${!isTrash && idea.isFavorite ? '<i data-lucide="bookmark" class="w-4 h-4 text-amber-300 flex-shrink-0 mt-1" data-favorite-mark="1"></i>' : ''}
     </div>`;
@@ -508,5 +508,10 @@ export async function sendIdeaToCreator(id) {
     sourceKeywords: idea.sourceKeywords,
     kbLink: idea.kbLink,
   });
-  gotoPage('creator');
+  const { openCreatorWithSource } = await import('../creator-bridge.js');
+  return openCreatorWithSource({
+    kind: 'inspiration', sourceId: String(idea.id), title: idea.title,
+    brief: `读者问题与选题摘要：\n${idea.summary || ''}\n\n创作角度：${idea.angle || '待补'}${knowledgeText}\n\n实测步骤、结果、成本与限制：待补；不能把选题当作已完成实测。`,
+    sources: `来源：灵感选题\n关键词：${(idea.sourceKeywords || []).join?.('、') || idea.sourceKeywords || '未填'}\n\n${JSON.stringify(idea.sourceItems || idea.evidence || [], null, 2)}\n来源链接与事实：待核验。`,
+  });
 }

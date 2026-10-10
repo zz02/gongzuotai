@@ -25,13 +25,18 @@
     "build:css": "tailwindcss -i ./css/tailwind-input.css -o ./css/tailwind.css --minify",
     "check": "node --check server.js",
     "preflight": "node scripts/preflight.js",
+    "skills:sync": "node scripts/sync-creator-skills.js",
+    "skills:update": "node scripts/sync-creator-skills.js --update",
     "test": "node --test --test-concurrency=1"
   },
   "engines": {
     "node": ">=20"
   },
   "dependencies": {
-    "better-sqlite3": "^12.10.0"
+    "better-sqlite3": "^12.10.0",
+    "marked": "^15.0.12",
+    "playwright": "^1.55.1",
+    "rss-parser": "3.13.0"
   },
   "devDependencies": {
     "tailwindcss": "^3.4.17"
