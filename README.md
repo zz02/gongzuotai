@@ -10,7 +10,7 @@
 
 新手先看 [操作手册：入口、首次试用、三端创作、OB 配合与故障处理](docs/点灯自媒体工作台-操作手册.md)。手册于 2026-10-10 更新；正常使用无需重新安装。
 
-详见 [试用说明与验收记录](docs/创作工作台-试用说明.md)。重新安装需要 `npm install` 与 `npm run skills:sync`，以及 Python 3、已登录的 Codex CLI；图文导出使用本机 Chrome，无 Chrome 时运行 `npx playwright install chromium`。定制版源码维护在 [zz02/insprira 的 main 分支](https://github.com/zz02/insprira/tree/main)，仍基于 `v0.6.0`，未创建新的版本 Release。数据库、密钥、私人笔记、第三方 Skill 源码和本机账号截图不随代码上传。以下章节介绍原版功能。
+详见 [试用说明与验收记录](docs/创作工作台-试用说明.md)。重新安装需要 `npm install` 与 `npm run skills:sync`，以及 Python 3、已登录的 Codex CLI；图文导出使用本机 Chrome，无 Chrome 时运行 `npx playwright install chromium`。定制版源码维护在 [zz02/gongzuotai 的 main 分支](https://github.com/zz02/gongzuotai/tree/main)，仍基于 `v0.6.0`，未创建新的版本 Release。数据库、密钥、私人笔记、第三方 Skill 源码和本机账号截图不随代码上传。以下章节介绍原版功能。
 
 Obsidian 接入已加入个人创作台：点击“连接知识库”，选择接入目录；在“知识库”页关联笔记、导入候选稿、归档三平台稿件与图片。原笔记只读，归档采用独立快照。详见 [OB 接入与插件调研](docs/Obsidian接入与插件调研-2026-10-08.md)。
 
