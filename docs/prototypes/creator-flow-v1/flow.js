@@ -2,6 +2,7 @@
 (() => {
   'use strict';
   const KEY='diandeng.prototype.creator-flow.v1',names={wechat:'公众号',xhs:'小红书',douyin:'抖音图文'},labels={sources:'信源',topics:'选题库',works:'我的作品',write:'生成稿件',images:'图片排版',deliver:'发布成品',skills:'Skill 中心',appearance:'外观设置',original:'RedFox 原工具'};
+  document.querySelector('#drawer-navigation').append(document.querySelector('.pui-sidebar .pui-nav').cloneNode(true));
   const $=s=>document.querySelector(s),esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])),id=()=>crypto.randomUUID();
   const initial=()=>({schema:1,topics:[],works:[],current:null,platform:'wechat',page:0,source:'all',appearance:{data:'',enabled:true,position:'center',mask:60}});
   let state=initial(),storageError='',look=null,unreadable=null;
@@ -66,7 +67,26 @@ document.addEventListener('change',async e=>{const el=e.target,d=draft();try{if(
     if(f.id==='generation-form'){const platforms=v.getAll('platform');if(!platforms.length){$('#generation-error').textContent='至少选择一个平台。';return;}return generate(platforms,v.has('fail'));}
     if(f.id==='publication-form'){const d=draft(),url=v.get('url').trim(),note=v.get('note').trim(),at=f.querySelector('[data-pui-picker-value]').textContent.trim();if(d.checked!==sig(d)){$('#publish-error').textContent='成品已修改，请重新检查。';return;}if(!url&&note.length<8){$('#publish-error').textContent='填写链接，或至少 8 字的核对备注。';return;}if(url){try{if(!['https:','http:'].includes(new URL(url).protocol))throw Error();}catch{$('#publish-error').textContent='填写完整 http 或 https 链接。';return;}}if(d.publication){$('#publish-error').textContent='本平台已登记，未重复计数。';return;}d.publication={url,note,at,snapshot:structuredClone({title:d.title,caption:d.caption,body:d.body,assets:d.assets})};persist();close();return render();}
   });
-  window.addEventListener('hashchange',()=>{close();render();$('#screen').focus({preventScroll:true});});window.addEventListener('beforeunload',e=>{if(storageError){e.preventDefault();e.returnValue='';}});
+  const navDrawer=$('#navigation-drawer');
+  new MutationObserver(()=>{
+    const expanded=navDrawer.classList.contains('is-open');
+    $('.navigation-toggle').setAttribute('aria-expanded',String(expanded));
+    $('.pui-sidebar').inert=expanded;
+    $('.pui-main').inert=expanded||$('#flow-modal').classList.contains('is-open');
+  }).observe(navDrawer,{attributes:true,attributeFilter:['class']});
+  document.addEventListener('click',e=>{
+    if(e.target.closest('.skip-link')){e.preventDefault();$('#screen').focus();}
+    if(e.target.closest('#drawer-navigation a')){window.PUI.closeDrawer(navDrawer);if(e.target.closest('a').hash===location.hash)$('#screen').focus();}
+  });
+  window.addEventListener('hashchange',()=>{close();window.PUI.closeDrawer(navDrawer);render();$('#screen').focus({preventScroll:true});});window.addEventListener('beforeunload',e=>{if(storageError){e.preventDefault();e.returnValue='';}});
+  document.addEventListener('keydown',e=>{
+    if(e.key!=='Tab'||!navDrawer.classList.contains('is-open'))return;
+    const items=[...navDrawer.querySelectorAll('button:not([disabled]),a[href]')].filter(el=>el.getClientRects().length);
+    if(e.shiftKey&&document.activeElement===items[0]){e.preventDefault();items.at(-1)?.focus();}
+    else if(!e.shiftKey&&document.activeElement===items.at(-1)){e.preventDefault();items[0]?.focus();}
+  });
+  const mobileQuery=matchMedia('(max-width:1100px)');
+  mobileQuery.addEventListener('change',()=>{if(!mobileQuery.matches)window.PUI.closeDrawer(navDrawer);});
   document.addEventListener('keydown',e=>{if(e.key!=='Tab'||!$('#flow-modal').classList.contains('is-open'))return;const items=[...$('#flow-modal').querySelectorAll('button:not([disabled]),input:not([type=hidden]),select,textarea,a[href]')].filter(el=>el.getClientRects().length);const first=items[0],last=items.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last?.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first?.focus();}});
   document.addEventListener('keydown',e=>{if(['Enter',' '].includes(e.key)&&e.target.matches('label.pui-btn')){e.preventDefault();e.target.querySelector('input[type=file]')?.click();}});
   for(const w of state.works)for(const d of Object.values(w.drafts))if(['running','waiting'].includes(d.task))d.task='failed';
