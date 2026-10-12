@@ -16,7 +16,7 @@ const out=path.resolve(__dirname,'../../assets');
   const capture=async(name,width=1440)=>{
     await page.setViewportSize({width,height:width===375?812:width===768?900:1000});
     await page.waitForFunction(()=>!document.querySelector('.pui-toast.is-open'));
-    await page.screenshot({path:path.join(out,`creator-studio-${baseline?'before':'review'}-${name}-${width}-2026-10-12.png`),fullPage:true});
+    await page.screenshot({path:path.join(out,`creator-studio-${baseline?'before':'review'}-${name}-${width}-2026-10-12.png`),fullPage:width!==375});
   };
   try{
     await page.goto(url);await page.waitForSelector('.source-row');await capture('sources');
