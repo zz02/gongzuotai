@@ -2,7 +2,7 @@
 <html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'none'; img-src 'self' data: blob:; script-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'none'">
 <link rel="icon" href="data:,"><title>点灯 · 功能交互原型</title>
-<link rel="stylesheet" href="./prototype-ui-kit/dist/prototype-ui.css"><script defer src="./prototype-ui-kit/dist/prototype-ui.js"></script><script defer src="./flow.js"></script><link rel="stylesheet" href="./flow.css"><link rel="stylesheet" href="./studio.css"></head>
+<link rel="stylesheet" href="./prototype-ui-kit/dist/prototype-ui.css"><script defer src="./prototype-ui-kit/dist/prototype-ui.js"></script><script defer src="./redfox.js"></script><script defer src="./flow.js"></script><link rel="stylesheet" href="./flow.css"><link rel="stylesheet" href="./studio.css"><link rel="stylesheet" href="./redfox-themes.css"></head>
 <body class="pui-page"><div id="wallpaper" aria-hidden="true"></div><div class="pui-admin">
 <a href="#screen" class="skip-link pui-btn">跳到内容</a>
 <aside class="pui-sidebar" aria-label="工作台导航">
@@ -17,8 +17,13 @@
 <span class="nav-label">创作辅助</span>
 <a href="#skills" aria-label="Skill 中心" title="Skill 中心"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 9 5-9 5-9-5zM3 12l9 5 9-5M3 16l9 5 9-5"/></svg><span class="nav-text">Skill 中心</span></a>
 <a href="#appearance" aria-label="外观设置" title="外观设置"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h18v16H3zM3 16l6-6 5 5 3-3 4 4"/><circle cx="16" cy="8" r="1"/></svg><span class="nav-text">外观设置</span></a>
-<span class="nav-label">原功能保留</span>
+<span class="nav-label">RedFox 工具区</span>
 <a href="#original" aria-label="RedFox 原工具" title="RedFox 原工具"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 5-5 7 5 7M16 5l5 7-5 7M14 4l-4 16"/></svg><span class="nav-text">RedFox 原工具</span></a>
+<a href="#rf-search" aria-label="跨平台搜索" title="跨平台搜索"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6"/><path d="m15 15 6 6"/></svg><span class="nav-text">跨平台搜索</span></a>
+<a href="#rf-tracker" aria-label="账号追踪" title="账号追踪"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7" r="4"/><path d="M4 21v-3a8 8 0 0 1 16 0v3"/></svg><span class="nav-text">账号追踪</span></a>
+<a href="#rf-creator" aria-label="原创作工具" title="原创作工具"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h14v18H5zM8 8h8M8 12h8M8 16h5"/></svg><span class="nav-text">原创作工具</span></a>
+<a href="#rf-library" aria-label="素材收藏" title="素材收藏"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span class="nav-text">素材收藏</span></a>
+<a href="#rf-settings" aria-label="运行设置" title="运行设置"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/><circle cx="8" cy="6" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="9" cy="18" r="2"/></svg><span class="nav-text">运行设置</span></a>
 </nav>
 <div class="sidebar-profile"><span class="profile-letter" aria-hidden="true">曾</span><div><strong>点灯的曾曾</strong><span>个人创作空间</span></div></div>
 </aside>
