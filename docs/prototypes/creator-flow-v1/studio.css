@@ -75,6 +75,50 @@ textarea, input { caret-color: var(--studio-accent); }
 #navigation-drawer .pui-drawer-body { padding: 24px 12px; }
 #navigation-drawer .pui-drawer-foot { font-size: 12px; justify-content: flex-start; background: transparent; color: #b2cabe; border-color: #426550; }
 .pui-nav a:focus-visible { outline-color: var(--studio-amber); outline-offset: -3px; }
+/* Workspace hierarchy: process ribbon → working surface → secondary context. */
+.pui-main > #screen { background: var(--studio-surface); margin: 24px 32px 40px; width: calc(100% - 64px); padding: 32px; border-radius: 8px; max-width: 1440px; min-height: calc(100svh - 172px); }
+.pui-page-head { margin-bottom: 0; align-items: flex-start; gap: 24px; }
+.pui-page-title { font-size: 28px; line-height: 1.35; font-weight: 650; text-wrap: balance; }
+.pui-page-desc { font-size: 14px; margin: 8px 0 0; max-width: 65ch; }
+.pui-page-actions { padding-top: 2px; }
+.work-steps { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); gap: 0; margin: 24px 0 32px; border-bottom: 1px solid var(--studio-line); }
+.work-steps a { display: flex; gap: 10px; align-items: center; padding: 14px 0; min-height: 52px; background: transparent; border: 0; border-radius: 0; color: var(--studio-muted); font-size: 14px; }
+.work-steps b { display: inline; margin: 0; font-variant-numeric: tabular-nums; color: var(--studio-muted); font-size: 12px; font-weight: 500; }
+.work-steps a.is-active { background: transparent; color: var(--studio-accent); box-shadow: 0 2px 0 var(--studio-accent); font-weight: 600; }
+.work-steps a.is-active b { color: var(--studio-accent); }
+.work-steps a:hover { color: var(--studio-accent); background: var(--studio-background); }
+.pui-panel { border-color: var(--studio-line); box-shadow: none; border-radius: 6px; }
+.pui-panel-head { background: var(--studio-background); border-color: var(--studio-line); padding: 16px 24px; }
+.pui-panel-title { font-size: 16px; font-weight: 600; }
+.pui-panel-body { padding: 24px; }
+.pui-btn { font-size: 14px; }
+.pui-btn:not(.pui-btn-primary):hover { border-color: var(--studio-accent); background: var(--studio-forest-100); color: var(--studio-accent); }
+.pui-control { border-color: var(--studio-line); border-radius: 6px; }
+.source-workspace { display: grid; grid-template-columns: minmax(0,1fr) 240px; gap: 40px; }
+.source-feed { min-width: 0; }
+.source-filter { margin: 0 0 24px; gap: 4px; }
+.source-filter .pui-btn { border: 0; background: transparent; padding: 10px 12px; color: var(--studio-muted); }
+.source-filter .pui-btn[aria-pressed=true] { background: var(--studio-forest-100); color: var(--studio-accent); font-weight: 600; }
+.feed-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--studio-line); }
+.feed-heading h2 { margin: 0; font-size: 16px; font-weight: 600; }
+.feed-heading > span { font-size: 12px; color: var(--studio-muted); }
+.source-row { gap: 24px; padding: 24px 0; border-color: var(--studio-line); }
+.source-byline { display: flex; align-items: center; gap: 12px; }
+.source-row .pui-tag { background: var(--studio-forest-100); color: var(--studio-accent); border-color: var(--studio-line); padding: 2px 8px; }
+.source-text h2 { font-size: 20px; line-height: 1.5; margin: 12px 0 8px; color: var(--studio-text); text-wrap: balance; }
+.source-text > p { margin: 0; font-size: 16px; color: var(--studio-muted); }
+.source-row-foot { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 16px; }
+.creation-context { border-left: 1px solid var(--studio-line); padding-left: 32px; }
+.creation-context h2 { margin: 8px 0 20px; font-size: 14px; font-weight: 600; }
+.creation-context .context-audience { font-size: 20px; font-weight: 600; margin: 0 0 8px; }
+.creation-context .muted { font-size: 14px; line-height: 1.8; }
+.creation-context dl { margin: 24px 0 32px; }
+.creation-context dt { font-size: 12px; color: var(--studio-muted); margin: 16px 0 6px; }
+.creation-context dd { font-size: 14px; margin: 0; }
+.context-material { border-top: 1px solid var(--studio-line); padding-top: 24px; margin-bottom: 32px; }
+.context-material h3 { font-size: 14px; margin: 0; }
+.creation-context .pui-link { font-size: 12px; line-height: 1.8; }
+#navigation-drawer .nav-label { display: block; }
 @media (max-width: 1100px) {
   :root { --studio-nav-width: 72px; }
   .pui-sidebar { padding: 20px 8px; }
@@ -87,6 +131,11 @@ textarea, input { caret-color: var(--studio-accent); }
   .sidebar-profile { justify-content: center; padding: 24px 0 0; }
   .pui-topbar { padding: 0 24px; }
   .prototype-notice { padding: 12px 24px; }
+  .pui-main > #screen { margin: 24px; width: calc(100% - 48px); padding: 24px; }
+  .source-workspace { grid-template-columns: minmax(0,1fr); gap: 32px; }
+  .creation-context { border-left: 0; border-top: 1px solid var(--studio-line); padding: 24px 0 0; }
+  .creation-context dl { display: flex; gap: 16px; flex-wrap: wrap; margin: 20px 0; }
+  .creation-context dt, .creation-context dd { margin: 0; }
 }
 @media (max-width: 600px) {
   :root { --studio-nav-width: 56px; }
@@ -101,4 +150,20 @@ textarea, input { caret-color: var(--studio-accent); }
   .location-trail > span { display: none; }
   #save-state { font-size: 12px; }
   .prototype-notice { padding: 10px 16px; align-items: flex-start; line-height: 1.6; }
+  .pui-main > #screen { margin: 12px; width: calc(100% - 24px); padding: 20px 16px; }
+  .pui-page-head { flex-direction: column; gap: 16px; }
+  .pui-page-title { font-size: 24px; }
+  .pui-page-desc { font-size: 14px; }
+  .pui-page-actions { padding: 0; }
+  .work-steps { margin: 20px 0 24px; }
+  .work-steps a { flex-direction: column; gap: 4px; padding: 8px 0; min-height: 56px; font-size: 12px; }
+  .work-steps a b { display: inline; }
+  .source-filter { gap: 4px; margin-bottom: 20px; }
+  .source-filter .pui-btn { padding: 10px 8px; }
+  .feed-heading { flex-direction: column; align-items: flex-start; gap: 4px; }
+  .source-text h2 { font-size: 18px; }
+  .source-byline { flex-wrap: wrap; gap: 8px; }
+  .source-row-foot { align-items: flex-start; flex-direction: column; gap: 8px; }
+  .source-row-foot .pui-btn { width: 100%; }
+  .pui-panel-head, .pui-panel-body { padding: 16px; }
 }
