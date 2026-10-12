@@ -102,6 +102,7 @@ document.addEventListener('change',async e=>{const el=e.target,d=draft();try{if(
   new MutationObserver(()=>{
     const open=$('#flow-modal').classList.contains('is-open'),drawerOpen=navDrawer.classList.contains('is-open');
     if(open&&!modalWasOpen)modalTrigger=document.activeElement;
+    $('.pui-admin').inert=open||drawerOpen;
     $('.pui-main').inert=open||drawerOpen;
     $('.pui-sidebar').inert=open||drawerOpen;
     if(!open&&modalWasOpen&&!drawerOpen&&modalTrigger?.isConnected)modalTrigger.focus();
@@ -111,6 +112,7 @@ document.addEventListener('change',async e=>{const el=e.target,d=draft();try{if(
     const expanded=navDrawer.classList.contains('is-open');
     if(expanded&&!drawerWasOpen){drawerOriginHash=location.hash;drawerNavigated=false;}
     $('.navigation-toggle').setAttribute('aria-expanded',String(expanded));
+    $('.pui-admin').inert=expanded||$('#flow-modal').classList.contains('is-open');
     $('.pui-sidebar').inert=expanded||$('#flow-modal').classList.contains('is-open');
     $('.pui-main').inert=expanded||$('#flow-modal').classList.contains('is-open');
     // PUI restores focus before the background ceases being inert. Restore again afterwards.
