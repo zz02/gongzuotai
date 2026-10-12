@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PUI 模板 - 配置页</title>
+  <script defer src="./prototype-ui-kit/dist/prototype-ui.js"></script>
+</head>
+<body class="pui-page">
+  <div class="pui-admin">
+    <aside class="pui-sidebar"><div class="pui-brand">PUI 业务中台</div><nav class="pui-nav" aria-label="主导航"><a href="list-page.html">数据列表</a><a href="detail-page.html">业务详情</a><a href="edit-page.html">表单编辑</a><a href="approval-page.html">流程审批</a><a href="dashboard-page.html">运营看板</a><a class="is-active" href="config-page.html">系统配置</a></nav></aside>
+    <main class="pui-main">
+      <header class="pui-topbar"><strong>系统管理中心</strong><span class="pui-meta">系统管理员 · 陈晨</span></header>
+      <section class="pui-content">
+        <nav class="pui-breadcrumb"><a href="#">系统管理</a><span>/</span><span>业务配置</span></nav>
+        <div class="pui-page-head"><div><h1 class="pui-page-title">业务配置</h1><p class="pui-page-desc">统一维护工单规则、通知方式和数据权限。</p></div><button class="pui-btn pui-btn-primary" type="button" data-pui-toast="配置已保存">保存配置</button></div>
+
+        <div class="pui-settings">
+          <nav class="pui-settings-nav" aria-label="配置分类"><button class="is-active" type="button" data-pui-settings-tab="base">基础规则</button><button type="button" data-pui-settings-tab="notice">通知提醒</button><button type="button" data-pui-settings-tab="permission">数据权限</button><button type="button" data-pui-settings-tab="archive">归档策略</button></nav>
+          <div class="pui-settings-body">
+            <section data-pui-settings-panel="base">
+              <div class="pui-page-head"><div><h2 class="pui-panel-title">基础规则</h2><p class="pui-page-desc">配置工单流转与办理时限。</p></div></div>
+              <div class="pui-setting-list">
+                <div class="pui-setting-item"><div><div class="pui-setting-title">自动受理</div><div class="pui-setting-desc">新工单提交后自动进入待分派状态。</div></div><button class="pui-switch is-checked" type="button" role="switch" aria-checked="true" aria-label="自动受理"></button></div>
+                <div class="pui-setting-item"><div><div class="pui-setting-title">重复工单检查</div><div class="pui-setting-desc">提交时检查 30 日内相同联系人和相似诉求。</div></div><button class="pui-switch is-checked" type="button" role="switch" aria-checked="true" aria-label="重复工单检查"></button></div>
+                <div class="pui-setting-item"><div><div class="pui-setting-title">默认办理时限</div><div class="pui-setting-desc">未单独设置时使用默认时限。</div></div><div class="pui-input-group" style="width:180px;"><input class="pui-control" value="3"><span class="pui-input-addon">工作日</span></div></div>
+                <div class="pui-setting-item"><div><div class="pui-setting-title">超时自动升级</div><div class="pui-setting-desc">超过办理时限后自动升级至部门负责人。</div></div><button class="pui-switch" type="button" role="switch" aria-checked="false" aria-label="超时自动升级"></button></div>
+              </div>
+              <hr class="pui-divider">
+              <div class="pui-form-columns"><label class="pui-field"><span class="pui-label">默认承办单位</span><select class="pui-control"><option>市政务服务中心</option><option>按业务分类分派</option></select></label><label class="pui-field"><span class="pui-label">办结回访比例</span><div class="pui-input-group"><input class="pui-control" value="20"><span class="pui-input-addon">%</span></div></label></div>
+            </section>
+
+            <section data-pui-settings-panel="notice" hidden>
+              <div class="pui-page-head"><div><h2 class="pui-panel-title">通知提醒</h2><p class="pui-page-desc">设置关键节点的消息通知。</p></div></div>
+              <div class="pui-setting-list"><div class="pui-setting-item"><div><div class="pui-setting-title">新工单提醒</div><div class="pui-setting-desc">分派成功后通知承办人员。</div></div><button class="pui-switch is-checked" type="button" role="switch" aria-checked="true" aria-label="新工单提醒"></button></div><div class="pui-setting-item"><div><div class="pui-setting-title">到期前提醒</div><div class="pui-setting-desc">到期前 4 小时发送站内消息。</div></div><button class="pui-switch is-checked" type="button" role="switch" aria-checked="true" aria-label="到期前提醒"></button></div><div class="pui-setting-item"><div><div class="pui-setting-title">短信通知</div><div class="pui-setting-desc">审批完成后向申请人发送短信。</div></div><button class="pui-switch" type="button" role="switch" aria-checked="false" aria-label="短信通知"></button></div></div>
+            </section>
+
+            <section data-pui-settings-panel="permission" hidden>
+              <div class="pui-page-head"><div><h2 class="pui-panel-title">数据权限</h2><p class="pui-page-desc">控制人员可以查看和处理的数据范围。</p></div><button class="pui-btn" type="button" data-pui-modal-open="roleModal">新增角色</button></div>
+              <div class="pui-table-wrap"><table class="pui-table"><thead><tr><th>角色名称</th><th>数据范围</th><th class="is-center">启用状态</th><th class="is-action">操作</th></tr></thead><tbody><tr><td>运营管理员</td><td>全部数据</td><td class="is-center"><span class="pui-tag pui-tag-success">启用</span></td><td class="is-action"><a class="pui-link" href="#">编辑</a></td></tr><tr><td>部门负责人</td><td>本部门及下级部门</td><td class="is-center"><span class="pui-tag pui-tag-success">启用</span></td><td class="is-action"><a class="pui-link" href="#">编辑</a></td></tr><tr><td>普通人员</td><td>本人处理数据</td><td class="is-center"><span class="pui-tag">启用</span></td><td class="is-action"><a class="pui-link" href="#">编辑</a></td></tr></tbody></table></div>
+            </section>
+
+            <section data-pui-settings-panel="archive" hidden>
+              <div class="pui-page-head"><div><h2 class="pui-panel-title">归档策略</h2><p class="pui-page-desc">设置已办结数据的保留和清理规则。</p></div></div>
+              <div class="pui-alert pui-alert-warning"><span>!</span><div>归档规则变更仅影响新办结数据。</div></div>
+              <div class="pui-setting-list"><div class="pui-setting-item"><div><div class="pui-setting-title">自动归档</div><div class="pui-setting-desc">工单办结 30 日后自动转入历史库。</div></div><button class="pui-switch is-checked" type="button" role="switch" aria-checked="true" aria-label="自动归档"></button></div><div class="pui-setting-item"><div><div class="pui-setting-title">附件保留期限</div><div class="pui-setting-desc">到期后仅保留附件目录信息。</div></div><select class="pui-control" style="width:180px;"><option>长期保留</option><option>保留 3 年</option><option>保留 1 年</option></select></div></div>
+            </section>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="pui-modal-mask" id="roleModal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="roleTitle"><div class="pui-modal" style="--pui-modal-width:500px;"><div class="pui-modal-head"><h3 class="pui-modal-title" id="roleTitle">新增角色</h3><button class="pui-modal-close" type="button" aria-label="关闭" data-pui-modal-close>×</button></div><div class="pui-modal-body"><div class="pui-stack"><label class="pui-field"><span class="pui-label"><span class="pui-required">*</span>角色名称</span><input class="pui-control" placeholder="请输入角色名称"></label><label class="pui-field"><span class="pui-label"><span class="pui-required">*</span>数据范围</span><select class="pui-control"><option>请选择范围</option><option>全部数据</option><option>本部门数据</option><option>本人数据</option></select></label></div></div><div class="pui-modal-foot"><button class="pui-btn" type="button" data-pui-modal-close>取消</button><button class="pui-btn pui-btn-primary" type="button" data-pui-modal-close data-pui-toast="角色已创建">确定</button></div></div></div>
+</body>
+</html>

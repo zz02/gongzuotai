@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Prototype UI Kit - 移动端示例</title>
+  <link rel="stylesheet" href="../dist/prototype-ui.css">
+  <script defer src="../dist/prototype-ui.js"></script>
+</head>
+<body class="pui-page">
+  <main class="pui-mobile-shell">
+    <header class="pui-mobile-topbar">
+      <button class="pui-btn pui-btn-ghost pui-btn-icon" aria-label="返回">‹</button>
+      <strong>移动端原型</strong>
+      <button class="pui-btn pui-btn-primary pui-btn-sm" data-pui-modal-open="mobileModal">新增</button>
+    </header>
+
+    <section class="pui-mobile-content">
+      <h1 class="pui-page-title">事项列表</h1>
+      <p class="pui-page-desc">适用于 App、H5、小程序风格的移动端原型。</p>
+
+      <div class="pui-panel">
+        <div class="pui-panel-body">
+          <div class="pui-stack">
+            <label class="pui-field">
+              <span class="pui-label">关键词</span>
+              <input class="pui-control" placeholder="请输入关键词">
+            </label>
+            <label class="pui-field">
+              <span class="pui-label">状态</span>
+              <select class="pui-control">
+                <option>全部状态</option>
+                <option>待处理</option>
+                <option>已完成</option>
+              </select>
+            </label>
+            <button class="pui-btn pui-btn-primary">查询</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="pui-list">
+        <article class="pui-list-item">
+          <div class="pui-row" style="justify-content:space-between;">
+            <strong>示例事项一</strong>
+            <span class="pui-tag pui-tag-success">已完成</span>
+          </div>
+          <p class="pui-page-desc" style="margin:8px 0 0;">2026-07-01 09:00 ~ 2026-07-01 18:00</p>
+        </article>
+        <article class="pui-list-item">
+          <div class="pui-row" style="justify-content:space-between;">
+            <strong>示例事项二</strong>
+            <span class="pui-tag pui-tag-warning">待处理</span>
+          </div>
+          <p class="pui-page-desc" style="margin:8px 0 0;">2026-07-02 09:00 ~ 2026-07-02 18:00</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <div class="pui-modal-mask" id="mobileModal" role="dialog" aria-modal="true" aria-labelledby="mobileModalTitle">
+    <div class="pui-modal" style="--pui-modal-width: 360px;">
+      <div class="pui-modal-head">
+        <h3 class="pui-modal-title" id="mobileModalTitle">新增事项</h3>
+        <button class="pui-modal-close" type="button" aria-label="关闭" data-pui-modal-close>×</button>
+      </div>
+      <div class="pui-modal-body">
+        <div class="pui-stack">
+          <label class="pui-field">
+            <span class="pui-label"><span class="pui-required">*</span>事项名称</span>
+            <input class="pui-control" placeholder="请输入名称">
+          </label>
+          <label class="pui-field">
+            <span class="pui-label">说明</span>
+            <textarea class="pui-control" placeholder="请输入说明"></textarea>
+          </label>
+        </div>
+      </div>
+      <div class="pui-modal-foot">
+        <button class="pui-btn" type="button" data-pui-modal-close>取消</button>
+        <button class="pui-btn pui-btn-primary" type="button" onclick="PUI.toast('已新增')" data-pui-modal-close>确定</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

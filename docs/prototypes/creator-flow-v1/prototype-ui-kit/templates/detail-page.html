@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PUI 模板 - 详情页</title>
+  <script defer src="../dist/prototype-ui.js"></script>
+</head>
+<body class="pui-page">
+  <div class="pui-admin">
+    <aside class="pui-sidebar">
+      <div class="pui-brand">PUI 业务中台</div>
+      <nav class="pui-nav" aria-label="主导航"><a href="list-page.html">数据列表</a><a class="is-active" href="detail-page.html">业务详情</a><a href="edit-page.html">表单编辑</a><a href="approval-page.html">流程审批</a><a href="dashboard-page.html">运营看板</a><a href="config-page.html">系统配置</a></nav>
+    </aside>
+    <main class="pui-main">
+      <header class="pui-topbar"><strong>服务运营中心</strong><span class="pui-meta">运营专员 · 王静</span></header>
+      <section class="pui-content">
+        <nav class="pui-breadcrumb"><a href="list-page.html">服务工单</a><span>/</span><span>工单详情</span></nav>
+        <div class="pui-hero-strip">
+          <div><div class="pui-row"><h1 class="pui-object-title">咨询公共服务办理材料及受理时限</h1><span class="pui-tag pui-tag-warning">待处理</span></div><div class="pui-object-meta"><span>工单编号：GD202607130032</span><span>业务分类：咨询</span><span>提交时间：2026-07-13 13:42</span></div></div>
+          <div class="pui-page-actions"><button class="pui-btn" type="button" data-pui-drawer-open="assignDrawer">转派</button><a class="pui-btn" href="edit-page.html">编辑</a><button class="pui-btn pui-btn-primary" type="button" data-pui-toast="已开始处理">开始处理</button></div>
+        </div>
+
+        <div class="pui-section-grid pui-mt-5">
+          <div>
+            <section class="pui-panel">
+              <div class="pui-panel-head"><h2 class="pui-panel-title">基本信息</h2><span class="pui-meta">最近更新：2026-07-13 14:06</span></div>
+              <div class="pui-panel-body"><div class="pui-desc"><div class="pui-desc-item"><div class="pui-desc-label">诉求人</div><div class="pui-desc-value">张先生</div></div><div class="pui-desc-item"><div class="pui-desc-label">联系电话</div><div class="pui-desc-value">138****6721</div></div><div class="pui-desc-item"><div class="pui-desc-label">受理渠道</div><div class="pui-desc-value">服务热线</div></div><div class="pui-desc-item"><div class="pui-desc-label">所属区域</div><div class="pui-desc-value">蜀山区</div></div><div class="pui-desc-item"><div class="pui-desc-label">承办单位</div><div class="pui-desc-value">市政务服务中心</div></div><div class="pui-desc-item"><div class="pui-desc-label">办结时限</div><div class="pui-desc-value">2026-07-15 18:00</div></div></div></div>
+            </section>
+            <section class="pui-panel">
+              <div class="pui-tabs" data-pui-tabs data-pui-tab-scope><button class="pui-tab is-active" type="button" data-pui-tab="detailContent">问题内容</button><button class="pui-tab" type="button" data-pui-tab="detailFiles">相关附件</button><button class="pui-tab" type="button" data-pui-tab="detailContact">联系记录</button></div>
+              <div class="pui-panel-body">
+                <div class="pui-tab-panel is-active" data-pui-tab-panel="detailContent"><p class="pui-copy">诉求人计划办理公共服务事项，希望确认需要携带的材料、线上预约方式以及正常受理时限，请相关单位提供准确办理指引。</p></div>
+                <div class="pui-tab-panel" data-pui-tab-panel="detailFiles"><div class="pui-empty"><div><div class="pui-empty-mark"></div><p class="pui-empty-title">暂无附件</p><p class="pui-empty-desc">当前工单未上传相关材料。</p></div></div></div>
+                <div class="pui-tab-panel" data-pui-tab-panel="detailContact"><div class="pui-alert">首次联系时间：2026-07-13 14:06，诉求人电话畅通。</div></div>
+              </div>
+            </section>
+            <section class="pui-panel">
+              <div class="pui-panel-head"><h2 class="pui-panel-title">处理记录</h2></div>
+              <div class="pui-panel-body"><div class="pui-timeline"><div class="pui-timeline-item"><span class="pui-timeline-dot"></span><div><div class="pui-timeline-title">工单已受理</div><div class="pui-timeline-desc">2026-07-13 13:45 系统自动受理</div></div></div><div class="pui-timeline-item"><span class="pui-timeline-dot"></span><div><div class="pui-timeline-title">分派至承办单位</div><div class="pui-timeline-desc">2026-07-13 13:58 王静分派至市政务服务中心</div></div></div><div class="pui-timeline-item"><span class="pui-timeline-dot"></span><div><div class="pui-timeline-title">完成首次联系</div><div class="pui-timeline-desc">2026-07-13 14:06 李明记录联系结果</div></div></div></div></div>
+            </section>
+          </div>
+          <aside class="pui-sticky">
+            <section class="pui-panel">
+              <div class="pui-panel-head"><h2 class="pui-panel-title">处理进度</h2></div>
+              <div class="pui-panel-body pui-stack"><div class="pui-progress"><div class="pui-progress-track"><div class="pui-progress-bar" style="--pui-progress-value:50%;"></div></div><span class="pui-progress-text">50%</span></div><div class="pui-steps" style="grid-template-columns:1fr;"><div class="pui-step is-done"><div class="pui-step-mark">1</div><div><div class="pui-step-title">受理</div><div class="pui-step-desc">2026-07-13 13:45</div></div></div><div class="pui-step is-active"><div class="pui-step-mark">2</div><div><div class="pui-step-title">办理</div><div class="pui-step-desc">当前环节</div></div></div><div class="pui-step"><div class="pui-step-mark">3</div><div><div class="pui-step-title">审核</div><div class="pui-step-desc">等待提交</div></div></div><div class="pui-step"><div class="pui-step-mark">4</div><div><div class="pui-step-title">办结</div><div class="pui-step-desc">等待归档</div></div></div></div></div>
+            </section>
+            <section class="pui-panel"><div class="pui-panel-head"><h2 class="pui-panel-title">时限提醒</h2></div><div class="pui-panel-body"><div class="pui-alert pui-alert-warning"><span>!</span><div><strong>剩余 2 天</strong><br>请在 2026-07-15 18:00 前完成办理。</div></div></div></section>
+          </aside>
+        </div>
+      </section>
+    </main>
+  </div>
+  <div class="pui-drawer-mask" id="assignDrawer" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="assignTitle"><aside class="pui-drawer"><div class="pui-drawer-head"><h3 class="pui-drawer-title" id="assignTitle">转派工单</h3><button class="pui-modal-close" type="button" aria-label="关闭" data-pui-drawer-close>×</button></div><div class="pui-drawer-body"><div class="pui-stack"><label class="pui-field"><span class="pui-label"><span class="pui-required">*</span>承办单位</span><select class="pui-control"><option>请选择单位</option><option>市政务服务中心</option><option>蜀山区服务中心</option></select></label><label class="pui-field"><span class="pui-label">转派说明</span><textarea class="pui-control" placeholder="请输入转派说明"></textarea></label></div></div><div class="pui-drawer-foot"><button class="pui-btn" type="button" data-pui-drawer-close>取消</button><button class="pui-btn pui-btn-primary" type="button" data-pui-drawer-close data-pui-toast="工单已转派">确定</button></div></aside></div>
+</body>
+</html>

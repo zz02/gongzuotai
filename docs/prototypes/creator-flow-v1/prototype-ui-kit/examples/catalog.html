@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
+  <title>PUI 全量组件目录</title>
+  <link rel="stylesheet" href="../dist/prototype-ui.css">
+  <script defer src="../dist/prototype-ui.js"></script>
+</head>
+<body class="pui-page">
+  <main class="pui-content">
+    <nav class="pui-breadcrumb"><a href="templates.html">页面模板</a><span>/</span><span>全量组件</span></nav>
+    <div class="pui-page-head">
+      <div>
+        <h1 class="pui-page-title">PUI 全量组件目录</h1>
+        <p class="pui-page-desc">纯 HTML / CSS / JS，参考本机 12 套开源组件库，桌面端与移动端统一调用。</p>
+      </div>
+      <div class="pui-page-actions">
+        <a class="pui-btn" href="parity-components.html">逐项补充</a>
+        <a class="pui-btn" href="specialized.html">专项组件</a>
+        <a class="pui-btn pui-btn-primary" href="templates.html">页面模板</a>
+      </div>
+    </div>
+
+    <div class="pui-alert pui-alert-success pui-mt-3"><span>✓</span><div><strong>调用方式不变</strong>：只引入 <code class="pui-code">prototype-ui.js</code>，脚本会自动加载基础样式和扩展组件层。</div></div>
+
+    <div class="pui-catalog-layout pui-mt-4">
+      <nav class="pui-catalog-nav" aria-label="组件分类">
+        <a href="#basic">基础</a><a href="#layout">布局</a><a href="#navigation">导航</a><a href="#input">输入</a>
+        <a href="#selection">选择器</a><a href="#datetime">日期时间</a><a href="#display">数据展示</a>
+        <a href="#feedback">反馈</a><a href="#overlay">弹层</a><a href="#advanced">高级</a><a href="#mobile">移动端</a>
+      </nav>
+
+      <div>
+        <section class="pui-component-section" id="basic">
+          <div class="pui-component-head"><h2>基础组件</h2><span class="pui-component-meta">Button / Icon / Typography / Link / Divider</span></div>
+          <div class="pui-component-demo pui-stack">
+            <div><span class="pui-demo-label">按钮类型与状态</span><div class="pui-space">
+              <button class="pui-btn pui-btn-primary">主要按钮</button><button class="pui-btn">默认按钮</button>
+              <button class="pui-btn pui-btn-success">通过</button><button class="pui-btn pui-btn-danger">删除</button>
+              <button class="pui-btn pui-btn-text">文字按钮</button><button class="pui-btn is-loading">加载中</button><button class="pui-btn" disabled>禁用</button>
+            </div></div>
+            <div><span class="pui-demo-label">尺寸、组合与图标按钮</span><div class="pui-space">
+              <button class="pui-btn pui-btn-primary pui-btn-sm">小按钮</button><button class="pui-btn pui-btn-primary pui-btn-lg">大按钮</button>
+              <span class="pui-button-group"><button class="pui-btn">上一项</button><button class="pui-btn">下一项</button></span>
+              <button class="pui-btn pui-btn-icon pui-tooltip" aria-label="刷新" data-pui-tooltip="刷新数据">↻</button>
+            </div></div>
+            <div class="pui-typography"><h3>统一的排版层级</h3><p>正文、<a class="pui-link" href="#basic">链接</a>、<code class="pui-code">行内代码</code> 与辅助文字共享设计令牌。</p></div>
+          </div>
+        </section>
+
+        <section class="pui-component-section" id="layout">
+          <div class="pui-component-head"><h2>布局组件</h2><span class="pui-component-meta">Grid / Space / Card / Splitter / Panel</span></div>
+          <div class="pui-component-demo pui-stack">
+            <div class="pui-grid">
+              <div class="pui-col-4 pui-card is-hoverable"><div class="pui-card-body"><strong>栅格一</strong><p class="pui-text-muted">4 / 12 列</p></div></div>
+              <div class="pui-col-4 pui-card is-hoverable"><div class="pui-card-body"><strong>栅格二</strong><p class="pui-text-muted">响应式换行</p></div></div>
+              <div class="pui-col-4 pui-card is-hoverable"><div class="pui-card-body"><strong>栅格三</strong><p class="pui-text-muted">统一间距</p></div></div>
+            </div>
+            <div class="pui-splitter"><div class="pui-splitter-pane">导航区域</div><div class="pui-splitter-handle" title="调整宽度"></div><div class="pui-splitter-pane">内容区域</div></div>
+          </div>
+        </section>
+
+        <section class="pui-component-section" id="navigation">
+          <div class="pui-component-head"><h2>导航组件</h2><span class="pui-component-meta">Breadcrumb / Menu / Tabs / Steps / Pagination / Dropdown / Anchor</span></div>
+          <div class="pui-component-demo pui-stack">
+            <nav class="pui-breadcrumb"><a href="#">工作台</a><span>/</span><a href="#">事项管理</a><span>/</span><span>事项详情</span></nav>
+            <div class="pui-demo-grid">
+              <div><span class="pui-demo-label">菜单</span><div class="pui-menu"><button class="pui-menu-item is-active">数据概览</button><button class="pui-menu-item">事项管理</button><button class="pui-menu-item">系统配置</button><div class="pui-menu-divider"></div><button class="pui-menu-item" disabled>归档中心</button></div></div>
+              <div><span class="pui-demo-label">锚点</span><nav class="pui-anchor"><a class="is-active" href="#navigation">导航组件</a><a href="#datetime">日期时间</a><a href="#mobile">移动端</a></nav></div>
+            </div>
+            <div class="pui-tabs" data-pui-tabs data-pui-tab-scope><button class="pui-tab is-active" data-pui-tab="navA">基本信息</button><button class="pui-tab" data-pui-tab="navB">办理记录</button><button class="pui-tab" data-pui-tab="navC">附件材料</button></div>
+            <div class="pui-tab-panel is-active" data-pui-tab-panel="navA">基本信息内容</div><div class="pui-tab-panel" data-pui-tab-panel="navB">办理记录内容</div><div class="pui-tab-panel" data-pui-tab-panel="navC">附件材料内容</div>
+            <div class="pui-steps"><div class="pui-step is-done"><div class="pui-step-mark">1</div><div><div class="pui-step-title">提交</div><div class="pui-step-desc">已完成</div></div></div><div class="pui-step is-active"><div class="pui-step-mark">2</div><div><div class="pui-step-title">审核</div><div class="pui-step-desc">处理中</div></div></div><div class="pui-step"><div class="pui-step-mark">3</div><div><div class="pui-step-title">办结</div><div class="pui-step-desc">待处理</div></div></div></div>
+            <div class="pui-row"><div class="pui-pagination"><button class="pui-btn pui-btn-sm">‹</button><button class="pui-btn pui-btn-primary pui-btn-sm">1</button><button class="pui-btn pui-btn-sm">2</button><button class="pui-btn pui-btn-sm">3</button><button class="pui-btn pui-btn-sm">›</button></div><div class="pui-dropdown"><button class="pui-btn" data-pui-dropdown-trigger aria-expanded="false">更多操作 ▾</button><div class="pui-dropdown-panel"><button class="pui-menu-item" data-pui-select-value="导出">导出</button><button class="pui-menu-item" data-pui-select-value="打印">打印</button></div></div></div>
+          </div>
+        </section>
+
+        <section class="pui-component-section" id="input">
+          <div class="pui-component-head"><h2>输入组件</h2><span class="pui-component-meta">Input / Textarea / InputNumber / OTP / TagInput / AutoComplete / Form</span></div>
+          <div class="pui-component-demo pui-demo-grid">
+            <label class="pui-field"><span class="pui-label">事项名称</span><span class="pui-input-wrapper"><span class="pui-input-prefix">⌕</span><input class="pui-control" placeholder="请输入名称"><span class="pui-input-suffix">×</span></span></label>
+            <label class="pui-field is-error"><span class="pui-label"><span class="pui-required">*</span>联系电话</span><input class="pui-control" value="123"><span class="pui-error">请输入正确的联系电话</span></label>
+            <label class="pui-field"><span class="pui-label">办理数量</span><span class="pui-input-number"><button type="button" data-pui-number-step="-1">−</button><input class="pui-control" type="number" value="3" min="0" max="99"><button type="button" data-pui-number-step="1">+</button></span></label>
+            <label class="pui-field"><span class="pui-label">验证码</span><span class="pui-otp"><input class="pui-control" value="1" maxlength="1"><input class="pui-control" value="8" maxlength="1"><input class="pui-control" maxlength="1"><input class="pui-control" maxlength="1"></span></label>
+            <label class="pui-field"><span class="pui-label">事项标签</span><span class="pui-tag-input"><span class="pui-tag">紧急 ×</span><span class="pui-tag">咨询 ×</span><input placeholder="添加标签"></span></label>
+            <label class="pui-field"><span class="pui-label">智能联想</span><span class="pui-autocomplete"><input class="pui-control" data-pui-select-output placeholder="输入关键词"><span class="pui-autocomplete-list"><button class="pui-autocomplete-option" data-pui-select-value="社会保障">社会保障</button><button class="pui-autocomplete-option" data-pui-select-value="公共服务">公共服务</button></span></span></label>
+            <label class="pui-field pui-col-12"><span class="pui-label">补充说明</span><textarea class="pui-control" rows="3" placeholder="请输入说明，不超过 200 字"></textarea><span class="pui-help">0 / 200</span></label>
+          </div>
+        </section>
+
+        <section class="pui-component-section" id="selection">
+          <div class="pui-component-head"><h2>选择组件</h2><span class="pui-component-meta">Select / Cascader / TreeSelect / Checkbox / Radio / Switch / Slider / Rate / ColorPicker / Transfer</span></div>
+          <div class="pui-component-demo pui-stack">
+            <div class="pui-demo-grid">
+              <label class="pui-field"><span class="pui-label">所属分类</span><select class="pui-control"><option>全部分类</option><option>咨询服务</option><option>投诉举报</option></select></label>
+              <div class="pui-field"><span class="pui-label">级联选择</span><div class="pui-dropdown"><button class="pui-picker-field" data-pui-dropdown-trigger><span data-pui-select-output>安徽省 / 合肥市 / 蜀山区</span><span>⌄</span></button><div class="pui-dropdown-panel"><div class="pui-cascader"><div class="pui-cascader-menu"><button class="pui-menu-item is-active">安徽省 ›</button><button class="pui-menu-item">江苏省 ›</button></div><div class="pui-cascader-menu"><button class="pui-menu-item is-active">合肥市 ›</button><button class="pui-menu-item">芜湖市 ›</button></div><div class="pui-cascader-menu"><button class="pui-menu-item" data-pui-select-value="安徽省 / 合肥市 / 蜀山区">蜀山区</button><button class="pui-menu-item" data-pui-select-value="安徽省 / 合肥市 / 包河区">包河区</button></div></div></div></div></div>
+            </div>
+            <div class="pui-check-row"><label class="pui-checkbox"><input type="checkbox" checked>短信通知</label><label class="pui-checkbox"><input type="checkbox">邮件通知</label><label class="pui-radio"><input type="radio" name="scope" checked>全部范围</label><label class="pui-radio"><input type="radio" name="scope">本人范围</label><button class="pui-switch is-checked" role="switch" aria-checked="true" aria-label="启用"></button></div>
+            <div class="pui-demo-grid"><div><span class="pui-demo-label">滑块</span><div class="pui-slider-row"><input class="pui-slider" type="range" min="0" max="100" value="68"><output class="pui-slider-value">68</output></div></div><div><span class="pui-demo-label">评分</span><div class="pui-rate" role="group" aria-label="4 星"><button class="is-active">★</button><button class="is-active">★</button><button class="is-active">★</button><button class="is-active">★</button><button>★</button></div></div></div>
+            <div><span class="pui-demo-label">颜色选择</span><div class="pui-color-picker"><button class="pui-color-swatch is-active" style="background:#0052d9" data-color="#0052d9" aria-label="蓝色"></button><button class="pui-color-swatch" style="background:#2ba471" data-color="#2ba471" aria-label="绿色"></button><button class="pui-color-swatch" style="background:#e37318" data-color="#e37318" aria-label="橙色"></button><button class="pui-color-swatch" style="background:#d54941" data-color="#d54941" aria-label="红色"></button></div></div>
+            <div class="pui-transfer"><div class="pui-transfer-panel"><div class="pui-transfer-head"><strong>待选人员</strong><span>3 项</span></div><div class="pui-transfer-list"><label class="pui-transfer-item"><input type="checkbox">张伟</label><label class="pui-transfer-item"><input type="checkbox">李娜</label><label class="pui-transfer-item"><input type="checkbox">王强</label></div></div><div class="pui-transfer-actions"><button class="pui-btn pui-btn-icon" data-pui-transfer="right">›</button><button class="pui-btn pui-btn-icon" data-pui-transfer="left">‹</button></div><div class="pui-transfer-panel"><div class="pui-transfer-head"><strong>已选人员</strong><span>1 项</span></div><div class="pui-transfer-list"><label class="pui-transfer-item"><input type="checkbox">刘敏</label></div></div></div>
+          </div>
+        </section>
+
+        <section class="pui-component-section" id="datetime">
+          <div class="pui-component-head"><h2>日期时间组件</h2><span class="pui-component-meta">DatePicker / TimePicker / TimeRangePicker / DateTimePicker / DateRangePicker / DateTimeRangePicker / Calendar</span></div>
+          <div class="pui-component-demo pui-stack">
+            <div class="pui-demo-grid">
+              <div class="pui-field"><span class="pui-label">日期选择器</span><div class="pui-picker pui-date-picker"><button class="pui-picker-field" data-pui-picker-trigger aria-expanded="false"><span data-pui-picker-value>2026-07-31</span><span class="pui-picker-icon">□</span></button><div class="pui-picker-panel"><div class="pui-picker-head"><button class="pui-btn pui-btn-icon pui-btn-sm">‹</button><span class="pui-picker-title">2026年07月</span><button class="pui-btn pui-btn-icon pui-btn-sm">›</button></div><div class="pui-mini-calendar"><div class="pui-mini-calendar-grid"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span><button data-pui-date-option="2026-07-20">20</button><button data-pui-date-option="2026-07-21">21</button><button data-pui-date-option="2026-07-22">22</button><button data-pui-date-option="2026-07-23">23</button><button data-pui-date-option="2026-07-24">24</button><button data-pui-date-option="2026-07-25">25</button><button data-pui-date-option="2026-07-26">26</button><button data-pui-date-option="2026-07-27">27</button><button data-pui-date-option="2026-07-28">28</button><button data-pui-date-option="2026-07-29">29</button><button data-pui-date-option="2026-07-30">30</button><button class="is-active" data-pui-date-option="2026-07-31">31</button><button data-pui-date-option="2026-08-01">1</button><button data-pui-date-option="2026-08-02">2</button></div></div><div class="pui-picker-foot"><button class="pui-btn pui-btn-sm" data-pui-picker-close>取消</button><button class="pui-btn pui-btn-primary pui-btn-sm" data-pui-picker-close data-pui-picker-confirm>确定</button></div></div></div></div>
+              <div class="pui-field"><span class="pui-label">时间选择器</span><div class="pui-picker pui-time-picker"><button class="pui-picker-field" data-pui-picker-trigger aria-expanded="false"><span data-pui-picker-value>09:30:00</span><span class="pui-picker-icon">◷</span></button><div class="pui-picker-panel"><div class="pui-picker-head"><span class="pui-picker-title">选择时间</span><button class="pui-modal-close" data-pui-picker-close>×</button></div><div class="pui-time-columns"><div class="pui-time-column" data-pui-time-column="hour" data-value="09"></div><div class="pui-time-column" data-pui-time-column="minute" data-step="5" data-value="30"></div><div class="pui-time-column" data-pui-time-column="second" data-step="5" data-value="00"></div></div><div class="pui-picker-foot"><button class="pui-btn pui-btn-sm" data-pui-picker-close>取消</button><button class="pui-btn pui-btn-primary pui-btn-sm" data-pui-picker-close data-pui-picker-confirm>确定</button></div></div></div></div>
+              <div class="pui-field"><span class="pui-label">时间范围</span><div class="pui-picker pui-range-picker"><button class="pui-picker-field" data-pui-picker-trigger aria-expanded="false"><span class="pui-range-fields"><span data-pui-range-start>09:00</span><span class="pui-range-divider">~</span><span data-pui-range-end>18:00</span></span><span class="pui-picker-icon">◷</span></button><div class="pui-picker-panel pui-datetime-panel"><div class="pui-picker-head"><span class="pui-picker-title">选择时间范围</span></div><div class="pui-demo-grid pui-picker-body"><div data-pui-range-part="start"><span class="pui-demo-label">开始时间</span><div class="pui-time-columns is-two"><div class="pui-time-column" data-pui-time-column="hour" data-value="09"></div><div class="pui-time-column" data-pui-time-column="minute" data-step="5" data-value="00"></div></div></div><div data-pui-range-part="end"><span class="pui-demo-label">结束时间</span><div class="pui-time-columns is-two"><div class="pui-time-column" data-pui-time-column="hour" data-value="18"></div><div class="pui-time-column" data-pui-time-column="minute" data-step="5" data-value="00"></div></div></div></div><div class="pui-picker-foot"><button class="pui-btn pui-btn-sm" data-pui-picker-close>取消</button><button class="pui-btn pui-btn-primary pui-btn-sm" data-pui-picker-close data-pui-picker-confirm>确定</button></div></div></div></div>
+              <div class="pui-field"><span class="pui-label">日期时间</span><div class="pui-picker pui-datetime-picker"><button class="pui-picker-field" data-pui-picker-trigger aria-expanded="false"><span data-pui-picker-value>2026-07-31 14:30</span><span>□ ◷</span></button><div class="pui-picker-panel pui-datetime-panel is-right"><div class="pui-picker-head"><span class="pui-picker-title">选择日期时间</span></div><div class="pui-datetime-grid"><div class="pui-mini-calendar"><div class="pui-mini-calendar-grid"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span><button data-pui-date-option="2026-07-20">20</button><button data-pui-date-option="2026-07-21">21</button><button data-pui-date-option="2026-07-22">22</button><button data-pui-date-option="2026-07-23">23</button><button data-pui-date-option="2026-07-24">24</button><button data-pui-date-option="2026-07-25">25</button><button data-pui-date-option="2026-07-26">26</button><button data-pui-date-option="2026-07-27">27</button><button data-pui-date-option="2026-07-28">28</button><button data-pui-date-option="2026-07-29">29</button><button data-pui-date-option="2026-07-30">30</button><button class="is-active" data-pui-date-option="2026-07-31">31</button><button data-pui-date-option="2026-08-01">1</button><button data-pui-date-option="2026-08-02">2</button></div></div><div class="pui-time-side"><div class="pui-time-columns is-two"><div class="pui-time-column" data-pui-time-column="hour" data-value="14"></div><div class="pui-time-column" data-pui-time-column="minute" data-step="5" data-value="30"></div></div></div></div><div class="pui-picker-foot"><button class="pui-btn pui-btn-sm" data-pui-picker-close>取消</button><button class="pui-btn pui-btn-primary pui-btn-sm" data-pui-picker-close data-pui-picker-confirm>确定</button></div></div></div></div>
+            </div>
+            <div class="pui-demo-grid">
+              <div class="pui-field"><span class="pui-label">日期范围</span><div class="pui-picker pui-range-picker"><button class="pui-picker-field" data-pui-picker-trigger><span class="pui-range-fields"><span data-pui-range-start>2026-07-21</span><span class="pui-range-divider">~</span><span data-pui-range-end>2026-07-31</span></span><span>□</span></button><div class="pui-picker-panel pui-datetime-panel"><div class="pui-picker-head"><span class="pui-picker-title">2026年07月</span></div><div class="pui-mini-calendar"><div class="pui-mini-calendar-grid"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span><button data-pui-date-option="2026-07-20">20</button><button class="is-active" data-pui-date-option="2026-07-21">21</button><button class="is-range" data-pui-date-option="2026-07-22">22</button><button class="is-range" data-pui-date-option="2026-07-23">23</button><button class="is-range" data-pui-date-option="2026-07-24">24</button><button class="is-range" data-pui-date-option="2026-07-25">25</button><button class="is-range" data-pui-date-option="2026-07-26">26</button><button class="is-range" data-pui-date-option="2026-07-27">27</button><button class="is-range" data-pui-date-option="2026-07-28">28</button><button class="is-range" data-pui-date-option="2026-07-29">29</button><button class="is-range" data-pui-date-option="2026-07-30">30</button><button class="is-active" data-pui-date-option="2026-07-31">31</button><button data-pui-date-option="2026-08-01">1</button><button data-pui-date-option="2026-08-02">2</button></div></div><div class="pui-picker-foot"><button class="pui-btn pui-btn-sm" data-pui-picker-close>取消</button><button class="pui-btn pui-btn-primary pui-btn-sm" data-pui-picker-close data-pui-picker-confirm>确定</button></div></div></div></div>
+              <div class="pui-field"><span class="pui-label">日期时间范围</span><div class="pui-picker pui-range-picker pui-datetime-range-picker"><button class="pui-picker-field" data-pui-picker-trigger><span class="pui-range-fields"><span data-pui-range-start>2026-07-31 09:00</span><span class="pui-range-divider">~</span><span data-pui-range-end>2026-07-31 18:00</span></span><span>□</span></button><div class="pui-picker-panel pui-datetime-panel is-right"><div class="pui-picker-head"><span class="pui-picker-title">选择日期时间范围</span></div><div class="pui-picker-body"><div class="pui-mini-calendar-grid"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span><button data-pui-date-option="2026-07-27">27</button><button data-pui-date-option="2026-07-28">28</button><button data-pui-date-option="2026-07-29">29</button><button data-pui-date-option="2026-07-30">30</button><button class="is-active" data-pui-date-option="2026-07-31">31</button><button class="is-active" data-pui-date-option="2026-08-01">1</button><button data-pui-date-option="2026-08-02">2</button></div><div class="pui-demo-grid pui-mt-3"><div data-pui-range-part="start"><span class="pui-demo-label">开始时间</span><div class="pui-time-columns is-two"><div class="pui-time-column" data-pui-time-column="hour" data-value="09"></div><div class="pui-time-column" data-pui-time-column="minute" data-step="5" data-value="00"></div></div></div><div data-pui-range-part="end"><span class="pui-demo-label">结束时间</span><div class="pui-time-columns is-two"><div class="pui-time-column" data-pui-time-column="hour" data-value="18"></div><div class="pui-time-column" data-pui-time-column="minute" data-step="5" data-value="00"></div></div></div></div></div><div class="pui-picker-foot"><button class="pui-btn pui-btn-sm" data-pui-picker-close>取消</button><button class="pui-btn pui-btn-primary pui-btn-sm" data-pui-picker-close data-pui-picker-confirm>确定</button></div></div></div></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="pui-component-section" id="display">
+          <div class="pui-component-head"><h2>数据展示</h2><span class="pui-component-meta">Table / List / Avatar / Badge / Tag / Descriptions / Statistic / Timeline / Collapse / Carousel / Calendar</span></div>
+          <div class="pui-component-demo pui-stack">
+            <div class="pui-row"><span class="pui-badge"><span class="pui-avatar">皖</span><span class="pui-badge-dot"></span></span><span class="pui-badge"><span class="pui-avatar pui-avatar-square">办</span><span class="pui-badge-count">12</span></span><span class="pui-avatar-group"><span class="pui-avatar">张</span><span class="pui-avatar">李</span><span class="pui-avatar">王</span></span><span class="pui-tag pui-tag-success">正常</span><span class="pui-tag pui-tag-warning">预警</span><span class="pui-tag pui-tag-danger">停用</span></div>
+            <div class="pui-stat-grid"><div class="pui-stat"><div class="pui-stat-label">受理总量</div><div class="pui-stat-value">12,680</div><div class="pui-stat-desc pui-trend-up">较昨日 +8.2%</div></div><div class="pui-stat"><div class="pui-stat-label">按时办结</div><div class="pui-stat-value">98.6%</div><div class="pui-stat-desc">目标 95%</div></div><div class="pui-stat"><div class="pui-stat-label">待处理</div><div class="pui-stat-value">36</div><div class="pui-stat-desc">今日新增 9</div></div><div class="pui-stat"><div class="pui-stat-label">预警事项</div><div class="pui-stat-value">3</div><div class="pui-stat-desc pui-text-danger">需要关注</div></div></div>
+            <div class="pui-table-wrap"><table class="pui-table"><thead><tr><th><input type="checkbox" data-pui-check-all></th><th>事项编号</th><th>事项名称</th><th>受理时间</th><th>状态</th><th class="is-action">操作</th></tr></thead><tbody><tr><td><input type="checkbox"></td><td>AH20260731001</td><td>社会保障咨询</td><td>2026-07-31 09:30</td><td><span class="pui-tag pui-tag-success">办理中</span></td><td class="is-action"><a class="pui-link">查看</a></td></tr><tr><td><input type="checkbox"></td><td>AH20260731002</td><td>公共设施报修</td><td>2026-07-31 10:15</td><td><span class="pui-tag pui-tag-warning">待分派</span></td><td class="is-action"><a class="pui-link">处理</a></td></tr></tbody></table></div>
+            <div class="pui-collapse"><div class="pui-collapse-item"><button class="pui-collapse-trigger" data-pui-collapse-target="collapseA" aria-expanded="true">基本信息</button><div class="pui-collapse-content" id="collapseA">展示对象的基础字段和状态。</div></div><div class="pui-collapse-item"><button class="pui-collapse-trigger" data-pui-collapse-target="collapseB" aria-expanded="false">办理规则</button><div class="pui-collapse-content" id="collapseB" hidden>展示时限、流程和分派规则。</div></div></div>
+            <div class="pui-demo-grid"><div class="pui-carousel"><div class="pui-carousel-track"><div class="pui-carousel-slide"><strong>统一的业务信息展示</strong></div><div class="pui-carousel-slide"><strong>可切换的轮播内容</strong></div><div class="pui-carousel-slide"><strong>兼容移动端触控</strong></div></div><div class="pui-carousel-nav"><button class="pui-carousel-dot is-active" aria-label="第1页"></button><button class="pui-carousel-dot" aria-label="第2页"></button><button class="pui-carousel-dot" aria-label="第3页"></button></div></div><div class="pui-timeline"><div class="pui-timeline-item"><span class="pui-timeline-dot"></span><div><div class="pui-timeline-title">事项受理</div><div class="pui-timeline-desc">2026-07-31 09:30</div></div></div><div class="pui-timeline-item"><span class="pui-timeline-dot"></span><div><div class="pui-timeline-title">部门签收</div><div class="pui-timeline-desc">2026-07-31 10:00</div></div></div></div></div>
+          </div>
+        </section>
+
+        <section class="pui-component-section" id="feedback">
+          <div class="pui-component-head"><h2>反馈组件</h2><span class="pui-component-meta">Alert / Message / Notification / Toast / Progress / Loading / Skeleton / Empty / Result</span></div>
+          <div class="pui-component-demo pui-stack">
+            <div class="pui-alert pui-alert-success"><span>✓</span><div><strong>提交成功</strong>：事项已进入审核流程。</div></div><div class="pui-alert pui-alert-warning"><span>!</span><div><strong>时限提醒</strong>：请在 2026-07-31 18:00 前完成。</div></div><div class="pui-alert pui-alert-danger"><span>×</span><div><strong>提交失败</strong>：请检查必填信息。</div></div>
+            <div class="pui-row"><button class="pui-btn" data-pui-toast="保存成功">Toast</button><button class="pui-btn" data-pui-notification="待办提醒" data-pui-notification-message="您有 3 条事项即将超时。">Notification</button><span class="pui-spin">正在加载</span></div>
+            <div class="pui-progress"><div class="pui-progress-track"><div class="pui-progress-bar" style="--pui-progress-value:72%"></div></div><span class="pui-progress-text">72%</span></div>
+            <div class="pui-demo-grid"><div class="pui-skeleton"><div class="pui-skeleton-line"></div><div class="pui-skeleton-line"></div><div class="pui-skeleton-line is-short"></div></div><div class="pui-empty"><div><div class="pui-empty-mark"></div><p class="pui-empty-title">暂无数据</p><p class="pui-empty-desc">调整筛选条件后重试。</p></div></div></div>
+            <div class="pui-result"><div><div class="pui-result-icon">✓</div><h3 class="pui-result-title">提交成功</h3><p class="pui-result-desc">事项编号 AH20260731001</p><button class="pui-btn pui-btn-primary">返回列表</button></div></div>
+          </div>
+        </section>
+
+        <section class="pui-component-section" id="overlay">
+          <div class="pui-component-head"><h2>弹层组件</h2><span class="pui-component-meta">Modal / Drawer / Popover / Popconfirm / Tooltip / Tour</span></div>
+          <div class="pui-component-demo pui-space">
+            <button class="pui-btn pui-btn-primary" data-pui-modal-open="fullModal">打开弹窗</button><button class="pui-btn" data-pui-drawer-open="fullDrawer">打开抽屉</button>
+            <div class="pui-popover"><button class="pui-btn" data-pui-popover-trigger aria-expanded="false">信息气泡</button><div class="pui-popover-panel"><p class="pui-popover-title">事项说明</p><p class="pui-popover-desc">补充展示不宜长期占用页面的信息。</p></div></div>
+            <div class="pui-popover"><button class="pui-btn pui-btn-danger" data-pui-popover-trigger aria-expanded="false">删除确认</button><div class="pui-popover-panel"><p class="pui-popover-title">确认删除该事项？</p><p class="pui-popover-desc">删除后无法恢复。</p><div class="pui-popconfirm-actions"><button class="pui-btn pui-btn-sm" data-pui-popover-trigger>取消</button><button class="pui-btn pui-btn-danger pui-btn-sm" data-pui-toast="删除成功">删除</button></div></div></div>
+            <span class="pui-tooltip" data-pui-tooltip="悬停查看提示"><button class="pui-btn pui-btn-icon">?</button></span>
+          </div>
+        </section>
+
+        <section class="pui-component-section" id="advanced">
+          <div class="pui-component-head"><h2>高级与业务组件</h2><span class="pui-component-meta">Tree / Upload / QRCode / Watermark / Tour / Comment</span></div>
+          <div class="pui-component-demo pui-demo-grid">
+            <div><span class="pui-demo-label">树形结构</span><div class="pui-tree"><div class="pui-tree-node" data-level="1"><button class="pui-tree-toggle" aria-expanded="true">▾</button><label><input type="checkbox">安徽省</label></div><div class="pui-tree-node" data-level="2"><button class="pui-tree-toggle" aria-expanded="true">▾</button><label><input type="checkbox">合肥市</label></div><div class="pui-tree-node" data-level="3"><span class="pui-tree-toggle"></span><label><input type="checkbox">蜀山区</label></div><div class="pui-tree-node" data-level="3"><span class="pui-tree-toggle"></span><label><input type="checkbox">包河区</label></div></div></div>
+            <div class="pui-stack"><div class="pui-upload"><div><strong>上传附件</strong><span>支持拖拽或点击选择文件</span></div></div><div class="pui-tour"><span class="pui-tour-step">2 / 4</span><h3 class="pui-tour-title">配置筛选条件</h3><p class="pui-tour-desc">选择常用条件后可保存为个人视图。</p><div class="pui-row"><button class="pui-btn pui-btn-sm">上一步</button><button class="pui-btn pui-btn-primary pui-btn-sm">下一步</button></div></div><div class="pui-watermark pui-card" data-watermark="内部资料"><div class="pui-card-body">水印用于敏感信息和预览材料。</div></div></div>
+          </div>
+        </section>
+
+        <section class="pui-component-section" id="mobile">
+          <div class="pui-component-head"><h2>移动端组件</h2><span class="pui-component-meta">NavBar / Search / Cell / Grid / Stepper / SwipeAction / TabBar / ActionSheet / Picker / NumberKeyboard</span></div>
+          <div class="pui-component-demo pui-demo-grid">
+            <div class="pui-mobile-shell" style="min-height:auto"><div class="pui-mobile-navbar"><button class="pui-btn pui-btn-text pui-btn-icon">‹</button><div class="pui-mobile-navbar-title">事项详情</div><button class="pui-btn pui-btn-text pui-btn-icon">⋯</button></div><div class="pui-mobile-notice"><strong>!</strong><span>您有 3 条事项即将超时，请及时处理。</span></div><div class="pui-mobile-grid"><button class="pui-mobile-grid-item"><span class="pui-mobile-grid-icon">查</span>查询</button><button class="pui-mobile-grid-item"><span class="pui-mobile-grid-icon">办</span>办理</button><button class="pui-mobile-grid-item"><span class="pui-mobile-grid-icon">评</span>评价</button><button class="pui-mobile-grid-item"><span class="pui-mobile-grid-icon">更</span>更多</button></div><div class="pui-mobile-cell-group"><a class="pui-mobile-cell"><span class="pui-mobile-cell-label">事项状态</span><span></span><span class="pui-mobile-cell-value">办理中 ›</span></a><a class="pui-mobile-cell"><span class="pui-mobile-cell-label">办理数量</span><span></span><span class="pui-mobile-stepper"><button data-pui-number-step="-1">−</button><input value="1" min="0" max="9"><button data-pui-number-step="1">+</button></span></a><div class="pui-mobile-swipe"><span class="pui-mobile-swipe-actions">删除</span><div class="pui-mobile-swipe-content">点击展开滑动操作</div></div></div><div class="pui-mobile-tabbar" style="--pui-tab-count:4"><button class="is-active"><span>⌂</span>首页</button><button><span>□</span>事项</button><button><span>○</span>消息</button><button><span>人</span>我的</button></div></div>
+            <div class="pui-stack"><button class="pui-btn pui-btn-block" data-pui-sheet-open="actionSheet">打开动作面板</button><button class="pui-btn pui-btn-block" data-pui-sheet-open="mobilePicker">打开移动选择器</button><button class="pui-btn pui-btn-block" data-pui-sheet-open="numberKeyboard">打开数字键盘</button><div class="pui-alert"><span>i</span><div>移动端控件保持至少 44px 触控尺寸，并适配底部安全区。</div></div></div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <div class="pui-modal-mask" id="fullModal" role="dialog" aria-modal="true" aria-hidden="true"><div class="pui-modal"><div class="pui-modal-head"><h3 class="pui-modal-title">新建事项</h3><button class="pui-modal-close" data-pui-modal-close aria-label="关闭">×</button></div><div class="pui-modal-body"><label class="pui-field"><span class="pui-label">事项名称</span><input class="pui-control" placeholder="请输入事项名称"></label></div><div class="pui-modal-foot"><button class="pui-btn" data-pui-modal-close>取消</button><button class="pui-btn pui-btn-primary" data-pui-modal-close data-pui-toast="保存成功">保存</button></div></div></div>
+  <div class="pui-drawer-mask" id="fullDrawer" role="dialog" aria-modal="true" aria-hidden="true"><aside class="pui-drawer"><div class="pui-drawer-head"><h3 class="pui-drawer-title">事项详情</h3><button class="pui-modal-close" data-pui-drawer-close>×</button></div><div class="pui-drawer-body"><div class="pui-desc"><div class="pui-desc-item"><div class="pui-desc-label">事项编号</div><div class="pui-desc-value">AH20260731001</div></div><div class="pui-desc-item"><div class="pui-desc-label">当前状态</div><div class="pui-desc-value">办理中</div></div></div></div><div class="pui-drawer-foot"><button class="pui-btn" data-pui-drawer-close>关闭</button></div></aside></div>
+
+  <div class="pui-mobile-sheet-mask" id="actionSheet" aria-hidden="true"><section class="pui-mobile-sheet"><div class="pui-mobile-sheet-head"><button class="pui-btn pui-btn-text" data-pui-sheet-close>取消</button><div class="pui-mobile-sheet-title">更多操作</div><span></span></div><div class="pui-mobile-sheet-body"><button class="pui-mobile-action" data-pui-sheet-close data-pui-toast="已转派">转派事项</button><button class="pui-mobile-action" data-pui-sheet-close data-pui-toast="已催办">发起催办</button><button class="pui-mobile-action is-danger" data-pui-sheet-close>删除事项</button></div></section></div>
+  <div class="pui-mobile-sheet-mask" id="mobilePicker" aria-hidden="true"><section class="pui-mobile-sheet"><div class="pui-mobile-sheet-head"><button class="pui-btn pui-btn-text" data-pui-sheet-close>取消</button><div class="pui-mobile-sheet-title">选择日期</div><button class="pui-btn pui-btn-text" data-pui-sheet-close>确定</button></div><div class="pui-mobile-picker-columns"><div class="pui-mobile-picker-column">2026年</div><div class="pui-mobile-picker-column">07月</div><div class="pui-mobile-picker-column">31日</div></div></section></div>
+  <div class="pui-mobile-sheet-mask" id="numberKeyboard" aria-hidden="true"><section class="pui-mobile-sheet"><div class="pui-mobile-sheet-head"><span></span><div class="pui-mobile-sheet-title">安全键盘</div><button class="pui-btn pui-btn-text" data-pui-sheet-close>完成</button></div><div class="pui-number-keyboard"><button>1</button><button>2</button><button>3</button><button>4</button><button>5</button><button>6</button><button>7</button><button>8</button><button>9</button><button>.</button><button>0</button><button>⌫</button></div></section></div>
+</body>
+</html>

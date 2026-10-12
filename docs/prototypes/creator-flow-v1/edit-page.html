@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PUI 模板 - 编辑页</title>
+  <script defer src="./prototype-ui-kit/dist/prototype-ui.js"></script>
+</head>
+<body class="pui-page">
+  <div class="pui-admin">
+    <aside class="pui-sidebar"><div class="pui-brand">PUI 业务中台</div><nav class="pui-nav" aria-label="主导航"><a href="list-page.html">数据列表</a><a href="detail-page.html">业务详情</a><a class="is-active" href="edit-page.html">表单编辑</a><a href="approval-page.html">流程审批</a><a href="dashboard-page.html">运营看板</a><a href="config-page.html">系统配置</a></nav></aside>
+    <main class="pui-main">
+      <header class="pui-topbar"><strong>服务运营中心</strong><span class="pui-meta">运营专员 · 王静</span></header>
+      <section class="pui-content">
+        <nav class="pui-breadcrumb"><a href="list-page.html">服务工单</a><span>/</span><a href="detail-page.html">工单详情</a><span>/</span><span>编辑工单</span></nav>
+        <div class="pui-page-head"><div><h1 class="pui-page-title">编辑工单</h1><p class="pui-page-desc">带星号的字段为必填项，保存后可继续补充。</p></div><span class="pui-tag">草稿</span></div>
+
+        <form class="pui-form">
+          <section class="pui-panel">
+            <div class="pui-panel-head"><h2 class="pui-panel-title">基本信息</h2><span class="pui-meta">工单编号：GD202607130032</span></div>
+            <div class="pui-panel-body">
+              <div class="pui-form-columns">
+                <label class="pui-field is-wide"><span class="pui-label"><span class="pui-required">*</span>工单主题</span><input class="pui-control" value="咨询公共服务办理材料及受理时限"><span class="pui-help">建议控制在 30 个汉字内。</span></label>
+                <label class="pui-field"><span class="pui-label"><span class="pui-required">*</span>业务分类</span><select class="pui-control"><option selected>咨询</option><option>投诉</option><option>建议</option></select></label>
+                <label class="pui-field"><span class="pui-label"><span class="pui-required">*</span>紧急程度</span><select class="pui-control"><option>一般</option><option selected>紧急</option><option>特急</option></select></label>
+                <label class="pui-field"><span class="pui-label">受理渠道</span><select class="pui-control"><option selected>服务热线</option><option>网站</option><option>移动端</option></select></label>
+                <label class="pui-field"><span class="pui-label">所属区域</span><select class="pui-control"><option selected>蜀山区</option><option>包河区</option><option>庐阳区</option></select></label>
+                <label class="pui-field is-wide"><span class="pui-label"><span class="pui-required">*</span>问题描述</span><textarea class="pui-control">诉求人计划办理公共服务事项，希望确认需要携带的材料、线上预约方式以及正常受理时限。</textarea><span class="pui-help">请完整描述业务诉求，便于承办单位处理。</span></label>
+              </div>
+            </div>
+          </section>
+
+          <section class="pui-panel">
+            <div class="pui-panel-head"><h2 class="pui-panel-title">联系信息</h2></div>
+            <div class="pui-panel-body">
+              <div class="pui-form-columns">
+                <label class="pui-field"><span class="pui-label"><span class="pui-required">*</span>联系人</span><input class="pui-control" value="张先生"></label>
+                <label class="pui-field is-error"><span class="pui-label"><span class="pui-required">*</span>联系电话</span><input class="pui-control" value="1386721" aria-invalid="true" aria-describedby="phoneError"><span class="pui-error" id="phoneError" role="alert">请输入 11 位手机号码。</span></label>
+                <label class="pui-field"><span class="pui-label">联系时间</span><input class="pui-control" value="2026-07-14 09:00 ~ 2026-07-14 11:30"></label>
+                <label class="pui-field"><span class="pui-label">通知方式</span><span class="pui-check-row"><span class="pui-checkbox"><input type="checkbox" checked>短信</span><span class="pui-checkbox"><input type="checkbox">电话</span><span class="pui-checkbox"><input type="checkbox">邮件</span></span></label>
+                <label class="pui-field is-wide"><span class="pui-label">联系地址</span><input class="pui-control" placeholder="请输入联系地址"></label>
+              </div>
+            </div>
+          </section>
+
+          <section class="pui-panel">
+            <div class="pui-panel-head"><h2 class="pui-panel-title">办理信息</h2></div>
+            <div class="pui-panel-body">
+              <div class="pui-form-columns">
+                <label class="pui-field"><span class="pui-label"><span class="pui-required">*</span>承办单位</span><select class="pui-control"><option selected>市政务服务中心</option><option>蜀山区服务中心</option></select></label>
+                <label class="pui-field"><span class="pui-label"><span class="pui-required">*</span>办结时限</span><input class="pui-control" value="2026-07-15 18:00"></label>
+                <label class="pui-field is-wide"><span class="pui-label">办理要求</span><textarea class="pui-control" placeholder="请输入办理要求"></textarea></label>
+                <div class="pui-field is-wide"><span class="pui-label">相关附件</span><button class="pui-upload" type="button" data-pui-toast="已选择附件"><span><strong>选择附件</strong>单个文件不超过 20 MB</span></button></div>
+              </div>
+            </div>
+          </section>
+        </form>
+
+        <div class="pui-action-bar">
+          <span class="pui-meta">上次保存：2026-07-13 14:22</span>
+          <div class="pui-page-actions"><a class="pui-btn" href="detail-page.html">取消</a><button class="pui-btn" type="button" data-pui-toast="草稿已保存">保存草稿</button><button class="pui-btn pui-btn-primary" type="button" data-pui-modal-open="submitModal">提交审核</button></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="pui-modal-mask" id="submitModal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="submitTitle"><div class="pui-modal" style="--pui-modal-width:420px;"><div class="pui-modal-head"><h3 class="pui-modal-title" id="submitTitle">提交审核</h3><button class="pui-modal-close" type="button" aria-label="关闭" data-pui-modal-close>×</button></div><div class="pui-modal-body"><div class="pui-alert pui-alert-warning"><span>!</span><div><strong>联系电话格式有误</strong><br>请修正后再提交审核。</div></div></div><div class="pui-modal-foot"><button class="pui-btn pui-btn-primary" type="button" data-pui-modal-close>返回修改</button></div></div></div>
+</body>
+</html>

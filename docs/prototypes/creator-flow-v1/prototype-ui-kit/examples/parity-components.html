@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
+  <title>PUI 逐项补充组件</title>
+  <link rel="stylesheet" href="../dist/prototype-ui.css">
+  <script defer src="../dist/prototype-ui.js"></script>
+</head>
+<body class="pui-page">
+  <main class="pui-content pui-content-narrow">
+    <nav class="pui-breadcrumb"><a href="catalog.html">全量组件</a><span>/</span><span>逐项补充</span></nav>
+    <div class="pui-page-head"><div><h1 class="pui-page-title">逐项补充组件</h1><p class="pui-page-desc">对应 12 套参考库中不属于高频后台控件、但仍具有可见界面的专项能力。</p></div><a class="pui-btn" href="../COMPONENT_PARITY.md">对齐矩阵</a></div>
+
+    <section class="pui-panel"><div class="pui-panel-head"><h2 class="pui-panel-title">动效与数值</h2></div><div class="pui-panel-body pui-demo-grid">
+      <div class="pui-card pui-border-beam pui-animate"><div class="pui-card-body"><span class="pui-demo-label">BorderBeam / Animate</span><strong>处理中事项</strong><p class="pui-text-muted">边框动效用于短时强调，不改变卡片尺寸。</p><button class="pui-btn pui-btn-primary pui-ripple">查看进度</button></div></div>
+      <div><span class="pui-demo-label">AnimatingNumbers / CountUp</span><div class="pui-animated-number">12,680</div><p class="pui-trend-up">较昨日 +8.2%</p></div>
+      <div><span class="pui-demo-label">ProgressCircle</span><div class="pui-progress-circle" style="--pui-circle-value:76%"><span>76%</span></div></div>
+      <div><span class="pui-demo-label">PageIndicator</span><span class="pui-page-indicator"><i class="is-active"></i><i></i><i></i><i></i></span></div>
+    </div></section>
+
+    <section class="pui-panel"><div class="pui-panel-head"><h2 class="pui-panel-title">滚动与长列表</h2></div><div class="pui-panel-body pui-demo-grid">
+      <div><span class="pui-demo-label">SideBar</span><nav class="pui-side-nav"><button class="is-active">全部事项</button><button>咨询服务</button><button>投诉举报</button><button>意见建议</button></nav></div>
+      <div><span class="pui-demo-label">Scrollbar</span><div class="pui-scroll-area" style="--pui-scroll-height:180px"><div class="pui-list"><div class="pui-list-item">滚动内容 01</div><div class="pui-list-item">滚动内容 02</div><div class="pui-list-item">滚动内容 03</div><div class="pui-list-item">滚动内容 04</div><div class="pui-list-item">滚动内容 05</div></div></div></div>
+      <div><span class="pui-demo-label">VirtualList</span><div class="pui-virtual-list" style="--pui-virtual-height:180px;--pui-virtual-total:1200px"><div class="pui-virtual-list-window"><div class="pui-virtual-list-items"><div class="pui-virtual-list-item"><span>事项 0001</span><span>办理中</span></div><div class="pui-virtual-list-item"><span>事项 0002</span><span>待分派</span></div><div class="pui-virtual-list-item"><span>事项 0003</span><span>已办结</span></div><div class="pui-virtual-list-item"><span>事项 0004</span><span>办理中</span></div></div></div></div></div>
+      <div><span class="pui-demo-label">Ellipsis</span><p class="pui-ellipsis" style="max-width:260px">这是一段需要在固定宽度内单行省略的较长业务说明文字。</p><p class="pui-ellipsis is-multiline" style="--pui-lines:2;max-width:260px">多行省略用于摘要、描述和移动端卡片正文，超过指定行数后不再撑高容器。</p></div>
+    </div></section>
+
+    <section class="pui-panel"><div class="pui-panel-head"><h2 class="pui-panel-title">头像与图片</h2></div><div class="pui-panel-body pui-demo-grid">
+      <div class="pui-avatar-crop"><div class="pui-avatar-crop-stage"><span class="pui-avatar-crop-image">皖</span></div><div class="pui-avatar-crop-controls"><strong>调整头像</strong><input class="pui-slider" type="range" min="0.7" max="1.7" value="1" step="0.1" data-pui-avatar-scale><div class="pui-row"><button class="pui-btn pui-btn-sm">重新选择</button><button class="pui-btn pui-btn-primary pui-btn-sm" data-pui-toast="头像已保存">保存</button></div></div></div>
+      <div><span class="pui-demo-label">ImageViewer</span><button class="pui-btn pui-btn-primary" data-pui-viewer-open="parityViewer">打开图片预览</button><p class="pui-help">支持遮罩、关闭按钮与 Esc 关闭。</p></div>
+    </div></section>
+
+    <section class="pui-panel"><div class="pui-panel-head"><h2 class="pui-panel-title">实时展示</h2></div><div class="pui-panel-body pui-demo-grid">
+      <div><span class="pui-demo-label">Barrage</span><div class="pui-barrage"><span class="pui-barrage-lane">办理速度很快</span><span class="pui-barrage-lane">页面信息清晰</span><span class="pui-barrage-lane">服务态度满意</span></div></div>
+      <div><span class="pui-demo-label">ShowMonitor</span><div class="pui-monitor"><i style="--pui-monitor-value:28%"></i><i style="--pui-monitor-value:42%"></i><i style="--pui-monitor-value:55%"></i><i style="--pui-monitor-value:38%"></i><i style="--pui-monitor-value:72%"></i><i style="--pui-monitor-value:64%"></i><i style="--pui-monitor-value:82%"></i><i style="--pui-monitor-value:58%"></i><i style="--pui-monitor-value:46%"></i><i style="--pui-monitor-value:70%"></i><i style="--pui-monitor-value:88%"></i><i style="--pui-monitor-value:76%"></i></div></div>
+      <div><span class="pui-demo-label">CalendarCard</span><article class="pui-calendar-card"><div class="pui-calendar-card-month">2026年07月</div><div class="pui-calendar-card-day">31</div><div class="pui-calendar-card-desc">星期五 · 3 项待办</div></article></div>
+      <div><span class="pui-demo-label">FloatingPanel</span><section class="pui-floating-panel"><div class="pui-floating-panel-handle"></div><div class="pui-floating-panel-body"><strong>事项快捷面板</strong><p class="pui-text-muted">适合地图、列表或移动端底部信息区。</p></div></section></div>
+    </div></section>
+
+    <section class="pui-panel"><div class="pui-panel-head"><h2 class="pui-panel-title">地址与联系人</h2></div><div class="pui-panel-body pui-stack">
+      <article class="pui-address"><span class="pui-address-mark">址</span><div><p class="pui-address-title">安徽省政务服务中心</p><p class="pui-address-desc">安徽省合肥市包河区马鞍山路 509 号</p></div><button class="pui-btn pui-btn-text">编辑</button></article>
+      <article class="pui-contact"><span class="pui-avatar">张</span><div><p class="pui-contact-title">张伟</p><p class="pui-contact-desc">承办人员 · 138****6800</p></div><button class="pui-btn pui-btn-text">联系</button></article>
+    </div></section>
+
+    <section class="pui-panel"><div class="pui-panel-head"><h2 class="pui-panel-title">拖拽排序</h2></div><div class="pui-panel-body"><div class="pui-reorder"><div class="pui-reorder-item"><span class="pui-reorder-handle">≡</span><span>受理信息</span><span class="pui-reorder-actions"><button class="pui-btn pui-btn-icon pui-btn-sm" data-pui-reorder-move="down">↓</button></span></div><div class="pui-reorder-item"><span class="pui-reorder-handle">≡</span><span>办理记录</span><span class="pui-reorder-actions"><button class="pui-btn pui-btn-icon pui-btn-sm" data-pui-reorder-move="up">↑</button><button class="pui-btn pui-btn-icon pui-btn-sm" data-pui-reorder-move="down">↓</button></span></div><div class="pui-reorder-item"><span class="pui-reorder-handle">≡</span><span>附件材料</span><span class="pui-reorder-actions"><button class="pui-btn pui-btn-icon pui-btn-sm" data-pui-reorder-move="up">↑</button></span></div></div></div></section>
+  </main>
+
+  <div class="pui-image-viewer" id="parityViewer" role="dialog" aria-modal="true" aria-hidden="true"><button class="pui-image-viewer-close" data-pui-viewer-close aria-label="关闭">×</button><div class="pui-image-viewer-content">图片预览</div></div>
+</body>
+</html>

@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
+  <title>PUI 专项组件</title>
+  <link rel="stylesheet" href="../dist/prototype-ui.css">
+  <script defer src="../dist/prototype-ui.js"></script>
+</head>
+<body class="pui-page" id="top">
+  <main class="pui-content pui-content-narrow">
+    <nav class="pui-breadcrumb"><a href="catalog.html">全量组件</a><span>/</span><span>专项组件</span></nav>
+    <div class="pui-page-head"><div><h1 class="pui-page-title">专项组件</h1><p class="pui-page-desc">补充移动、电商、媒体与长列表场景，不和通用控件重复计数。</p></div></div>
+
+    <section class="pui-panel"><div class="pui-panel-head"><h2 class="pui-panel-title">浮动与状态</h2></div><div class="pui-panel-body pui-stack">
+      <div class="pui-row"><span class="pui-countdown"><strong>01:28:36</strong><span>后结束</span></span><span class="pui-spin">加载更多</span></div>
+      <div class="pui-pull-refresh">↓ 下拉刷新</div><div class="pui-load-more"><span class="pui-spin">正在加载下一页</span></div>
+    </div></section>
+
+    <section class="pui-panel"><div class="pui-panel-head"><h2 class="pui-panel-title">评论与索引列表</h2></div><div class="pui-panel-body pui-demo-grid">
+      <article class="pui-comment"><span class="pui-avatar">李</span><div><div class="pui-comment-head"><span class="pui-comment-author">李明</span><time class="pui-comment-time">2026-07-31 14:30</time></div><div class="pui-comment-body">材料已核验，建议进入下一办理环节。</div></div></article>
+      <div class="pui-index-list"><div class="pui-index-title">A</div><div class="pui-index-item">安徽省</div><div class="pui-index-title">B</div><div class="pui-index-item">北京市</div><div class="pui-index-item">蚌埠市</div></div>
+    </div></section>
+
+    <section class="pui-panel"><div class="pui-panel-head"><h2 class="pui-panel-title">瀑布流</h2></div><div class="pui-panel-body"><div class="pui-masonry"><div class="pui-masonry-item"><strong>事项卡片一</strong><p class="pui-text-muted">适合短内容。</p></div><div class="pui-masonry-item"><strong>事项卡片二</strong><p class="pui-text-muted">内容高度可以不同，浏览器自动排列，不需要框架计算。</p></div><div class="pui-masonry-item"><strong>事项卡片三</strong><p class="pui-text-muted">保持统一间距与边框。</p></div><div class="pui-masonry-item"><strong>事项卡片四</strong><p class="pui-text-muted">用于图片、素材和不等高信息流原型。</p></div></div></div></section>
+
+    <section class="pui-panel"><div class="pui-panel-head"><h2 class="pui-panel-title">签名与媒体</h2></div><div class="pui-panel-body pui-demo-grid"><div><span class="pui-demo-label">签名板</span><div class="pui-signature" data-signature="张伟"></div></div><div><span class="pui-demo-label">原生媒体</span><video class="pui-media" controls preload="metadata"><track kind="captions" srclang="zh" label="中文字幕"></video><p class="pui-help">原型中使用原生 audio / video，避免引入播放器框架。</p></div></div></section>
+
+    <section class="pui-panel"><div class="pui-panel-head"><h2 class="pui-panel-title">价格与优惠券</h2></div><div class="pui-panel-body pui-demo-grid"><div><span class="pui-demo-label">价格</span><span class="pui-price"><span class="pui-price-symbol">¥</span><span class="pui-price-value">99</span><span class="pui-price-decimal">.00</span></span></div><article class="pui-coupon"><div class="pui-coupon-value"><span class="pui-price"><span class="pui-price-symbol">¥</span><span class="pui-price-value">20</span></span><small>满 100 可用</small></div><div class="pui-coupon-body"><p class="pui-coupon-title">服务体验券</p><p class="pui-coupon-desc">有效期：2026-07-01 ~ 2026-08-31</p><button class="pui-btn pui-btn-primary pui-btn-sm pui-mt-3">立即使用</button></div></article></div></section>
+
+    <section class="pui-panel"><div class="pui-panel-head"><h2 class="pui-panel-title">二维码与水印</h2></div><div class="pui-panel-body pui-row"><div class="pui-qrcode" aria-label="二维码占位"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="pui-watermark pui-card" data-watermark="仅供评审"><div class="pui-card-body">二维码为视觉占位；真实编码由开发阶段组件生成。</div></div></div></section>
+  </main>
+  <a class="pui-fab pui-tooltip" href="catalog.html" aria-label="组件目录" data-pui-tooltip="组件目录">目</a>
+  <a class="pui-backtop pui-tooltip" href="#top" aria-label="返回顶部" data-pui-tooltip="返回顶部">↑</a>
+</body>
+</html>

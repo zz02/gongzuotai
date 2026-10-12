@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PUI 模板 - 审批页</title>
+  <script defer src="../dist/prototype-ui.js"></script>
+</head>
+<body class="pui-page">
+  <div class="pui-admin">
+    <aside class="pui-sidebar"><div class="pui-brand">PUI 业务中台</div><nav class="pui-nav" aria-label="主导航"><a href="list-page.html">数据列表</a><a href="detail-page.html">业务详情</a><a href="edit-page.html">表单编辑</a><a class="is-active" href="approval-page.html">流程审批</a><a href="dashboard-page.html">运营看板</a><a href="config-page.html">系统配置</a></nav></aside>
+    <main class="pui-main">
+      <header class="pui-topbar"><strong>审批工作台</strong><span class="pui-meta">审批人员 · 李明</span></header>
+      <section class="pui-content">
+        <nav class="pui-breadcrumb"><a href="#">待办中心</a><span>/</span><span>工单审批</span></nav>
+        <div class="pui-page-head"><div><h1 class="pui-page-title">工单办结审批</h1><p class="pui-page-desc">审批编号：SP202607130018 · 提交时间：2026-07-13 14:10</p></div><span class="pui-tag pui-tag-warning">待审批</span></div>
+
+        <section class="pui-panel"><div class="pui-panel-body"><div class="pui-steps"><div class="pui-step is-done"><div class="pui-step-mark">✓</div><div><div class="pui-step-title">提交申请</div><div class="pui-step-desc">2026-07-13 14:10</div></div></div><div class="pui-step is-active"><div class="pui-step-mark">2</div><div><div class="pui-step-title">部门审批</div><div class="pui-step-desc">当前环节</div></div></div><div class="pui-step"><div class="pui-step-mark">3</div><div><div class="pui-step-title">业务确认</div><div class="pui-step-desc">等待审批</div></div></div><div class="pui-step"><div class="pui-step-mark">4</div><div><div class="pui-step-title">流程完成</div><div class="pui-step-desc">等待归档</div></div></div></div></div></section>
+
+        <div class="pui-section-grid">
+          <div>
+            <section class="pui-panel"><div class="pui-panel-head"><h2 class="pui-panel-title">申请信息</h2><a class="pui-link" href="detail-page.html">查看工单</a></div><div class="pui-panel-body"><div class="pui-desc"><div class="pui-desc-item"><div class="pui-desc-label">申请人员</div><div class="pui-desc-value">王静</div></div><div class="pui-desc-item"><div class="pui-desc-label">所属部门</div><div class="pui-desc-value">服务运营部</div></div><div class="pui-desc-item"><div class="pui-desc-label">申请类型</div><div class="pui-desc-value">工单办结</div></div><div class="pui-desc-item"><div class="pui-desc-label">紧急程度</div><div class="pui-desc-value"><span class="pui-tag pui-tag-warning">紧急</span></div></div><div class="pui-desc-item"><div class="pui-desc-label">工单编号</div><div class="pui-desc-value">GD202607130032</div></div><div class="pui-desc-item"><div class="pui-desc-label">处理时长</div><div class="pui-desc-value">2 小时 18 分</div></div></div><hr class="pui-divider"><div><strong>办结说明</strong><p style="margin-bottom:0;color:var(--pui-text-secondary);line-height:1.8;">已联系诉求人并提供办理材料清单、线上预约入口和受理时限。诉求人确认信息清楚，同意办结。</p></div></div></section>
+            <section class="pui-panel"><div class="pui-panel-head"><h2 class="pui-panel-title">办理结果</h2></div><div class="pui-panel-body"><div class="pui-alert pui-alert-success"><span>✓</span><div><strong>诉求已解决</strong><br>回访结果为满意，相关材料已上传。</div></div><div class="pui-table-wrap" style="margin-top:16px;"><table class="pui-table"><thead><tr><th>材料名称</th><th style="width:140px;">上传人员</th><th style="width:160px;">上传时间</th><th style="width:80px;" class="is-action">操作</th></tr></thead><tbody><tr><td>公共服务办理指引.pdf</td><td>王静</td><td>2026-07-13 14:02</td><td class="is-action"><a class="pui-link" href="#">预览</a></td></tr><tr><td>联系记录截图.png</td><td>王静</td><td>2026-07-13 14:05</td><td class="is-action"><a class="pui-link" href="#">预览</a></td></tr></tbody></table></div></div></section>
+            <section class="pui-panel"><div class="pui-panel-head"><h2 class="pui-panel-title">审批记录</h2></div><div class="pui-panel-body"><div class="pui-timeline"><div class="pui-timeline-item"><span class="pui-timeline-dot"></span><div><div class="pui-timeline-title">王静提交办结申请</div><div class="pui-timeline-desc">2026-07-13 14:10 · 请审核办理结果</div></div></div><div class="pui-timeline-item"><span class="pui-timeline-dot"></span><div><div class="pui-timeline-title">流程到达部门审批</div><div class="pui-timeline-desc">2026-07-13 14:10 · 当前处理人李明</div></div></div></div></div></section>
+          </div>
+
+          <aside class="pui-sticky">
+            <section class="pui-panel"><div class="pui-panel-head"><h2 class="pui-panel-title">审批处理</h2></div><div class="pui-panel-body"><div class="pui-decision"><label class="pui-decision-option"><input type="radio" name="decision" checked><span><strong>审批通过</strong><br><span class="pui-meta">同意当前办结结果。</span></span></label><label class="pui-decision-option"><input type="radio" name="decision"><span><strong>退回修改</strong><br><span class="pui-meta">退回申请人补充材料。</span></span></label><label class="pui-field"><span class="pui-label">审批意见</span><textarea class="pui-control" placeholder="请输入审批意见">办理结果完整，同意办结。</textarea></label><label class="pui-checkbox"><input type="checkbox" checked>通知申请人</label><button class="pui-btn pui-btn-primary" type="button" data-pui-modal-open="approveModal">提交审批</button></div></div></section>
+            <div class="pui-alert pui-alert-warning"><span>!</span><div>请在 2026-07-13 18:00 前完成审批。</div></div>
+          </aside>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="pui-modal-mask" id="approveModal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="approveTitle"><div class="pui-modal" style="--pui-modal-width:420px;"><div class="pui-modal-head"><h3 class="pui-modal-title" id="approveTitle">确认审批</h3><button class="pui-modal-close" type="button" aria-label="关闭" data-pui-modal-close>×</button></div><div class="pui-modal-body"><p style="margin:0;">确定通过当前办结申请吗？提交后将进入业务确认环节。</p></div><div class="pui-modal-foot"><button class="pui-btn" type="button" data-pui-modal-close>取消</button><button class="pui-btn pui-btn-primary" type="button" data-pui-modal-close data-pui-toast="审批已提交">确定</button></div></div></div>
+</body>
+</html>

@@ -1,0 +1,9 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'none'; img-src 'self' data: blob:; script-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'none'">
+<link rel="icon" href="data:,"><title>点灯 · 功能交互原型</title>
+<link rel="stylesheet" href="./prototype-ui-kit/dist/prototype-ui.css"><script defer src="./prototype-ui-kit/dist/prototype-ui.js"></script><script defer src="./flow.js"></script><link rel="stylesheet" href="./flow.css"></head>
+<body class="pui-page"><div id="wallpaper" aria-hidden="true"></div><div class="pui-admin">
+<aside class="pui-sidebar"><div class="pui-brand">点灯自媒体工作台</div><p class="sidebar-note">点灯的曾曾 · 图文创作</p><nav class="pui-nav" aria-label="主导航"><a href="#sources">信源</a><a href="#topics">选题库</a><a href="#works">我的作品</a><a href="#deliver">发布成品</a><span class="nav-label">辅助与设置</span><a href="#skills">Skill 中心</a><a href="#appearance">外观设置</a><span class="nav-label">原功能保留</span><a href="#original">RedFox 原工具</a></nav></aside>
+<main class="pui-main"><header class="pui-topbar"><strong id="location-name">信源</strong><span id="save-state" role="status">仅保存演示数据</span></header><div class="prototype-notice">功能交互原型 · 信源、稿件与图片任务均为模拟，不是正式系统</div><div id="storage-error" class="pui-alert pui-alert-danger" role="alert" hidden></div><section class="pui-content" id="screen" tabindex="-1"></section></main></div>
+<div class="pui-modal-mask" id="flow-modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="modal-title"><div class="pui-modal"><div class="pui-modal-head"><h2 class="pui-modal-title" id="modal-title"></h2><button type="button" class="pui-modal-close" aria-label="关闭" data-pui-modal-close>×</button></div><div class="pui-modal-body" id="modal-body"></div></div></div><noscript>请启用浏览器脚本查看交互原型。</noscript></body></html>

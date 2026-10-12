@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PUI 模板 - 移动端列表页</title>
+  <script defer src="../dist/prototype-ui.js"></script>
+</head>
+<body class="pui-page">
+  <main class="pui-mobile-shell">
+    <h1 class="pui-sr-only">我的工单</h1>
+    <header class="pui-mobile-topbar"><button class="pui-btn pui-btn-ghost pui-btn-icon" type="button" aria-label="返回">‹</button><strong>我的工单</strong><button class="pui-btn pui-btn-ghost pui-btn-icon" type="button" aria-label="筛选" data-pui-drawer-open="mobileFilter">☷</button></header>
+    <section class="pui-mobile-search">
+      <label class="pui-field"><span class="pui-sr-only">搜索工单</span><input class="pui-control" type="search" placeholder="搜索编号或主题"></label>
+      <div class="pui-chips" style="margin-top:12px;"><button class="pui-chip is-active" type="button">全部 28</button><button class="pui-chip" type="button">待处理 6</button><button class="pui-chip" type="button">处理中 9</button><button class="pui-chip" type="button">已办结 13</button></div>
+    </section>
+
+    <section aria-label="工单列表">
+      <article class="pui-mobile-card">
+        <div class="pui-mobile-card-head"><h2 class="pui-mobile-card-title">咨询公共服务办理材料及受理时限</h2><span class="pui-tag pui-tag-warning">待处理</span></div>
+        <div class="pui-mobile-card-meta"><span>工单编号</span><strong>GD202607130032</strong><span>业务分类</span><span>咨询</span><span>提交时间</span><time>2026-07-13 13:42</time></div>
+        <div class="pui-mobile-card-foot"><span class="pui-meta">剩余 2 天</span><button class="pui-btn pui-btn-primary pui-btn-sm" type="button" data-pui-toast="已进入处理">立即处理</button></div>
+      </article>
+      <article class="pui-mobile-card">
+        <div class="pui-mobile-card-head"><h2 class="pui-mobile-card-title">反馈道路照明设施故障问题</h2><span class="pui-tag">处理中</span></div>
+        <div class="pui-mobile-card-meta"><span>工单编号</span><strong>GD202607130031</strong><span>业务分类</span><span>投诉</span><span>提交时间</span><time>2026-07-13 12:18</time></div>
+        <div class="pui-mobile-card-foot"><span class="pui-meta">已处理 1 小时</span><button class="pui-btn pui-btn-sm" type="button" data-pui-toast="已打开详情">查看详情</button></div>
+      </article>
+      <article class="pui-mobile-card">
+        <div class="pui-mobile-card-head"><h2 class="pui-mobile-card-title">建议优化线上材料提交入口</h2><span class="pui-tag pui-tag-success">已办结</span></div>
+        <div class="pui-mobile-card-meta"><span>工单编号</span><strong>GD202607130027</strong><span>业务分类</span><span>建议</span><span>办结时间</span><time>2026-07-13 11:36</time></div>
+        <div class="pui-mobile-card-foot"><span class="pui-meta">回访结果：满意</span><button class="pui-btn pui-btn-sm" type="button" data-pui-toast="已打开详情">查看详情</button></div>
+      </article>
+      <article class="pui-mobile-card">
+        <div class="pui-mobile-card-head"><h2 class="pui-mobile-card-title">反映业务窗口等待时间较长</h2><span class="pui-tag pui-tag-danger">已超时</span></div>
+        <div class="pui-mobile-card-meta"><span>工单编号</span><strong>GD202607120116</strong><span>业务分类</span><span>投诉</span><span>提交时间</span><time>2026-07-12 16:05</time></div>
+        <div class="pui-mobile-card-foot"><span class="pui-trend-down">超时 2 小时</span><button class="pui-btn pui-btn-danger pui-btn-sm" type="button" data-pui-toast="催办消息已发送">立即催办</button></div>
+      </article>
+    </section>
+
+    <nav class="pui-mobile-bottom" aria-label="底部导航"><a class="is-active" href="#">工单</a><a href="#">待办</a><a href="#">消息</a><a href="#">我的</a></nav>
+  </main>
+
+  <div class="pui-drawer-mask" id="mobileFilter" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="mobileFilterTitle"><aside class="pui-drawer"><div class="pui-drawer-head"><h3 class="pui-drawer-title" id="mobileFilterTitle">筛选工单</h3><button class="pui-modal-close" type="button" aria-label="关闭" data-pui-drawer-close>×</button></div><div class="pui-drawer-body"><div class="pui-stack"><label class="pui-field"><span class="pui-label">业务分类</span><select class="pui-control"><option>全部分类</option><option>咨询</option><option>投诉</option><option>建议</option></select></label><label class="pui-field"><span class="pui-label">紧急程度</span><select class="pui-control"><option>全部程度</option><option>一般</option><option>紧急</option><option>特急</option></select></label><label class="pui-field"><span class="pui-label">提交日期</span><input class="pui-control" value="2026-07-01 ~ 2026-07-13" readonly></label><label class="pui-checkbox"><input type="checkbox">仅看已超时</label></div></div><div class="pui-drawer-foot"><button class="pui-btn" type="button">重置</button><button class="pui-btn pui-btn-primary" type="button" data-pui-drawer-close data-pui-toast="筛选条件已应用">确定</button></div></aside></div>
+</body>
+</html>
