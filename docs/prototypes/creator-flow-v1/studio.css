@@ -70,7 +70,7 @@ textarea, input { caret-color: var(--studio-accent); }
 .skip-link { position: fixed; z-index: 110; left: 12px; top: -100px; }
 .skip-link:focus { top: 12px; }
 #navigation-drawer { justify-content: flex-start; }
-#navigation-drawer .pui-drawer { --pui-drawer-width: 264px; background: var(--studio-nav); color: var(--studio-white); }
+#navigation-drawer .pui-drawer { --pui-drawer-width: 264px; width: min(264px, calc(100vw - 56px)); background: var(--studio-nav); color: var(--studio-white); }
 #navigation-drawer .pui-drawer-head { min-height: 72px; border-color: #426550; }
 #navigation-drawer .pui-drawer-body { padding: 24px 12px; }
 #navigation-drawer .pui-drawer-foot { font-size: 12px; justify-content: flex-start; background: transparent; color: #b2cabe; border-color: #426550; }

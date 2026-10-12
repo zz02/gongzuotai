@@ -81,15 +81,20 @@ document.addEventListener('change',async e=>{const el=e.target,d=draft();try{if(
     if(f.id==='publication-form'){const d=draft(),url=v.get('url').trim(),note=v.get('note').trim(),at=f.querySelector('[data-pui-picker-value]').textContent.trim();if(d.checked!==sig(d)){$('#publish-error').textContent='成品已修改，请重新检查。';return;}if(!url&&note.length<8){$('#publish-error').textContent='填写链接，或至少 8 字的核对备注。';return;}if(url){try{if(!['https:','http:'].includes(new URL(url).protocol))throw Error();}catch{$('#publish-error').textContent='填写完整 http 或 https 链接。';return;}}if(d.publication){$('#publish-error').textContent='本平台已登记，未重复计数。';return;}d.publication={url,note,at,snapshot:structuredClone({title:d.title,caption:d.caption,body:d.body,assets:d.assets})};persist();close();return render();}
   });
   const navDrawer=$('#navigation-drawer');
+  let drawerWasOpen=false,drawerOriginHash='',drawerNavigated=false;
   new MutationObserver(()=>{
     const expanded=navDrawer.classList.contains('is-open');
+    if(expanded&&!drawerWasOpen){drawerOriginHash=location.hash;drawerNavigated=false;}
     $('.navigation-toggle').setAttribute('aria-expanded',String(expanded));
     $('.pui-sidebar').inert=expanded;
     $('.pui-main').inert=expanded||$('#flow-modal').classList.contains('is-open');
+    // PUI restores focus before the background ceases being inert. Restore again afterwards.
+    if(!expanded&&drawerWasOpen&&!drawerNavigated&&location.hash===drawerOriginHash)$('.navigation-toggle').focus();
+    drawerWasOpen=expanded;
   }).observe(navDrawer,{attributes:true,attributeFilter:['class']});
   document.addEventListener('click',e=>{
     if(e.target.closest('.skip-link')){e.preventDefault();$('#screen').focus();}
-    if(e.target.closest('#drawer-navigation a')){window.PUI.closeDrawer(navDrawer);if(e.target.closest('a').hash===location.hash)$('#screen').focus();}
+    if(e.target.closest('#drawer-navigation a')){drawerNavigated=true;window.PUI.closeDrawer(navDrawer);if(e.target.closest('a').hash===location.hash)queueMicrotask(()=>$('#screen').focus());}
   });
   window.addEventListener('hashchange',()=>{close();window.PUI.closeDrawer(navDrawer);render();$('#screen').focus({preventScroll:true});});window.addEventListener('beforeunload',e=>{if(storageError){e.preventDefault();e.returnValue='';}});
   document.addEventListener('keydown',e=>{
