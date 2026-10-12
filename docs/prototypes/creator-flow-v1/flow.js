@@ -69,7 +69,7 @@ function startWork(topicId){const t=state.topics.find(t=>t.id===topicId);if(t.wo
   function paint(a){const bg=$('#wallpaper');bg.style.backgroundImage=a.enabled&&a.data?`linear-gradient(rgba(244,247,244,${a.mask/100}),rgba(244,247,244,${a.mask/100})),url("${a.data}")`:'';bg.style.backgroundPosition=a.position;const preview=$('#wallpaper-preview');if(preview){preview.style.backgroundImage=bg.style.backgroundImage;preview.style.backgroundPosition=a.position;}}
   async function imageData(file){if(!file||!['image/png','image/jpeg','image/webp'].includes(file.type)||file.size>5*1024*1024)throw Error('请选择 5 MB 内的 PNG、JPEG 或 WebP。');const data=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=()=>reject(Error('读取失败，请重选。'));r.readAsDataURL(file);});await new Promise((resolve,reject)=>{const im=new Image();im.onload=resolve;im.onerror=()=>reject(Error('图片损坏，请重新选择。'));im.src=data;});return data;}
   function exportHtml(d){return `<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'none';style-src 'unsafe-inline';img-src data:"><title>原型模拟预览</title><style>body{max-width:720px;margin:24px auto;padding:16px;font-family:sans-serif;line-height:1.8}pre{white-space:pre-wrap;overflow-wrap:anywhere}img{max-width:100%}</style><p>原型模拟稿，不是已核验作品或真实生图。</p><h1>${esc(d.title)}</h1><p>${esc(d.caption)}</p><pre>${esc(d.body)}</pre>${d.assets.filter(a=>a?.data&&a.basis===sig(d)).map(a=>`<img src="${a.data}" alt="本人上传图片">`).join('')}</html>`;}
-  function render(){let v=location.hash.slice(1)||'sources';if(!labels[v])v='sources';if(work()&&!work().platforms.includes(state.platform))state.platform=work().platforms[0];if(work()&&['write','images','deliver'].includes(v)&&work().lastStep!==v){work().lastStep=v;persist();}$('#location-name').textContent=labels[v];document.title=labels[v]+' · 点灯功能原型';document.querySelectorAll('.pui-nav a').forEach(a=>a.classList.toggle('is-active',a.hash==='#'+(['write','images'].includes(v)?'works':v)));$('#screen').innerHTML=({sources:sourceView,topics:topicView,works:workView,write:writeView,images:imageView,deliver:deliveryView,skills:skillsView,appearance:appearanceView,original:originalView})[v]();document.querySelectorAll('label.pui-btn').forEach(el=>{el.tabIndex=0;el.setAttribute('role','button');});paint(v==='appearance'?look:state.appearance);showStorage();}
+  function render(){let v=location.hash.slice(1)||'sources';if(!labels[v])v='sources';if(work()&&!work().platforms.includes(state.platform))state.platform=work().platforms[0];if(work()&&['write','images','deliver'].includes(v)&&work().lastStep!==v){work().lastStep=v;persist();}$('#location-name').textContent=labels[v];document.title=labels[v]+' · 点灯功能原型';document.querySelectorAll('.pui-nav a').forEach(a=>{const active=a.hash==='#'+(['write','images'].includes(v)?'works':v);a.classList.toggle('is-active',active);if(active)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});$('#screen').dataset.view=v;$('#screen').innerHTML=({sources:sourceView,topics:topicView,works:workView,write:writeView,images:imageView,deliver:deliveryView,skills:skillsView,appearance:appearanceView,original:originalView})[v]();document.querySelectorAll('label.pui-btn').forEach(el=>{el.tabIndex=0;el.setAttribute('role','button');});paint(v==='appearance'?look:state.appearance);showStorage();}
   document.addEventListener('click',e=>{const b=e.target.closest('[data-action]');if(!b||b.disabled)return;const a=b.dataset.action,d=draft();
     if(a==='writer-view'){
       $('.writer-space').dataset.view=b.dataset.writerView;
@@ -95,11 +95,20 @@ document.addEventListener('change',async e=>{const el=e.target,d=draft();try{if(
   });
   const navDrawer=$('#navigation-drawer');
   let drawerWasOpen=false,drawerOriginHash='',drawerNavigated=false;
+  let modalWasOpen=false,modalTrigger=null;
+  new MutationObserver(()=>{
+    const open=$('#flow-modal').classList.contains('is-open'),drawerOpen=navDrawer.classList.contains('is-open');
+    if(open&&!modalWasOpen)modalTrigger=document.activeElement;
+    $('.pui-main').inert=open||drawerOpen;
+    $('.pui-sidebar').inert=open||drawerOpen;
+    if(!open&&modalWasOpen&&!drawerOpen&&modalTrigger?.isConnected)modalTrigger.focus();
+    modalWasOpen=open;
+  }).observe($('#flow-modal'),{attributes:true,attributeFilter:['class']});
   new MutationObserver(()=>{
     const expanded=navDrawer.classList.contains('is-open');
     if(expanded&&!drawerWasOpen){drawerOriginHash=location.hash;drawerNavigated=false;}
     $('.navigation-toggle').setAttribute('aria-expanded',String(expanded));
-    $('.pui-sidebar').inert=expanded;
+    $('.pui-sidebar').inert=expanded||$('#flow-modal').classList.contains('is-open');
     $('.pui-main').inert=expanded||$('#flow-modal').classList.contains('is-open');
     // PUI restores focus before the background ceases being inert. Restore again afterwards.
     if(!expanded&&drawerWasOpen&&!drawerNavigated&&location.hash===drawerOriginHash)$('.navigation-toggle').focus();
@@ -109,7 +118,7 @@ document.addEventListener('change',async e=>{const el=e.target,d=draft();try{if(
     if(e.target.closest('.skip-link')){e.preventDefault();$('#screen').focus();}
     if(e.target.closest('#drawer-navigation a')){drawerNavigated=true;window.PUI.closeDrawer(navDrawer);if(e.target.closest('a').hash===location.hash)queueMicrotask(()=>$('#screen').focus());}
   });
-  window.addEventListener('hashchange',()=>{close();window.PUI.closeDrawer(navDrawer);render();$('#screen').focus({preventScroll:true});});window.addEventListener('beforeunload',e=>{if(storageError){e.preventDefault();e.returnValue='';}});
+  window.addEventListener('hashchange',()=>{close();window.PUI.closeDrawer(navDrawer);render();queueMicrotask(()=>$('#screen').focus({preventScroll:true}));});window.addEventListener('beforeunload',e=>{if(storageError){e.preventDefault();e.returnValue='';}});
   document.addEventListener('keydown',e=>{
     if(e.key!=='Tab'||!navDrawer.classList.contains('is-open'))return;
     const items=[...navDrawer.querySelectorAll('button:not([disabled]),a[href]')].filter(el=>el.getClientRects().length);
