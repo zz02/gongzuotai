@@ -33,6 +33,8 @@
 .creator-workspace .topic-choice{padding:12px 0 24px;border-bottom:1px solid var(--line-2)}
 .creator-workspace .topic-choice p{white-space:pre-wrap;overflow-wrap:anywhere}
 .creator-workspace .creator-assistant{padding:18px 0 20px;margin-bottom:20px;border-bottom:1px solid var(--line-2)}
+.creator-workspace .creator-draft-path{padding:20px 22px;margin-bottom:18px;background:var(--bg-3)}
+.creator-workspace .draft-path-head{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap}.creator-workspace .draft-path-head .eyebrow{margin:0 0 6px}.creator-workspace .draft-path-head h3{font-size:17px;margin:0 0 5px}.creator-workspace #draft-path-status{font-size:12px;color:var(--fg-3);margin:0}.creator-workspace .draft-path-links{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}.creator-workspace .draft-path-links span{color:var(--fg-3);margin-left:8px}.creator-workspace .creator-draft-path .pui-help{margin:12px 0 0}
 .creator-workspace .assistant-heading{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
 .creator-workspace .assistant-heading h3{font-size:14px;margin:0}.creator-workspace .assistant-heading .muted{font-size:11px}
 .creator-workspace .assistant-controls{display:grid;grid-template-columns:minmax(150px,1.3fr) minmax(150px,1fr) minmax(120px,1fr) auto;gap:12px;align-items:end}
@@ -40,6 +42,7 @@
 .creator-workspace .creator-assistant .pui-help{margin:10px 0 0}.creator-workspace .method-note{font-size:11px;line-height:1.8;color:var(--fg-3);margin:10px 0 0;overflow-wrap:anywhere}
 @media(max-width:900px){.creator-workspace .assistant-controls{grid-template-columns:1fr 1fr}.creator-workspace .assistant-controls .pui-control,.creator-workspace .assistant-controls .pui-btn{min-height:44px}}
 @media(max-width:480px){.creator-workspace .assistant-controls{grid-template-columns:1fr}.creator-workspace .assistant-controls .pui-btn{justify-self:start}.creator-workspace .assistant-heading .muted{width:100%}}
+@media(max-width:480px){.creator-workspace .draft-path-head>button{width:100%}.creator-workspace .draft-path-links{display:grid;grid-template-columns:1fr 1fr}.creator-workspace .draft-path-links button{min-height:44px}.creator-workspace .creator-draft-path{padding:16px}}
 .creator-workspace .job-assets audio{max-width:100%;width:280px}
 .creator-workspace button:focus-visible,.creator-workspace a:focus-visible{outline:2px solid var(--brand);outline-offset:3px}
 @media(max-width:1080px){.creator-workspace{padding:20px}.creator-workspace .work-tabs{gap:16px}}

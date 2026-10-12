@@ -1,0 +1,22 @@
+#!/usr/bin/env node
+// Deterministic CLI fixture for the full HTTP → editor → job → apply flow.
+const fs=require('fs');
+const args=process.argv.slice(2);
+if(args[0]==='--version'){console.log('codex-cli test');process.exit(0);}
+if(args[0]==='login'&&args[1]==='status'){console.log('Logged in using test account');process.exit(0);}
+if(args[0]==='features'){console.log('image_generation stable true');process.exit(0);}
+const output=args[args.indexOf('-o')+1];
+if(args[0]!=='exec'||!output){console.error('Unexpected test CLI invocation');process.exit(2);}
+let prompt='';
+process.stdin.setEncoding('utf8');
+process.stdin.on('data',chunk=>prompt+=chunk);
+process.stdin.on('end',()=>{
+  if(prompt.includes('【测试失败】')){console.error('Test model failure');process.exitCode=1;return;}
+  let draft;
+  if(prompt.includes('wechatTitle、wechatSummary、wechat'))draft={wechatTitle:'AI 整理会议待办，要先核对什么',wechatSummary:'选题准备稿；真实测试结果待补。',wechat:'## 读者问题\n会议结束后，待办容易混在记录里。\n\n## 准备验证\n从原文找任务、负责人和日期；没有写明的内容标【待补】。\n\n## 结果与边界\n【待补：本人测试截图、耗时和失败案例】'};
+  else if(prompt.includes('xhsTitle、xhsCaption、xhs'))draft={xhsTitle:'用 AI 整理会议待办前，先核对这 3 件事',xhsCaption:'这是一份选题准备稿；你会先核对哪一步？',xhs:'## 会后待办，先别急着发\n先留住原文。\n\n---\n\n## 找任务和负责人\n原文没有的写【待补】。\n\n---\n\n## 结果待实测\n【待补：实际测试和截图】'};
+  else{console.error('Unknown test writing task');process.exitCode=2;return;}
+  fs.writeFileSync(output,JSON.stringify(draft));
+  console.log(JSON.stringify({type:'thread.started',thread_id:'00000000-0000-0000-0000-000000000001'}));
+  console.log(JSON.stringify({type:'turn.completed'}));
+});

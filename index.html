@@ -257,6 +257,14 @@
             <button id="creator-tab-knowledge" role="tab" aria-selected="false" aria-controls="creator-panel-knowledge" tabindex="-1" data-tab="knowledge">知识库</button>
             <button id="creator-tab-materials" role="tab" aria-selected="true" aria-controls="creator-panel-materials" tabindex="0" data-tab="materials">01 选题母稿</button><button id="creator-tab-wechat" role="tab" aria-selected="false" aria-controls="creator-panel-wechat" tabindex="-1" data-tab="wechat">02 公众号</button><button id="creator-tab-xhs" role="tab" aria-selected="false" aria-controls="creator-panel-xhs" tabindex="-1" data-tab="xhs">03 小红书</button><button id="creator-tab-douyin" role="tab" aria-selected="false" aria-controls="creator-panel-douyin" tabindex="-1" data-tab="douyin">04 抖音图文</button><button id="creator-tab-video" role="tab" aria-selected="false" aria-controls="creator-panel-video" tabindex="-1" data-tab="video">05 视频制作</button><button id="creator-tab-images" role="tab" aria-selected="false" aria-controls="creator-panel-images" tabindex="-1" data-tab="images">06 图片</button><button id="creator-tab-publish" role="tab" aria-selected="false" aria-controls="creator-panel-publish" tabindex="-1" data-tab="publish">07 发布复盘</button>
           </nav>
+          <section class="creator-draft-path pui-panel" aria-labelledby="draft-path-heading">
+            <div class="draft-path-head">
+              <div><p class="eyebrow">选题 → 图文初稿</p><h3 id="draft-path-heading">公众号与小红书</h3><p id="draft-path-status" role="status">正在读取稿件状态…</p></div>
+              <button class="pui-btn pui-btn-primary" id="draft-both-button" data-action="draft-both">生成双平台初稿</button>
+            </div>
+            <div class="draft-path-links"><button class="pui-btn" data-tab="wechat">公众号 <span id="draft-wechat-state">未生成</span></button><button class="pui-btn" data-tab="xhs">小红书 <span id="draft-xhs-state">未生成</span></button></div>
+            <p class="pui-help">只有选题时会写明待补的测试和结果；生成稿可继续编辑，已有正文不会被覆盖。</p>
+          </section>
           <section class="creator-assistant" aria-labelledby="assistant-heading">
             <div class="assistant-heading"><h3 id="assistant-heading">创作助手</h3><span class="pui-tag">db 方法适配</span><span class="muted">每次一项 · 原稿不改</span></div>
             <form id="assistant-form" class="assistant-controls">

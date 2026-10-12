@@ -510,7 +510,7 @@ export async function sendIdeaToCreator(id) {
   });
   const { openCreatorWithSource } = await import('../creator-bridge.js');
   return openCreatorWithSource({
-    kind: 'inspiration', sourceId: String(idea.id), title: idea.title,
+    kind: 'inspiration', sourceId: String(idea.id), title: idea.title, autoDrafts: true,
     brief: `读者问题与选题摘要：\n${idea.summary || ''}\n\n创作角度：${idea.angle || '待补'}${knowledgeText}\n\n实测步骤、结果、成本与限制：待补；不能把选题当作已完成实测。`,
     sources: `来源：灵感选题\n关键词：${(idea.sourceKeywords || []).join?.('、') || idea.sourceKeywords || '未填'}\n\n${JSON.stringify(idea.sourceItems || idea.evidence || [], null, 2)}\n来源链接与事实：待核验。`,
   });
