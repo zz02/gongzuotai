@@ -2,7 +2,7 @@
 <html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'none'; img-src 'self' data: blob:; script-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'none'">
 <link rel="icon" href="data:,"><title>点灯 · 功能交互原型</title>
-<link rel="stylesheet" href="./prototype-ui-kit/dist/prototype-ui.css"><script defer src="./prototype-ui-kit/dist/prototype-ui.js"></script><script defer src="./redfox.js"></script><script defer src="./flow.js"></script><link rel="stylesheet" href="./flow.css"><link rel="stylesheet" href="./studio.css"><link rel="stylesheet" href="./redfox-themes.css"></head>
+<link rel="stylesheet" href="./prototype-ui-kit/dist/prototype-ui.css"><script defer src="./prototype-ui-kit/dist/prototype-ui.js"></script><script defer src="./redfox.js"></script><script defer src="./skill-catalog.js"></script><script defer src="./learning.js"></script><script defer src="./unified.js"></script><link rel="stylesheet" href="./flow.css"><link rel="stylesheet" href="./studio.css"><link rel="stylesheet" href="./redfox-themes.css"><link rel="stylesheet" href="./unified.css"></head>
 <body class="pui-page"><div id="wallpaper" aria-hidden="true"></div><div class="pui-admin">
 <a href="#screen" class="skip-link pui-btn">跳到内容</a>
 <aside class="pui-sidebar" aria-label="工作台导航">
@@ -10,23 +10,16 @@
 <button type="button" class="pui-btn pui-btn-icon navigation-toggle" data-pui-drawer-open="navigation-drawer" aria-label="展开左侧菜单" aria-controls="navigation-drawer" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h14M5 12h14M5 18h14"/></svg></button>
 <nav class="pui-nav" aria-label="主导航">
 <span class="nav-label">创作工作区</span>
+<a href="#content" aria-label="内容创作" title="内容创作"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H5v18h14v-8M10 14l1-4 8-8 3 3-8 8z"/></svg><span class="nav-text">内容创作</span></a>
 <a href="#sources" aria-label="信源" title="信源"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16v12H4zM7 4h10v4M8 12h8M8 16h5"/></svg><span class="nav-text">信源</span></a>
-<a href="#topics" aria-label="选题库" title="选题库"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M9 21h6M8 14a6 6 0 1 1 8 0l-1 2H9z"/></svg><span class="nav-text">选题库</span></a>
-<a href="#works" aria-label="我的作品" title="我的作品"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H5v18h14v-8M10 14l1-4 8-8 3 3-8 8z"/></svg><span class="nav-text">我的作品</span></a>
-<a href="#deliver" aria-label="发布成品" title="发布成品"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5M4 13v8h16v-8"/></svg><span class="nav-text">发布成品</span></a>
+<a href="#knowledge" aria-label="知识库" title="知识库"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span class="nav-text">知识库</span></a>
 <span class="nav-label">创作辅助</span>
-<a href="#skills" aria-label="Skill 中心" title="Skill 中心"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 9 5-9 5-9-5zM3 12l9 5 9-5M3 16l9 5 9-5"/></svg><span class="nav-text">Skill 中心</span></a>
-<a href="#appearance" aria-label="外观设置" title="外观设置"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h18v16H3zM3 16l6-6 5 5 3-3 4 4"/><circle cx="16" cy="8" r="1"/></svg><span class="nav-text">外观设置</span></a>
-<span class="nav-label">RedFox 工具区</span>
-<a href="#original" aria-label="RedFox 原工具" title="RedFox 原工具"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 5-5 7 5 7M16 5l5 7-5 7M14 4l-4 16"/></svg><span class="nav-text">RedFox 原工具</span></a>
-<a href="#rf-search" aria-label="跨平台搜索" title="跨平台搜索"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6"/><path d="m15 15 6 6"/></svg><span class="nav-text">跨平台搜索</span></a>
-<a href="#rf-tracker" aria-label="账号追踪" title="账号追踪"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7" r="4"/><path d="M4 21v-3a8 8 0 0 1 16 0v3"/></svg><span class="nav-text">账号追踪</span></a>
-<a href="#rf-creator" aria-label="原创作工具" title="原创作工具"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h14v18H5zM8 8h8M8 12h8M8 16h5"/></svg><span class="nav-text">原创作工具</span></a>
-<a href="#rf-library" aria-label="素材收藏" title="素材收藏"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span class="nav-text">素材收藏</span></a>
-<a href="#rf-settings" aria-label="运行设置" title="运行设置"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/><circle cx="8" cy="6" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="9" cy="18" r="2"/></svg><span class="nav-text">运行设置</span></a>
+<a href="#skills" aria-label="Skills 中心" title="Skills 中心"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 9 5-9 5-9-5zM3 12l9 5 9-5M3 16l9 5 9-5"/></svg><span class="nav-text">Skills 中心</span></a>
+<a href="#assistant" aria-label="助手" title="助手"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h18v13H8l-5 4z"/></svg><span class="nav-text">助手</span></a>
+<a href="#settings" aria-label="设置" title="设置"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/><circle cx="8" cy="6" r="2"/><circle cx="16" cy="12" r="2"/></svg><span class="nav-text">设置</span></a>
 </nav>
 <div class="sidebar-profile"><span class="profile-letter" aria-hidden="true">曾</span><div><strong>点灯的曾曾</strong><span>个人创作空间</span></div></div>
 </aside>
-<main class="pui-main"><header class="pui-topbar"><div class="location-trail"><span>创作工作区</span><span aria-hidden="true">/</span><strong id="location-name">信源</strong></div><span id="save-state" role="status">仅保存演示数据</span></header><div class="prototype-notice"><span class="prototype-label">模拟原型</span><span>仅演示交互，不调用信源、模型或发布平台。</span></div><div id="storage-error" class="pui-alert pui-alert-danger" role="alert" hidden></div><section class="pui-content" id="screen" tabindex="-1"></section></main></div>
+<main class="pui-main"><header class="pui-topbar"><div class="location-trail"><span>创作工作区</span><span aria-hidden="true">/</span><strong id="location-name">内容创作</strong></div><div class="unified-toolbar"><span id="save-state" role="status">仅保存演示数据</span><a class="pui-btn" href="#appearance">主题壁纸</a></div></header><div class="prototype-notice"><span class="prototype-label">交互评审</span><span>数据与任务均为模拟，不调用信源、模型、发布平台或真实 OB。</span></div><div id="storage-error" class="pui-alert pui-alert-danger" role="alert" hidden></div><section class="pui-content" id="screen" tabindex="-1"></section></main></div>
 <div class="pui-drawer-mask" id="navigation-drawer" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="navigation-title"><div class="pui-drawer"><div class="pui-drawer-head"><h2 class="pui-drawer-title" id="navigation-title">点灯工作台</h2><button type="button" class="pui-btn pui-btn-icon" data-pui-drawer-close aria-label="收起左侧菜单">×</button></div><div class="pui-drawer-body" id="drawer-navigation"></div><div class="pui-drawer-foot">点灯的曾曾 · 模拟原型</div></div></div>
 <div class="pui-modal-mask" id="flow-modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="modal-title"><div class="pui-modal"><div class="pui-modal-head"><h2 class="pui-modal-title" id="modal-title"></h2><button type="button" class="pui-modal-close" aria-label="关闭" data-pui-modal-close>×</button></div><div class="pui-modal-body" id="modal-body"></div></div></div><noscript>请启用浏览器脚本查看交互原型。</noscript></body></html>
